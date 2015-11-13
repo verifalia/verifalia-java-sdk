@@ -1,55 +1,34 @@
-[![Build Status](https://travis-ci.org/verifalia/verifalia-java-sdk.png?branch=master)](https://travis-ci.org/verifalia/verifalia-java-sdk)
+package com.verifalia.api.samples;
 
-Verifalia REST API - Java SDK and helper library
-================================================
+import java.io.IOException;
+import java.net.URISyntaxException;
 
-Verifalia provides a simple HTTPS-based API for validating email addresses and checking whether or not they are deliverable. 
-Learn more at the http://verifalia.com
-
-## Installation ##
-
-Download Verifalia REST API Java SDK source code from the GitHub.
-Compile and install it into the your local Maven repository.
-
-```shell
-$ git clone git@github.com:verifalia/verifalia-java-sdk
-$ cd verifalia-java-sdk
-$ mvn install       # Requires maven, download from http://maven.apache.org/download.html
-```
-or alternatively
-
-```shell
-$ wget https://github.com/verifalia/verifalia-java-sdk/archive/master.zip
-$ unzip master.zip
-$ cd verifalia-java-sdk-master
-$ mvn install       # Requires maven, download from http://maven.apache.org/download.html
-```
-
-## Adding to Java Project ##
-
-Specify Verifalia REST API Java SDK as your Java project dependency:
-
-```xml
-  	<dependency>
-  		<groupId>com.verifalia.api</groupId>
-  		<artifactId>verifalia-java-sdk</artifactId>
-  		<version>1.0.0</version>
-		<scope>compile</scope>
-  	</dependency>
-```
-
-
-### Sample Usage ###
-
-The example below shows how to have your application initiate and validate a couple of email addresses using the Verifalia REST API Java SDK:
-
-```java
 import com.verifalia.api.VerifaliaRestClient;
 import com.verifalia.api.WaitForCompletionOptions;
+import com.verifalia.api.common.ServerPollingLoopEventListener;
+//import com.verifalia.api.common.ServerPollingLoopEventListener;
 import com.verifalia.api.emailvalidation.models.Validation;
 import com.verifalia.api.emailvalidation.models.ValidationEntry;
+import com.verifalia.api.emailvalidation.models.ValidationStatus;
 import com.verifalia.api.exceptions.VerifaliaException;
 
+public class Samples {
+
+	public static void main(String[] args) {
+		if(args.length >= 2) {
+			try {
+				Samples sample = new Samples();
+				sample.queryVerifaliaServiceSample1(args[0], args[1]);
+				sample.queryVerifaliaServiceSample2(args[0], args[1]);	
+				sample.queryVerifaliaServiceSample3(args[0], args[1]);	
+			} catch(Exception ex) {
+				ex.printStackTrace();
+				System.exit(1);
+			}
+			System.exit(0);
+		}
+	}
+	
 	/**
 	 * This sample method demonstrates, how to use Verifalia API with request timeout.
 	 * @param accountSid Your Verifalia sub-account SID
@@ -85,20 +64,6 @@ import com.verifalia.api.exceptions.VerifaliaException;
 			}
 		}
 	}
-```
-
-Internally, the `submit()` method sends the email addresses to the Verifalia servers and then polls them until the validations complete.
-You may use built-in timeout-based polling with listener object that intercepts internal polling loop events, so you are able to track polling progress.
-Here is the example how to use it:
-
-```java
-import com.verifalia.api.VerifaliaRestClient;
-import com.verifalia.api.WaitForCompletionOptions;
-import com.verifalia.api.common.ServerPollingLoopEventListener;
-import com.verifalia.api.emailvalidation.models.Validation;
-import com.verifalia.api.emailvalidation.models.ValidationEntry;
-import com.verifalia.api.emailvalidation.models.ValidationStatus;
-import com.verifalia.api.exceptions.VerifaliaException;
 
 	/**
 	 * This sample method demonstrates, how to use Verifalia API with preconfigured request timeout
@@ -186,17 +151,6 @@ import com.verifalia.api.exceptions.VerifaliaException;
 			}
 		}
 	}
-```
-
-Instead of relying on the automatic polling behavior, you may choose to poll Verifalia servers for the your request status manually using the `query()` method, as shown below:
-
-```java
-import com.verifalia.api.VerifaliaRestClient;
-import com.verifalia.api.WaitForCompletionOptions;
-import com.verifalia.api.emailvalidation.models.Validation;
-import com.verifalia.api.emailvalidation.models.ValidationEntry;
-import com.verifalia.api.emailvalidation.models.ValidationStatus;
-import com.verifalia.api.exceptions.VerifaliaException;
 
 	/**
 	 * This sample method demonstrates, how to use Verifalia API for the manual status polling.
@@ -206,7 +160,7 @@ import com.verifalia.api.exceptions.VerifaliaException;
 	 * @throws IOException
 	 * @throws URISyntaxException
 	 */
-	void queryVerifaliaServiceSample3(String accountSid, String authToken) throws VerifaliaException, IOException, URISyntaxException {
+	void queryVerifaliaServiceSample3(String accountSid, String authToken) throws VerifaliaException, IOException, URISyntaxException {	
 
 		// Create REST client object with your credentials
 		VerifaliaRestClient restClient = new VerifaliaRestClient(accountSid, authToken);
@@ -245,6 +199,5 @@ import com.verifalia.api.exceptions.VerifaliaException;
 			}
 		}
 	}
-```
 
-You may find these samples in the bundled file [Samples.java](https://github.com/verifalia/verifalia-java-sdk/src/main/java/com/verifalia/api/samples/Samples.java)
+}
