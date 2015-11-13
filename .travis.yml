@@ -4,9 +4,3 @@ jdk:
   - oraclejdk7
   - openjdk7
 sudo: false
-notifications:
-  email:
-    recipients:
-      - ivanp.noreply@gmail.com
-    on_success: always
-    on_failure: always
