@@ -37,7 +37,6 @@ public class RestRequest {
 	
 	/**
 	 * Add string to body
-	 * @return 
 	 */
 	public void addEntries(Iterable<String> entries) {
 		if(this.entries == null)

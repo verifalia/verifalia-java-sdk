@@ -57,7 +57,7 @@ public class Samples {
 			// Display results
 			for (ValidationEntry entry: result.getEntries())
 			{
-				System.out.printf("Address: %s => Result: %s",
+				System.out.printf("Address: %s => Result: %s\n",
 					entry.getInputData(),
 					entry.getStatus()
 				);
@@ -144,7 +144,7 @@ public class Samples {
 			// Display results
 			for (ValidationEntry entry: result.getEntries())
 			{
-				System.out.printf("Address: %s => Result: %s",
+				System.out.printf("Address: %s => Result: %s\n",
 					entry.getInputData(),
 					entry.getStatus()
 				);
@@ -192,7 +192,7 @@ public class Samples {
 		else {
 			for (ValidationEntry entry: result.getEntries())
 			{
-				System.out.printf("Address: %s => Result: %s",
+				System.out.printf("Address: %s => Result: %s\n",
 					entry.getInputData(),
 					entry.getStatus()
 				);

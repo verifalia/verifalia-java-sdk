@@ -24,7 +24,7 @@ public class ValidationEntry {
     /**
      * Gets the domain part of the email address, converted to ASCII if needed and with comments and folding
      * white spaces stripped off.
-     * <p>The ASCII encoding is performed using the standard {@link http://en.wikipedia.org/wiki/Punycode Punycode algorithm}
+     * <p>The ASCII encoding is performed using the standard <a href="http://en.wikipedia.org/wiki/Punycode">Punycode algorithm</a>.
      */
     private String asciiEmailAddressDomainPart;
 
@@ -204,7 +204,7 @@ public class ValidationEntry {
     /**
      * Returns the domain part of the email address, converted to ASCII if needed and with comments and folding
      * white spaces stripped off.
-     * <p>The ASCII encoding is performed using the standard {@link http://en.wikipedia.org/wiki/Punycode punycode algorithm}
+     * <p>The ASCII encoding is performed using the standard <a href="http://en.wikipedia.org/wiki/Punycode">Punycode algorithm</a>.
      */
 	public String getAsciiEmailAddressDomainPart() {
 		return asciiEmailAddressDomainPart;

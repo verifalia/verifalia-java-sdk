@@ -11,6 +11,8 @@ import org.codehaus.jackson.JsonParser;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 
+import com.verifalia.api.common.Utils;
+
 /**
  * Represents REST service response
  */

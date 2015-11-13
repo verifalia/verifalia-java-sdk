@@ -17,8 +17,7 @@ public class MiniHTTPD implements Runnable {
 	private Thread thread = new Thread(this);
 	private boolean running;
 	
-	public MiniHTTPD(int port, String message) {
-		this.port = port;
+	public MiniHTTPD(String message) {
 		this.message = message;
 	}
 	
@@ -38,10 +37,12 @@ public class MiniHTTPD implements Runnable {
     public void  run() {
         ServerSocket ss = null;
 		try {
-			ss = new ServerSocket(port);
+			ss = createServerSocket(30000);
 		} catch (IOException e1) {
 			e1.printStackTrace();
+			return;
 		}
+		System.out.println("MiniHTTPD Server has started on the port " + port);
         while (isRunning()) {
             Socket s = null;
 			try {
@@ -58,6 +59,25 @@ public class MiniHTTPD implements Runnable {
         }
     }
 
+    public int getPort() {
+		return port;
+	}
+
+    private ServerSocket createServerSocket(int startPort) throws IOException {
+        for (int port = startPort; port < 65536; ++port) {
+            try {
+                ServerSocket ss = new ServerSocket(port);
+                this.port = port;
+                return ss;
+            } catch (IOException ex) {
+                continue; // try next port
+            }
+        }
+
+        // if the program gets here, no port in the range was found
+        throw new IOException("no free port found");
+    }
+    
 
 	private class SocketProcessor implements Runnable {
 

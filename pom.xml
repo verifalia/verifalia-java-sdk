@@ -1,15 +1,14 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>com.verifalia.api</groupId>
+  <groupId>com.github.verifalia</groupId>
   <artifactId>verifalia-java-sdk</artifactId>
   <packaging>jar</packaging>
   <version>1.0.0-SNAPSHOT</version>
   <name>Verifalia SDK for Java</name>
   <description>Java helper library for the Verifalia services</description>
   <url>http://verifalia.com</url>
-  
+
   <licenses>
     <license>
       <name>MIT License</name>
@@ -23,7 +22,7 @@
     <connection>scm:git:git@github.com:verifalia/verifalia-java-sdk.git</connection>
     <developerConnection>scm:git:git@github.com:verifalia/verifalia-java-sdk.git</developerConnection>
   </scm>
-  
+
   <developers>
     <developer>
       <id>support</id>
@@ -42,14 +41,12 @@
   </properties>
 
   <dependencies>
-
-  	<!-- Jackson -->
-  	<dependency>
-  		<groupId>org.codehaus.jackson</groupId>
-  		<artifactId>jackson-mapper-asl</artifactId>
-  		<version>1.9.13</version>
-  	</dependency>
-
+    <!-- Jackson -->
+    <dependency>
+      <groupId>org.codehaus.jackson</groupId>
+      <artifactId>jackson-mapper-asl</artifactId>
+      <version>1.9.13</version>
+    </dependency>
     <!-- test dependencies -->
     <dependency>
       <groupId>junit</groupId>
@@ -57,33 +54,152 @@
       <version>4.8.1</version>
       <scope>test</scope>
     </dependency>
-
   </dependencies>
 
   <profiles>
-      <profile>
-          <id>doclint-java8-disable</id>
-          <activation>
-              <jdk>[1.8,)</jdk>
-          </activation>
-          <build>
-              <plugins>
-                  <plugin>
-                      <groupId>org.apache.maven.plugins</groupId>
-                      <artifactId>maven-javadoc-plugin</artifactId>
-                      <configuration>
-                          <additionalparam>-Xdoclint:none</additionalparam>
-                      </configuration>
-                  </plugin>
-              </plugins>
-          </build>
-      </profile>
+
+    <profile>
+      <id>doclint-java8-disable</id>
+      <activation>
+        <jdk>[1.8,)</jdk>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-javadoc-plugin</artifactId>
+            <configuration>
+              <additionalparam>-Xdoclint:none</additionalparam>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <profile>
+      <id>signature-test</id>
+      <activation>
+        <activeByDefault>false</activeByDefault>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-gpg-plugin</artifactId>
+            <version>1.5</version>
+            <executions>
+              <execution>
+                <id>sign-artifacts</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>sign</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+	</plugins>
+      </build>
+    </profile>
+
+    <profile>
+      <id>stage</id>
+      <activation>
+        <activeByDefault>false</activeByDefault>
+      </activation>
+      <distributionManagement>
+        <snapshotRepository>
+          <id>ossrh</id>
+          <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
+        <repository>
+          <id>ossrh</id>
+          <url> https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
+        </repository>
+      </distributionManagement>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.sonatype.plugins</groupId>
+            <artifactId>nexus-staging-maven-plugin</artifactId>
+            <version>1.6.3</version>
+            <extensions>true</extensions>
+            <configuration>
+              <serverId>ossrh</serverId>
+              <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+	      <skipStagingRepositoryClose>true</skipStagingRepositoryClose>
+              <autoReleaseAfterClose>false</autoReleaseAfterClose>
+	      <keepStagingRepositoryOnCloseRuleFailure>true</keepStagingRepositoryOnCloseRuleFailure>
+            </configuration>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-gpg-plugin</artifactId>
+            <version>1.5</version>
+            <executions>
+              <execution>
+                <id>sign-artifacts</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>sign</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <profile>
+      <id>release</id>
+      <activation>
+        <activeByDefault>false</activeByDefault>
+      </activation>
+      <distributionManagement>
+        <snapshotRepository>
+          <id>ossrh</id>
+          <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
+        <repository>
+          <id>ossrh</id>
+          <url> https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
+        </repository>
+      </distributionManagement>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.sonatype.plugins</groupId>
+            <artifactId>nexus-staging-maven-plugin</artifactId>
+            <version>1.6.3</version>
+            <extensions>true</extensions>
+            <configuration>
+              <serverId>ossrh</serverId>
+              <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+              <autoReleaseAfterClose>false</autoReleaseAfterClose>
+	      <keepStagingRepositoryOnCloseRuleFailure>true</keepStagingRepositoryOnCloseRuleFailure>
+            </configuration>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-gpg-plugin</artifactId>
+            <version>1.5</version>
+            <executions>
+              <execution>
+                <id>sign-artifacts</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>sign</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
   </profiles>
 
   <build>
-
     <plugins>
-    
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
@@ -93,7 +209,6 @@
           <target>1.7</target>
         </configuration>
       </plugin>
-
       <plugin>
         <artifactId>maven-assembly-plugin</artifactId>
         <version>2.3</version>
@@ -114,7 +229,6 @@
           </execution>
         </executions>
       </plugin>
-
       <plugin>
         <artifactId>maven-jar-plugin</artifactId>
         <version>2.3.1</version>
@@ -133,7 +247,6 @@
           </archive>
         </configuration>
       </plugin>
-
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
@@ -157,7 +270,6 @@
           </execution>
         </executions>
       </plugin>
-
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-source-plugin</artifactId>
@@ -166,12 +278,11 @@
           <execution>
             <id>attach-sources</id>
             <goals>
-              <goal>jar</goal>
+              <goal>jar-no-fork</goal>
             </goals>
           </execution>
         </executions>
       </plugin>
-
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>cobertura-maven-plugin</artifactId>
@@ -182,9 +293,6 @@
           </formats>
         </configuration>
       </plugin>
-
     </plugins>
-
   </build>
-
 </project>

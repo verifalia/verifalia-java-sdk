@@ -1,4 +1,4 @@
-package com.verifalia.api.rest;
+package com.verifalia.api.common;
 
 public class Utils {
 	public static final char CR = '\r';

@@ -76,7 +76,7 @@ public class EmailValidationRestClient
      * Initiates a new email validation batch. Makes a POST request to the "/email-validations" resource.
      * <p>Upon initialization, batches usually are in the {@link ValidationStatus#Pending Pending} status.
      * Validations are completed only when their {@link Validation#status} property.
-     * is {@link ValidationStatus#Completed Completed}; the {@link EmailValidationRestClient#waitForCompletionOptions} parameter
+     * is {@link ValidationStatus#Completed Completed}; the <b>waitForCompletionOptions</b> parameter
      * allows to wait for the completion of the batch, without having to manually poll the API.
      * In order to retrieve the most up-to-date snapshot of a validation batch, call the {@link EmailValidationRestClient#query(String)}
      * along with the batch's {@link Validation#uniqueID}.
@@ -358,7 +358,7 @@ public class EmailValidationRestClient
     /**
      * Deletes an email validation batch, identified by the specified unique identifier.
      * Makes a DELETE request to the <b>"/email-validations/{uniqueId}"</b> resource.
-     * @param uniqueIdThe unique identifier for an email validation batch to be deleted
+     * @param uniqueId The unique identifier for an email validation batch to be deleted
      * @throws IOException 
      */
     public void delete(String uniqueId) throws IOException {

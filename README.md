@@ -68,7 +68,7 @@ else {
 	// Display results
 	for (ValidationEntry entry: result.getEntries())
 	{
-		System.out.printf("Address: %s => Result: %s",
+		System.out.printf("Address: %s => Result: %s\n",
 			entry.getInputData(),
 			entry.getStatus()
 		);
@@ -117,7 +117,7 @@ if (result.getStatus() != ValidationStatus.Completed)
 else {
 	for (ValidationEntry entry: result.getEntries())
 	{
-		System.out.printf("Address: %s => Result: %s",
+		System.out.printf("Address: %s => Result: %s\n",
 			entry.getInputData(),
 			entry.getStatus()
 		);
@@ -206,7 +206,7 @@ else {
 	// Display results
 	for (ValidationEntry entry: result.getEntries())
 	{
-		System.out.printf("Address: %s => Result: %s",
+		System.out.printf("Address: %s => Result: %s\n",
 			entry.getInputData(),
 			entry.getStatus()
 		);
