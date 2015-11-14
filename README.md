@@ -8,8 +8,12 @@ Learn more at http://verifalia.com
 
 ## Installation ##
 
-Download the Verifalia REST API Java SDK source code from GitHub.
-Compile and install it into your local Maven repository.
+Verifalia REST API Java SDK is going to use public Maven repository soon. We will update this page when JARs are available from a public maven repository.
+
+Meanwhile you need to compile it yourself, here's how:
+
+1. Download the Verifalia REST API Java SDK source code from GitHub.
+2. Compile and install it into your local Maven repository:
 
 ```shell
 $ git clone git@github.com:verifalia/verifalia-java-sdk
@@ -24,6 +28,8 @@ $ unzip master.zip
 $ cd verifalia-java-sdk-master
 $ mvn install       # Requires maven, download from http://maven.apache.org/download.html
 ```
+
+This will also build the javadoc in twilio-java/target/apidocs. You can open the index.html located there to view it locally.
 
 ## Adding to Java Project ##
 
