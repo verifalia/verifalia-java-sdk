@@ -37,7 +37,7 @@ Specify the Verifalia REST API Java SDK as a dependency of your Java project:
 
 ```xml
   	<dependency>
-  		<groupId>com.verifalia.api</groupId>
+  		<groupId>com.github.verifalia</groupId>
   		<artifactId>verifalia-java-sdk</artifactId>
   		<version>1.0.0</version>
 		<scope>compile</scope>
