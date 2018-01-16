@@ -1,10 +1,13 @@
 package com.verifalia.api.emailvalidation.models;
 
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
+
 import java.util.Date;
 
 /**
  * Represents a single validated entry within an email validation batch.
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class ValidationEntry {
     /**
      * The input string to validate.
