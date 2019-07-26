@@ -1,3 +1,4 @@
+![Verifalia API](https://img.shields.io/badge/Verifalia%20API-v1.1-green)
 [![Build Status](https://travis-ci.org/verifalia/verifalia-java-sdk.png?branch=master)](https://travis-ci.org/verifalia/verifalia-java-sdk)
 
 Verifalia REST API - Java SDK and helper library
