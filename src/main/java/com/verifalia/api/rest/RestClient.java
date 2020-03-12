@@ -14,14 +14,14 @@ import java.net.URL;
 /***
  * Represents REST client
  */
-public class RestClient {		
+public class RestClient {
 	/**
 	 * Creates new object using given host name and API version.
 	 * @param baseURL Base URL of the server
 	 * @param apiVersion API version name
 	 * @param accountSid Account SID
 	 * @param authToken Authentication token
-	 * @throws URISyntaxException 
+	 * @throws URISyntaxException
 	 */
 	public RestClient(String baseURL, String apiVersion, String accountSid, String authToken, String userAgent) throws URISyntaxException {
 		this.baseURI = new URI(baseURL);
@@ -33,7 +33,7 @@ public class RestClient {
 			authString = "Basic " + javax.xml.bind.DatatypeConverter.printBase64Binary(authBytes);
 		} catch(UnsupportedEncodingException ex) {/* just ignore it, UTF-8 is supported encoding */ }
 	}
-	
+
 	/**
 	 * Executes given request
 	 * @param request The request
@@ -58,6 +58,7 @@ public class RestClient {
 		HttpURLConnection conn = sendRequest(request);
 		int responseCode = conn.getResponseCode();
 		InputStream input = HttpStatusCode.isSuccess(responseCode) ? conn.getInputStream() : conn.getErrorStream();
+		System.out.println("RestClient :: execute :: Response Code: " + responseCode);
 		return new RestResponse(responseCode, input, responseObjectClass);
 	}
 
@@ -65,19 +66,19 @@ public class RestClient {
 			throws UnsupportedEncodingException, MalformedURLException, IOException, ProtocolException {
 
 		StringBuilder sb = new StringBuilder();
-		sb.append(baseURI.toString()).append('/').append(apiVersion).append('/').append(request.getResource()); 
+		sb.append(baseURI.toString()).append('/').append(apiVersion).append('/').append(request.getResource());
 		URL url = new URL(sb.toString());
-		
-		HttpURLConnection conn = (HttpURLConnection) url.openConnection();  
+
+		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 		HttpRequestMethod method = request.getMethod();
 		conn.setRequestMethod(method.name());
 		conn.setRequestProperty("User-Agent", userAgent);
 		conn.setRequestProperty("Authorization", authString);
-		conn.setRequestProperty("Content-Type", "application/json"); 
+		conn.setRequestProperty("Content-Type", "application/json");
 		conn.setRequestProperty("charset", "utf-8");
 		conn.setUseCaches(false);
 		conn.setInstanceFollowRedirects(false);
-		
+
 		switch(method)
 		{
 			case POST: {
@@ -90,18 +91,18 @@ public class RestClient {
 				out.flush();
 				break;
 			}
-			
+
 			case GET: {
 				conn.setRequestProperty("Accept", "application/json");
 				break;
 			}
-			
+
 			default: break;
 		}
-		
+
 		return conn;
 	}
-	
+
 
 	/**
 	 * Returns base URI
@@ -116,7 +117,7 @@ public class RestClient {
 	public void setBaseURI(URI baseURI) {
 		this.baseURI = baseURI;
 	}
-	
+
 	/**
 	 * Returns API version
 	 */
@@ -130,31 +131,31 @@ public class RestClient {
 	public void setAPIVersion(String apiVersion) {
 		this.apiVersion = apiVersion;
 	}
-	
+
 	/**
 	 * Returns user agent string
 	 */
 	public String getUserAgent() {
 		return userAgent;
 	}
-	
+
 	/**
 	 * Base URI
 	 */
 	private URI baseURI;
-	
+
 	/**
 	 * API version
 	 */
 	private String apiVersion;
-	
+
 	/**
 	 * User Agent string
 	 */
 	private String userAgent;
-	
+
 	/**
 	 * Authentication string
 	 */
-	String authString;	
+	String authString;
 }

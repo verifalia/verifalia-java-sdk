@@ -11,13 +11,13 @@ import java.util.ArrayList;
 import com.verifalia.api.VerifaliaRestClient;
 import com.verifalia.api.WaitForCompletionOptions;
 import com.verifalia.api.common.ServerPollingLoopEventListener;
-import com.verifalia.api.emailvalidation.models.Validation;
+import com.verifalia.api.emailvalidations.models.Validation;
 
 public class VerifaliaApiTool {
 
 	private static final String PROGRAM_NAME = "VerifaliaApiTool";
 	private static final String PROGRAM_VERSION = "0.0.1";
-	
+
 	public static void main(String[] args) {
 		if(args.length < 1) {
 			System.err.println("Missing required arguments. Try supplying option --help to find out more.");
@@ -64,14 +64,14 @@ public class VerifaliaApiTool {
 			System.err.println("Error: Too few arguments for the command '" + args[0] + "'.");
 			return 1;
 		}
-		
+
 		WaitForCompletionOptions waitOptions = WaitForCompletionOptions.DontWait;
 		if(args.length >= 6) {
 			int timeout = Integer.parseInt(args[4]);
 			int period = Integer.parseInt(args[5]);
 			waitOptions = new WaitForCompletionOptions(timeout, period);
 		}
-		
+
 		class ServerPollingLoopEventListenerImpl implements ServerPollingLoopEventListener {
 			@Override
 			public void onPollingLoopEvent(ServerPollingLoopEvent event, Validation currentResult) {
@@ -81,17 +81,17 @@ public class VerifaliaApiTool {
 						System.out.println("Info: Polling loop started.");
 						break;
 					}
-					
+
 					case ServerPollingLoopFinished: {
 						System.out.println("Info: Polling loop finished.");
 						break;
 					}
-					
+
 					case BeforePollServer: {
 						System.out.println("Info: Going to poll the server right now...");
 						break;
 					}
-					
+
 					case AfterPollServer: {
 						System.out.println("Info: Request to server has been completed.");
 						showCurrentResult(currentResult);
@@ -99,7 +99,7 @@ public class VerifaliaApiTool {
 					}
 				}
 			}
-			
+
 			private void showCurrentResult(Validation currentResult) {
 				System.out.print("Info: Current status:");
 				if(currentResult == null)
@@ -107,10 +107,10 @@ public class VerifaliaApiTool {
 				else {
 					System.out.println();
 					System.out.println(currentResult.toString());
-				}				
+				}
 			}
 		};
-		
+
 		System.out.println("Querying job status (uniqueId=" + args[1] + ")...");
 		VerifaliaRestClient client = new VerifaliaRestClient(args[2], args[3]);
 		Validation validation = client.getEmailValidations().query(args[1], waitOptions, new ServerPollingLoopEventListenerImpl());
@@ -129,7 +129,7 @@ public class VerifaliaApiTool {
 			System.err.println("Error: Too few arguments for the command '" + args[0] + "'.");
 			return 1;
 		}
-		
+
 		System.out.println("Submitting new  job...");
 		ArrayList<String> emails = new ArrayList<String>();
 		try(BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(new File(args[1]))))) {
@@ -146,10 +146,10 @@ public class VerifaliaApiTool {
 			}
 			System.out.println("Info: Read " + lineNo + " line(s), saved " + emails.size() + " line(s).");
 		}
-		
+
 		VerifaliaRestClient client = new VerifaliaRestClient(args[2], args[3]);
 		Validation validation = client.getEmailValidations().submit(emails);
-		System.out.println("New job ID: " + validation.getUniqueID());
+		System.out.println("New job ID: " + validation.getOverview().getId());
 		System.out.println("Result:");
 		System.out.println(validation.toString());
 		return 0;
@@ -170,7 +170,7 @@ public class VerifaliaApiTool {
 
 	private static void showVersion() {
 		System.out.println(
-			PROGRAM_NAME + " ver. " + PROGRAM_VERSION 
+			PROGRAM_NAME + " ver. " + PROGRAM_VERSION
 			+ ". Copyright (c) 2015 Ivan Pizhenko. All rights reserved."
 		);
 	}

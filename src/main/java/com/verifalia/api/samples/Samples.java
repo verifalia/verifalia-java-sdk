@@ -6,10 +6,9 @@ import java.net.URISyntaxException;
 import com.verifalia.api.VerifaliaRestClient;
 import com.verifalia.api.WaitForCompletionOptions;
 import com.verifalia.api.common.ServerPollingLoopEventListener;
-//import com.verifalia.api.common.ServerPollingLoopEventListener;
-import com.verifalia.api.emailvalidation.models.Validation;
-import com.verifalia.api.emailvalidation.models.ValidationEntry;
-import com.verifalia.api.emailvalidation.models.ValidationStatus;
+import com.verifalia.api.emailvalidations.models.Validation;
+import com.verifalia.api.emailvalidations.models.ValidationEntryData;
+import com.verifalia.api.emailvalidations.models.ValidationStatus;
 import com.verifalia.api.exceptions.VerifaliaException;
 
 public class Samples {
@@ -18,9 +17,9 @@ public class Samples {
 		if(args.length >= 2) {
 			try {
 				Samples sample = new Samples();
-				sample.queryVerifaliaServiceSample1(args[0], args[1]);
-				sample.queryVerifaliaServiceSample2(args[0], args[1]);	
-				sample.queryVerifaliaServiceSample3(args[0], args[1]);	
+//				sample.queryVerifaliaServiceSample1(args[0], args[1]);
+//				sample.queryVerifaliaServiceSample2(args[0], args[1]);
+				sample.queryVerifaliaServiceSample3(args[0], args[1]);
 			} catch(Exception ex) {
 				ex.printStackTrace();
 				System.exit(1);
@@ -28,7 +27,7 @@ public class Samples {
 			System.exit(0);
 		}
 	}
-	
+
 	/**
 	 * This sample method demonstrates, how to use Verifalia API with request timeout.
 	 * @param accountSid Your Verifalia sub-account SID
@@ -37,13 +36,13 @@ public class Samples {
 	 * @throws IOException
 	 * @throws URISyntaxException
 	 */
-	void queryVerifaliaServiceSample1(String accountSid, String authToken) throws VerifaliaException, IOException, URISyntaxException {	
+	void queryVerifaliaServiceSample1(String accountSid, String authToken) throws VerifaliaException, IOException, URISyntaxException {
 
 		// Create REST client object with your credentials
 		VerifaliaRestClient restClient = new VerifaliaRestClient(accountSid, authToken);
-		
+
 		// Submit email verification request with waiting parameters
-		Validation result = restClient.getEmailValidations().submit(new String[] { 
+		Validation result = restClient.getEmailValidations().submit(new String[] {
 				"alice@example.com",
 				"bob@example.net",
 				"carol@example.org"
@@ -55,11 +54,11 @@ public class Samples {
 			System.err.println("Request timeout expired");
 		else {
 			// Display results
-			for (ValidationEntry entry: result.getEntries())
+			for (ValidationEntryData entryData: result.getEntries().getData())
 			{
 				System.out.printf("Address: %s => Result: %s\n",
-					entry.getInputData(),
-					entry.getStatus()
+						entryData.getInputData(),
+						entryData.getStatus()
 				);
 			}
 		}
@@ -74,7 +73,7 @@ public class Samples {
 	 * @throws IOException
 	 * @throws URISyntaxException
 	 */
-	void queryVerifaliaServiceSample2(String accountSid, String authToken) throws VerifaliaException, IOException, URISyntaxException {	
+	void queryVerifaliaServiceSample2(String accountSid, String authToken) throws VerifaliaException, IOException, URISyntaxException {
 
 		// Create REST client object with your credentials
 		VerifaliaRestClient restClient = new VerifaliaRestClient(accountSid, authToken);
@@ -91,17 +90,17 @@ public class Samples {
 						System.out.println("Info: Polling loop started.");
 						break;
 					}
-					
+
 					case ServerPollingLoopFinished: {
 						System.out.println("Info: Polling loop finished.");
 						break;
 					}
-					
+
 					case BeforePollServer: {
 						System.out.println("Info: Going to poll the server right now...");
 						break;
 					}
-					
+
 					case AfterPollServer: {
 						System.out.println("Info: Request to server has been completed.");
 						showCurrentResult(currentResult);
@@ -117,23 +116,23 @@ public class Samples {
 				else {
 					System.out.println();
 					System.out.println(currentResult.toString());
-				}				
+				}
 			}
 		};
-		
+
 		// Submit email verification request with method that returns immediately
-		Validation result = restClient.getEmailValidations().submit(new String[] { 
+		Validation result = restClient.getEmailValidations().submit(new String[] {
 				"alice@example.com",
 				"bob@example.net",
 				"carol@example.org"
 			}
 		);
-		
+
 		// If request not completed, wait and display progress.
 		// when there are polling events happening
-		if(result.getStatus() != ValidationStatus.Completed)
+		if(result.getOverview().getStatus() != ValidationStatus.Completed)
 			result = restClient.getEmailValidations().query(
-				result.getUniqueID(), 
+				result.getOverview().getId(),
 				new WaitForCompletionOptions(10*60), // in seconds
 				new ServerPollingLoopEventListenerImpl()
 			);
@@ -142,11 +141,10 @@ public class Samples {
 			System.err.println("Request timeout expired");
 		else {
 			// Display results
-			for (ValidationEntry entry: result.getEntries())
-			{
+			for (ValidationEntryData entryData: result.getEntries().getData()){
 				System.out.printf("Address: %s => Result: %s\n",
-					entry.getInputData(),
-					entry.getStatus()
+						entryData.getInputData(),
+						entryData.getStatus()
 				);
 			}
 		}
@@ -160,13 +158,13 @@ public class Samples {
 	 * @throws IOException
 	 * @throws URISyntaxException
 	 */
-	void queryVerifaliaServiceSample3(String accountSid, String authToken) throws VerifaliaException, IOException, URISyntaxException {	
+	void queryVerifaliaServiceSample3(String accountSid, String authToken) throws VerifaliaException, IOException, URISyntaxException {
 
 		// Create REST client object with your credentials
 		VerifaliaRestClient restClient = new VerifaliaRestClient(accountSid, authToken);
-		
+
 		// Submit email verification request with method that return status immediately
-		Validation result = restClient.getEmailValidations().submit(new String[] { 
+		Validation result = restClient.getEmailValidations().submit(new String[] {
 				"alice@example.com",
 				"bob@example.net",
 				"carol@example.org"
@@ -174,9 +172,9 @@ public class Samples {
 		);
 
 		// Loop until request processing is completed or execution thread is interrupted
-		while (result.getStatus() != ValidationStatus.Completed)
+		while (result.getOverview().getStatus() != ValidationStatus.Completed)
 		{
-			result = restClient.getEmailValidations().query(result.getUniqueID(), WaitForCompletionOptions.DontWait);
+			result = restClient.getEmailValidations().query(result.getOverview().getId(), WaitForCompletionOptions.DontWait);
 			try {
 				Thread.sleep(5000);
 			} catch (InterruptedException e) {
@@ -187,14 +185,14 @@ public class Samples {
 		}
 
 		// If request completed, display result
-		if (result.getStatus() != ValidationStatus.Completed)
+		if (result.getOverview().getStatus() != ValidationStatus.Completed)
 			System.err.println("Request still pending.");
 		else {
-			for (ValidationEntry entry: result.getEntries())
-			{
+			// Display results
+			for (ValidationEntryData entryData: result.getEntries().getData()){
 				System.out.printf("Address: %s => Result: %s\n",
-					entry.getInputData(),
-					entry.getStatus()
+						entryData.getInputData(),
+						entryData.getStatus()
 				);
 			}
 		}

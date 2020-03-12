@@ -1,4 +1,4 @@
-package com.verifalia.api.emailvalidation;
+package com.verifalia.api.emailvalidations;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -7,15 +7,15 @@ import java.util.Date;
 import com.verifalia.api.WaitForCompletionOptions;
 import com.verifalia.api.common.ServerPollingLoopEventListener;
 import com.verifalia.api.common.ServerPollingLoopEventListener.ServerPollingLoopEvent;
-import com.verifalia.api.emailvalidation.models.Validation;
-import com.verifalia.api.emailvalidation.models.ValidationStatus;
+import com.verifalia.api.emailvalidations.models.Validation;
+import com.verifalia.api.emailvalidations.models.ValidationStatus;
 import com.verifalia.api.exceptions.AuthorizationException;
 import com.verifalia.api.exceptions.InsufficientCreditException;
 import com.verifalia.api.exceptions.VerifaliaException;
+import com.verifalia.api.rest.HttpRequestMethod;
 import com.verifalia.api.rest.HttpStatusCode;
 import com.verifalia.api.rest.RestClient;
 import com.verifalia.api.rest.RestRequest;
-import com.verifalia.api.rest.HttpRequestMethod;
 import com.verifalia.api.rest.RestResponse;
 
 /**
@@ -44,16 +44,16 @@ public class EmailValidationRestClient
      * to wait for the completion of the batch without having to manually poll the API.
      * In order to retrieve the most up-to-date snapshot of a validation batch, call the {@link EmailValidationRestClient#query(String) query}
      * along with the batch's {@link Validation#uniqueID}.
-     * 
+     *
      * @param emailAddresses A collection of email addresses to validate
      * @return An object representing the email validation batch
-     * @throws VerifaliaException 
-     * @throws IOException 
+     * @throws VerifaliaException
+     * @throws IOException
      */
     public Validation submit(String[] emailAddresses) throws IOException, VerifaliaException {
         return submit(emailAddresses, WaitForCompletionOptions.DontWait);
     }
-    
+
     /**
      * Initiates a new email validation batch. Makes a POST request to the "/email-validations" resource.
      * <p>Upon initialization, batches usually are in the {@link ValidationStatus#Pending Pending} status.
@@ -62,11 +62,11 @@ public class EmailValidationRestClient
      * to wait for the completion of the batch without having to manually poll the API.
      * In order to retrieve the most up-to-date snapshot of a validation batch, call the {@link EmailValidationRestClient#query(String) query}
      * along with the batch's {@link Validation#uniqueID}.
-     * 
+     *
      * @param emailAddresses A collection of email addresses to validate
      * @return An object representing the email validation batch
-     * @throws VerifaliaException 
-     * @throws IOException 
+     * @throws VerifaliaException
+     * @throws IOException
      */
     public Validation submit(Iterable<String> emailAddresses) throws IOException, VerifaliaException {
         return submit(emailAddresses, WaitForCompletionOptions.DontWait);
@@ -80,17 +80,17 @@ public class EmailValidationRestClient
      * allows to wait for the completion of the batch, without having to manually poll the API.
      * In order to retrieve the most up-to-date snapshot of a validation batch, call the {@link EmailValidationRestClient#query(String)}
      * along with the batch's {@link Validation#uniqueID}.
-     * 
+     *
      * @param emailAddresses A collection of email addresses to validate
      * @param waitForCompletionOptions The options about waiting for the validation completion
      * @return An object representing the email validation batch.
-     * @throws IOException 
-     * @throws VerifaliaException 
+     * @throws IOException
+     * @throws VerifaliaException
      */
     public Validation submit(String[] emailAddresses, WaitForCompletionOptions waitForCompletionOptions) throws IOException, VerifaliaException {
     	return submit(Arrays.asList(emailAddresses), waitForCompletionOptions);
     }
-    
+
     /**
      * Initiates a new email validation batch. Makes a POST request to the "/email-validations" resource.
      * <p>Upon initialization, batches usually are in the {@link ValidationStatus#Pending Pending} status.
@@ -99,17 +99,17 @@ public class EmailValidationRestClient
      * allows to wait for the completion of the batch, without having to manually poll the API.
      * In order to retrieve the most up-to-date snapshot of a validation batch, call the {@link EmailValidationRestClient#query(String)}
      * along with the batch's {@link Validation#uniqueID}.
-     * 
+     *
      * @param emailAddresses A collection of email addresses to validate
      * @param waitForCompletionOptions The options about waiting for the validation completion
      * @return An object representing the email validation batch.
-     * @throws IOException 
-     * @throws VerifaliaException 
+     * @throws IOException
+     * @throws VerifaliaException
      */
     public Validation submit(Iterable<String> emailAddresses, WaitForCompletionOptions waitForCompletionOptions) throws IOException, VerifaliaException {
         if (emailAddresses == null)
             throw new IllegalArgumentException("emailAddresses");
-        
+
         if (waitForCompletionOptions == null)
             throw new IllegalArgumentException("waitForCompletionOptions");
 
@@ -128,7 +128,7 @@ public class EmailValidationRestClient
         switch (response.getStatusCode()) {
             case HttpStatusCode.OK: {
                 // The batch has been completed in real time
-                data.setStatus(ValidationStatus.Completed);
+                data.getOverview().setStatus(ValidationStatus.Completed);
                 return data;
             }
 
@@ -136,11 +136,12 @@ public class EmailValidationRestClient
                 // The batch has been accepted but is not yet completed
 
                 if (waitForCompletionOptions == WaitForCompletionOptions.DontWait) {
-                	data.setStatus(ValidationStatus.Pending);
+                	data.getOverview().setStatus(ValidationStatus.InProgress);
                     return data;
-                } else {                
+                } else {
 	                // Poll the service until completion
-	                return query(data.getUniqueID(), waitForCompletionOptions);
+                	System.out.println("Status code accepted response: " + data.toString());
+	                return query(data.getOverview().getId(), waitForCompletionOptions);
                 }
             }
 
@@ -160,19 +161,19 @@ public class EmailValidationRestClient
             }
         }
     }
-    
+
     /**
      * Returns an object representing an email validation batch, identified by the specified unique identifier.
      * Makes a GET request to the <b>"/email-validations/{uniqueId}"</b> resource.
      * <p>To initiate a new email validation batch, please use {@link EmailValidationRestClient#submit(java.lang.Iterable)}
      * @param uniqueId The unique identifier for an email validation batch to be retrieved.
      * @return An object representing the current status of the requested email validation batch.
-     * @throws IOException 
+     * @throws IOException
      */
     public Validation query(String uniqueId) throws IOException {
         return query(uniqueId, WaitForCompletionOptions.DontWait);
     }
-    
+
     /**
      * Returns an object representing an email validation batch, waiting for its completion and issuing multiple retries if needed.
      * Makes a GET request to the <b>"/email-validations/{uniqueId}"</b> resource.
@@ -180,7 +181,7 @@ public class EmailValidationRestClient
      * @param uniqueId The unique identifier for an email validation batch to be retrieved.
      * @param waitOptions The options about waiting for the validation completion.
      * @return An object representing the current status of the requested email validation batch.
-     * @throws IOException 
+     * @throws IOException
      */
     public Validation query(final String uniqueId, final WaitForCompletionOptions waitOptions) throws IOException {
     	return query(uniqueId, waitOptions, null);
@@ -194,9 +195,9 @@ public class EmailValidationRestClient
      * @param waitOptions The options about waiting for the validation completion.
      * @param pollingLoopEventListener Polling loop event listener, may be <b>null</b>.
      * @return An object representing the current status of the requested email validation batch.
-     * @throws IOException 
+     * @throws IOException
      */
-    public Validation query(final String uniqueId, final WaitForCompletionOptions waitOptions, 
+    public Validation query(final String uniqueId, final WaitForCompletionOptions waitOptions,
     		final ServerPollingLoopEventListener pollingLoopEventListener) throws IOException {
         // Handle the case when the client wishes to avoid waiting for completion
 
@@ -209,7 +210,7 @@ public class EmailValidationRestClient
          * Polling thread task
          */
         class PollingTask implements Runnable {
-        	
+
 	        /**
 	         * Main thread method
 	         */
@@ -217,39 +218,39 @@ public class EmailValidationRestClient
 	        {
         		if(pollingLoopEventListener != null)
         			pollingLoopEventListener.onPollingLoopEvent(ServerPollingLoopEvent.ServerPollingLoopStarted, result);
-        		
+
         		runActually();
-        		
+
         		if(pollingLoopEventListener != null)
         			pollingLoopEventListener.onPollingLoopEvent(ServerPollingLoopEvent.ServerPollingLoopFinished, result);
 	        }
-        	
+
         	/**
         	 * Implements actual activities
         	 */
         	void runActually()
         	{
-        		
-        		try {        			
+
+        		try {
 	        		long startTime = (new Date()).getTime();
 	        		long timeout = waitOptions.getTimeout() * 1000;
 		            do {
 		            	if(pollingLoopEventListener != null)
 		            		pollingLoopEventListener.onPollingLoopEvent(ServerPollingLoopEvent.BeforePollServer, result);
-		            	
+
 		                result = queryOnce(uniqueId);
 
 		                if(pollingLoopEventListener != null)
 		            		pollingLoopEventListener.onPollingLoopEvent(ServerPollingLoopEvent.AfterPollServer, result);
-		
+
 		                // A null result means the validation has not been found
 		                if (result == null)
 		                	return;
-		
+
 		                // Returns immediately if the validation has been completed
-		                if (result.getStatus() == ValidationStatus.Completed)
+		                if (result.getOverview().getStatus() == ValidationStatus.Completed)
 		                    return;
-		                
+
 		                // Wait for the polling interval
 		                try {
 							Thread.sleep(waitOptions.getPollingInterval()*1000);
@@ -262,48 +263,48 @@ public class EmailValidationRestClient
         		catch(IOException ex) {
         			this.exception = ex;
         			return;
-        		}         		
+        		}
 	        }
-        	
+
         	/**
         	 * Returns polling result
         	 */
         	public Validation getResult() {
         		return result;
         	}
-        	
+
         	/*
         	 * Returns flag whether task have been completed
         	 */
         	public boolean isCompleted() {
-        		return result != null && result.getStatus() == ValidationStatus.Completed;
+        		return result != null && result.getOverview().getStatus() == ValidationStatus.Completed;
         	}
 
         	/*
-        	 * Returns flag whether task has faulted 
+        	 * Returns flag whether task has faulted
         	 */
         	public boolean isFaulted() {
         		return exception != null;
         	}
-        	
+
         	/**
         	 * Returns the underlying exception
         	 */
         	public IOException getException() {
         		return exception;
         	}
-        	
+
         	/**
         	 * Query result
         	 */
         	private Validation result;
-        	
+
         	/*
         	 * Thread exception
         	 */
         	private IOException exception;
         };
-        
+
         PollingTask pollingTask = new PollingTask();
 
         // Waits for the request completion or for the timeout to expire
@@ -329,19 +330,19 @@ public class EmailValidationRestClient
      */
     Validation queryOnce(String uniqueId) throws IOException {
         RestRequest request = new RestRequest(HttpRequestMethod.GET, EMAIL_VALIDATIONS_RESOURCE + "/" + uniqueId);
-        
+
         // Sends the request to the Verifalia servers
         RestResponse response = restClient.execute(request, Validation.class);
         Validation data = (Validation) response.getData();
-        
+
         switch (response.getStatusCode()) {
             case HttpStatusCode.OK: {
-                    data.setStatus(ValidationStatus.Completed);
+                    data.getOverview().setStatus(ValidationStatus.Completed);
                     return data;
             }
 
             case HttpStatusCode.ACCEPTED: {
-                data.setStatus(ValidationStatus.Pending);
+                data.getOverview().setStatus(ValidationStatus.InProgress);
                 return data;
             }
 
@@ -349,7 +350,7 @@ public class EmailValidationRestClient
             case HttpStatusCode.NOT_FOUND: {
                 return null;
             }
-            
+
             default:
             	throw new VerifaliaException(response);
         }
@@ -359,7 +360,7 @@ public class EmailValidationRestClient
      * Deletes an email validation batch, identified by the specified unique identifier.
      * Makes a DELETE request to the <b>"/email-validations/{uniqueId}"</b> resource.
      * @param uniqueId The unique identifier for an email validation batch to be deleted
-     * @throws IOException 
+     * @throws IOException
      */
     public void delete(String uniqueId) throws IOException {
     	RestRequest request = new RestRequest(HttpRequestMethod.DELETE, EMAIL_VALIDATIONS_RESOURCE + "/" + uniqueId);

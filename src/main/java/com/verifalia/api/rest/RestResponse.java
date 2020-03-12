@@ -19,11 +19,11 @@ import com.verifalia.api.common.Utils;
 public class RestResponse {
 	/**
 	 * Creates new object
-	 * @throws IOException 
-	 * @throws JsonMappingException 
-	 * @throws JsonParseException 
+	 * @throws IOException
+	 * @throws JsonMappingException
+	 * @throws JsonParseException
 	 */
-	public RestResponse(int statusCode, InputStream input, Class<?> responseDataClass) 
+	public RestResponse(int statusCode, InputStream input, Class<?> responseDataClass)
 			throws JsonParseException, JsonMappingException, IOException {
 		this.statusCode = statusCode;
 		if(HttpStatusCode.isSuccess(statusCode)) {
@@ -37,7 +37,7 @@ public class RestResponse {
 		} else
 			readErrorMessage(input);
 	}
-	
+
 	private void readErrorMessage(InputStream input) throws IOException {
 		StringBuilder sb = new StringBuilder();
 		try (BufferedReader reader = new BufferedReader(new InputStreamReader(input))) {
@@ -50,14 +50,14 @@ public class RestResponse {
 		}
 		this.errorMessage = sb.toString();
 	}
-	
+
 	/**
 	 * Returns HTTP response code
 	 */
 	public int getStatusCode() {
 		return statusCode;
 	}
-	
+
 	/**
 	 * Returns data
 	 */
@@ -71,12 +71,12 @@ public class RestResponse {
 	public String getErrorMessage() {
 		return errorMessage;
 	}
-	
+
 	/**
 	 * HTTP response code
 	 */
 	private int statusCode;
-	
+
 	/**
 	 * Response data
 	 */
