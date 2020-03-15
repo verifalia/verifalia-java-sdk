@@ -1,4 +1,4 @@
-package com.verifalia.api.emailvalidations.models;
+package com.verifalia.api.common.models;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -10,7 +10,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class ValidationEntriesMeta {
+public class ResponseMeta {
 
 	/**
      * A string representing the cursor meta details for the entries result

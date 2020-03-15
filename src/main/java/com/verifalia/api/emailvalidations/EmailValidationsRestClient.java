@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Date;
 
 import com.verifalia.api.WaitForCompletionOptions;
+import com.verifalia.api.common.Constants;
 import com.verifalia.api.common.ServerPollingLoopEventListener;
 import com.verifalia.api.common.ServerPollingLoopEventListener.ServerPollingLoopEvent;
 import com.verifalia.api.emailvalidations.models.Validation;
@@ -23,13 +24,10 @@ import com.verifalia.api.rest.RestResponse;
  * <p>The functionalities of this type are exposed by way of the {@link com.verifalia.api.VerifaliaRestClient#getEmailValidations getmailValidations()}
  * of {@link com.verifalia.api.VerifaliaRestClient VerifaliaRestClient}.
  */
-public class EmailValidationRestClient
-{
-	private final String EMAIL_VALIDATIONS_RESOURCE = "email-validations";
+public class EmailValidationsRestClient {
     private RestClient restClient;
 
-    public EmailValidationRestClient(RestClient restClient)
-    {
+    public EmailValidationsRestClient(RestClient restClient) {
         if (restClient == null)
             throw new IllegalArgumentException("restClient is null.");
 
@@ -40,9 +38,9 @@ public class EmailValidationRestClient
      * Initiates a new email validation batch. Makes a POST request to the "/email-validations" resource.
      * <p>Upon initialization, batches usually are in the {@link ValidationStatus#Pending Pending} status.
      * Validations are completed only when their {@link Validation#status} property
-     * is {@link ValidationStatus#Completed Completed}. Use the {@link EmailValidationRestClient#submit(String[], WaitForCompletionOptions)}
+     * is {@link ValidationStatus#Completed Completed}. Use the {@link EmailValidationsRestClient#submit(String[], WaitForCompletionOptions)}
      * to wait for the completion of the batch without having to manually poll the API.
-     * In order to retrieve the most up-to-date snapshot of a validation batch, call the {@link EmailValidationRestClient#query(String) query}
+     * In order to retrieve the most up-to-date snapshot of a validation batch, call the {@link EmailValidationsRestClient#query(String) query}
      * along with the batch's {@link Validation#uniqueID}.
      *
      * @param emailAddresses A collection of email addresses to validate
@@ -58,9 +56,9 @@ public class EmailValidationRestClient
      * Initiates a new email validation batch. Makes a POST request to the "/email-validations" resource.
      * <p>Upon initialization, batches usually are in the {@link ValidationStatus#Pending Pending} status.
      * Validations are completed only when their {@link Validation#status} property
-     * is {@link ValidationStatus#Completed Completed}. Use the {@link EmailValidationRestClient#submit(java.lang.Iterable, WaitForCompletionOptions)}
+     * is {@link ValidationStatus#Completed Completed}. Use the {@link EmailValidationsRestClient#submit(java.lang.Iterable, WaitForCompletionOptions)}
      * to wait for the completion of the batch without having to manually poll the API.
-     * In order to retrieve the most up-to-date snapshot of a validation batch, call the {@link EmailValidationRestClient#query(String) query}
+     * In order to retrieve the most up-to-date snapshot of a validation batch, call the {@link EmailValidationsRestClient#query(String) query}
      * along with the batch's {@link Validation#uniqueID}.
      *
      * @param emailAddresses A collection of email addresses to validate
@@ -78,7 +76,7 @@ public class EmailValidationRestClient
      * Validations are completed only when their {@link Validation#status} property.
      * is {@link ValidationStatus#Completed Completed}; the <b>waitForCompletionOptions</b> parameter
      * allows to wait for the completion of the batch, without having to manually poll the API.
-     * In order to retrieve the most up-to-date snapshot of a validation batch, call the {@link EmailValidationRestClient#query(String)}
+     * In order to retrieve the most up-to-date snapshot of a validation batch, call the {@link EmailValidationsRestClient#query(String)}
      * along with the batch's {@link Validation#uniqueID}.
      *
      * @param emailAddresses A collection of email addresses to validate
@@ -97,7 +95,7 @@ public class EmailValidationRestClient
      * Validations are completed only when their {@link Validation#status} property.
      * is {@link ValidationStatus#Completed Completed}; the {@code waitForCompletionOptions} parameter
      * allows to wait for the completion of the batch, without having to manually poll the API.
-     * In order to retrieve the most up-to-date snapshot of a validation batch, call the {@link EmailValidationRestClient#query(String)}
+     * In order to retrieve the most up-to-date snapshot of a validation batch, call the {@link EmailValidationsRestClient#query(String)}
      * along with the batch's {@link Validation#uniqueID}.
      *
      * @param emailAddresses A collection of email addresses to validate
@@ -118,7 +116,7 @@ public class EmailValidationRestClient
 
         // Build the REST request
 
-        RestRequest request = new RestRequest(HttpRequestMethod.POST, EMAIL_VALIDATIONS_RESOURCE);
+        RestRequest request = new RestRequest(HttpRequestMethod.POST, Constants.EMAIL_VALIDATIONS_RESOURCE);
         request.addEntries(emailAddresses);
 
         // Send the request to the Verifalia servers
@@ -165,7 +163,7 @@ public class EmailValidationRestClient
     /**
      * Returns an object representing an email validation batch, identified by the specified unique identifier.
      * Makes a GET request to the <b>"/email-validations/{uniqueId}"</b> resource.
-     * <p>To initiate a new email validation batch, please use {@link EmailValidationRestClient#submit(java.lang.Iterable)}
+     * <p>To initiate a new email validation batch, please use {@link EmailValidationsRestClient#submit(java.lang.Iterable)}
      * @param uniqueId The unique identifier for an email validation batch to be retrieved.
      * @return An object representing the current status of the requested email validation batch.
      * @throws IOException
@@ -177,7 +175,7 @@ public class EmailValidationRestClient
     /**
      * Returns an object representing an email validation batch, waiting for its completion and issuing multiple retries if needed.
      * Makes a GET request to the <b>"/email-validations/{uniqueId}"</b> resource.
-     * <p>To initiate a new email validation batch, please use {@link EmailValidationRestClient#submit(java.lang.Iterable)}
+     * <p>To initiate a new email validation batch, please use {@link EmailValidationsRestClient#submit(java.lang.Iterable)}
      * @param uniqueId The unique identifier for an email validation batch to be retrieved.
      * @param waitOptions The options about waiting for the validation completion.
      * @return An object representing the current status of the requested email validation batch.
@@ -190,7 +188,7 @@ public class EmailValidationRestClient
     /**
      * Returns an object representing an email validation batch, waiting for its completion and issuing multiple retries if needed.
      * Makes a GET request to the <b>"/email-validations/{uniqueId}"</b> resource.
-     * <p>To initiate a new email validation batch, please use {@link EmailValidationRestClient#submit(java.lang.Iterable)}
+     * <p>To initiate a new email validation batch, please use {@link EmailValidationsRestClient#submit(java.lang.Iterable)}
      * @param uniqueId The unique identifier for an email validation batch to be retrieved.
      * @param waitOptions The options about waiting for the validation completion.
      * @param pollingLoopEventListener Polling loop event listener, may be <b>null</b>.
@@ -214,8 +212,7 @@ public class EmailValidationRestClient
 	        /**
 	         * Main thread method
 	         */
-        	public void run()
-	        {
+        	public void run() {
         		if(pollingLoopEventListener != null)
         			pollingLoopEventListener.onPollingLoopEvent(ServerPollingLoopEvent.ServerPollingLoopStarted, result);
 
@@ -228,8 +225,7 @@ public class EmailValidationRestClient
         	/**
         	 * Implements actual activities
         	 */
-        	void runActually()
-        	{
+        	void runActually() {
 
         		try {
 	        		long startTime = (new Date()).getTime();
@@ -324,12 +320,12 @@ public class EmailValidationRestClient
     /**
      * Returns an object representing an email validation batch, identified by the specified unique identifier.
      * Makes a GET request to the <b>"/email-validations/{uniqueId}"</b> resource.
-     * <p>To initiate a new email validation batch, please use {@link EmailValidationRestClient#submit(java.lang.Iterable)}
+     * <p>To initiate a new email validation batch, please use {@link EmailValidationsRestClient#submit(java.lang.Iterable)}
      * @param uniqueId The unique identifier for an email validation batch to be retrieved.
      * @return An object representing the current status of the requested email validation batch.
      */
     Validation queryOnce(String uniqueId) throws IOException {
-        RestRequest request = new RestRequest(HttpRequestMethod.GET, EMAIL_VALIDATIONS_RESOURCE + "/" + uniqueId);
+        RestRequest request = new RestRequest(HttpRequestMethod.GET, Constants.EMAIL_VALIDATIONS_RESOURCE + "/" + uniqueId);
 
         // Sends the request to the Verifalia servers
         RestResponse response = restClient.execute(request, Validation.class);
@@ -363,7 +359,7 @@ public class EmailValidationRestClient
      * @throws IOException
      */
     public void delete(String uniqueId) throws IOException {
-    	RestRequest request = new RestRequest(HttpRequestMethod.DELETE, EMAIL_VALIDATIONS_RESOURCE + "/" + uniqueId);
+    	RestRequest request = new RestRequest(HttpRequestMethod.DELETE, Constants.EMAIL_VALIDATIONS_RESOURCE + "/" + uniqueId);
 
         // Sends the request to the Verifalia servers
         RestResponse response = restClient.execute(request, Validation.class);

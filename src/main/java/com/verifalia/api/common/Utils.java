@@ -1,19 +1,8 @@
 package com.verifalia.api.common;
 
-public class Utils {
-	public static final char CR = '\r';
-	public static final char LF = '\n';
-	public static final String EMPTY_STRING = "";
-	
-    /**
-     * <p>Checks if a CharSequence is empty ("") or null.</p>
-     * @param cs  the CharSequence to check, may be null
-     * @return {@code true} if the CharSequence is empty or null
-     */
-    public static boolean isEmpty(final CharSequence cs) {
-        return cs == null || cs.length() == 0;
-    }
+import org.apache.commons.lang3.StringUtils;
 
+public class Utils {
     /**
      * <p>Removes one newline from end of a String if it's there,
      * otherwise leave it alone.  A newline is &quot;{@code \n}&quot;,
@@ -22,14 +11,14 @@ public class Utils {
      * @return String without newline, {@code null} if null String input
      */
     public static String chomp(final String str) {
-    	    	
-        if (isEmpty(str)) {
+
+        if (StringUtils.isEmpty(str)) {
             return str;
         }
 
         if (str.length() == 1) {
             final char ch = str.charAt(0);
-            if (ch == CR || ch == LF) {
+            if (ch == Constants.CR || ch == Constants.LF) {
                 return "";
             }
             return str;
@@ -38,11 +27,11 @@ public class Utils {
         int lastIdx = str.length() - 1;
         final char last = str.charAt(lastIdx);
 
-        if (last == LF) {
-            if (str.charAt(lastIdx - 1) == CR) {
+        if (last == Constants.LF) {
+            if (str.charAt(lastIdx - 1) == Constants.CR) {
                 lastIdx--;
             }
-        } else if (last != CR) {
+        } else if (last != Constants.CR) {
             lastIdx++;
         }
         return str.substring(0, lastIdx);

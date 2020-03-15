@@ -14,7 +14,7 @@ public class WaitForCompletionOptions {
      * The timeout to obey while waiting for completion.
      */
     private int timeout;
-    
+
     public int getTimeout() {
     	return timeout;
     }
@@ -23,7 +23,7 @@ public class WaitForCompletionOptions {
      * The polling interval for the completion check.
      */
     private int pollingInterval;
-    
+
     /**
      * Returns polling interval for the completion check.
      */
@@ -43,16 +43,14 @@ public class WaitForCompletionOptions {
      */
     public static final int DefaultPollingInterval = 5;
 
-    private WaitForCompletionOptions()
-    {
+    private WaitForCompletionOptions() {
         // Private constructor, used by DontWait
     }
 
     /**
      * Creates new object with specified timeout and default polling interval
      */
-    public WaitForCompletionOptions(int timeout)
-    {
+    public WaitForCompletionOptions(int timeout) {
     	this.timeout = timeout;
     	this.pollingInterval = DefaultPollingInterval;
     }
@@ -60,8 +58,7 @@ public class WaitForCompletionOptions {
     /**
      * Creates new object with specified timeout and polling interval
      */
-    public WaitForCompletionOptions(int timeout, int pollingInterval)
-    {
+    public WaitForCompletionOptions(int timeout, int pollingInterval) {
     	this.timeout = timeout;
     	this.pollingInterval = pollingInterval;
     }

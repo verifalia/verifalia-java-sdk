@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
+import org.apache.commons.lang3.StringUtils;
 import org.codehaus.jackson.JsonFactory;
 import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.JsonParser;
@@ -85,5 +86,5 @@ public class RestResponse {
 	/**
 	 * Error message
 	 */
-	private String errorMessage = Utils.EMPTY_STRING;
+	private String errorMessage = StringUtils.EMPTY;
 }

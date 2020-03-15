@@ -10,13 +10,11 @@ import java.util.ArrayList;
 
 import com.verifalia.api.VerifaliaRestClient;
 import com.verifalia.api.WaitForCompletionOptions;
+import com.verifalia.api.common.Constants;
 import com.verifalia.api.common.ServerPollingLoopEventListener;
 import com.verifalia.api.emailvalidations.models.Validation;
 
 public class VerifaliaApiTool {
-
-	private static final String PROGRAM_NAME = "VerifaliaApiTool";
-	private static final String PROGRAM_VERSION = "0.0.1";
 
 	public static void main(String[] args) {
 		if(args.length < 1) {
@@ -114,13 +112,13 @@ public class VerifaliaApiTool {
 		System.out.println("Querying job status (uniqueId=" + args[1] + ")...");
 		VerifaliaRestClient client = new VerifaliaRestClient(args[2], args[3]);
 		Validation validation = client.getEmailValidations().query(args[1], waitOptions, new ServerPollingLoopEventListenerImpl());
-		if(validation != null)
-		{
+		if(validation != null){
 			System.out.println("Result:");
 			System.out.println(validation.toString());
 		}
-		else
+		else {
 			System.err.println("Warning: Timeout expired!");
+		}
 		return 0;
 	}
 
@@ -157,7 +155,7 @@ public class VerifaliaApiTool {
 
 	private static void showHelp() {
 		System.out.println(
-				"Usage: " + PROGRAM_NAME + "<command> [parameters]\n"
+				"Usage: " + Constants.PROGRAM_NAME + "<command> [parameters]\n"
 				+ "\n"
 				+ "Commands:\n"
 				+ "--submit <file> <sid> <token>    Submit new job with email list from a given file\n"
@@ -170,7 +168,7 @@ public class VerifaliaApiTool {
 
 	private static void showVersion() {
 		System.out.println(
-			PROGRAM_NAME + " ver. " + PROGRAM_VERSION
+				Constants.PROGRAM_NAME + " ver. " + Constants.PROGRAM_VERSION
 			+ ". Copyright (c) 2015 Ivan Pizhenko. All rights reserved."
 		);
 	}

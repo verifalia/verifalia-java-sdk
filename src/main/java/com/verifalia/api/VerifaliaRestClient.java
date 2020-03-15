@@ -2,19 +2,17 @@ package com.verifalia.api;
 
 import java.net.URISyntaxException;
 
-import com.verifalia.api.emailvalidations.EmailValidationRestClient;
+import com.verifalia.api.common.Constants;
+import com.verifalia.api.credits.CreditsRestClient;
+import com.verifalia.api.emailvalidations.EmailValidationsRestClient;
 import com.verifalia.api.rest.RestClient;
 
 /**
  * This is main Verifalia SDK REST client "facade" class to be used directly by the SDK end-users.
  * It provides access to various SDK sub-facilities, including email validation service.
  */
-public class VerifaliaRestClient
-{
-	private static final String CLIENT_VERSION = "2.1";
-	private static final String DEFAULT_BASE_URL = "https://api.verifalia.com";
-	private static final String DEFAULT_API_VERSION = "v2.1";
-	private static final String USER_AGENT_BASE = "verifalia-rest-client/java/";
+public class VerifaliaRestClient {
+
 
 	/**
 	 * REST client object
@@ -24,13 +22,18 @@ public class VerifaliaRestClient
 	/**
 	 * Email validation service client object
 	 */
-	EmailValidationRestClient emailValidations;
+	EmailValidationsRestClient emailValidations;
+
+	/**
+	 * Credits service client object
+	 */
+	CreditsRestClient credits;
 
 	/**
 	 * Returns current client verion
 	 */
 	public static String getClientVersion() {
-		return CLIENT_VERSION;
+		return Constants.CLIENT_VERSION;
 	}
 
 	/**
@@ -44,7 +47,7 @@ public class VerifaliaRestClient
 	 * @throws URISyntaxException
 	 */
 	public VerifaliaRestClient(String baseURL, String apiVersion, String accountSid, String authToken) throws URISyntaxException {
-		restClient = new RestClient(baseURL, apiVersion, accountSid, authToken, USER_AGENT_BASE + CLIENT_VERSION);
+		restClient = new RestClient(baseURL, apiVersion, accountSid, authToken, Constants.USER_AGENT_BASE + Constants.CLIENT_VERSION);
 	}
 
 	/**
@@ -57,7 +60,7 @@ public class VerifaliaRestClient
 	 * @throws URISyntaxException
 	 */
 	public VerifaliaRestClient(String apiVersion, String accountSid, String authToken) throws URISyntaxException {
-		restClient = new RestClient(DEFAULT_BASE_URL, apiVersion, accountSid, authToken, USER_AGENT_BASE + CLIENT_VERSION);
+		restClient = new RestClient(Constants.DEFAULT_BASE_URL, apiVersion, accountSid, authToken, Constants.USER_AGENT_BASE + Constants.CLIENT_VERSION);
 	}
 
 	/**
@@ -69,15 +72,25 @@ public class VerifaliaRestClient
 	 * @throws URISyntaxException
 	 */
 	public VerifaliaRestClient(String accountSid, String authToken) throws URISyntaxException {
-		restClient = new RestClient(DEFAULT_BASE_URL, DEFAULT_API_VERSION, accountSid, authToken, USER_AGENT_BASE + CLIENT_VERSION);
+		restClient = new RestClient(Constants.DEFAULT_BASE_URL, Constants.DEFAULT_API_VERSION, accountSid, authToken,
+				Constants.USER_AGENT_BASE + Constants.CLIENT_VERSION);
 	}
 
 	/**
 	 * Returns Verifalia email validations service client object
 	 */
-	public EmailValidationRestClient getEmailValidations () {
+	public EmailValidationsRestClient getEmailValidations () {
 		if(emailValidations == null)
-			emailValidations = new EmailValidationRestClient(restClient);
+			emailValidations = new EmailValidationsRestClient(restClient);
 		return emailValidations;
+	}
+
+	/**
+	 * Returns Verifalia credits service client object
+	 */
+	public CreditsRestClient getCredits() {
+		if(credits == null)
+			credits = new CreditsRestClient(restClient);
+		return credits;
 	}
 }

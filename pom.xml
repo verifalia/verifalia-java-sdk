@@ -39,6 +39,7 @@
 		<jackson.version>1.9.3</jackson.version>
 		<junit.version>4.8.1</junit.version>
 		<lombok.version>1.18.4</lombok.version>
+		<apache.commons.version>3.9</apache.commons.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 	</properties>
@@ -50,7 +51,7 @@
 			<artifactId>jackson-mapper-asl</artifactId>
 			<version>${jackson.version}</version>
 		</dependency>
-		<!-- test dependencies -->
+		<!-- Junit -->
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
@@ -63,6 +64,12 @@
 			<artifactId>lombok</artifactId>
 			<version>${lombok.version}</version>
 			<scope>provided</scope>
+		</dependency>
+		<!-- Apache Commons -->
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<version>${apache.commons.version}</version>
 		</dependency>
 	</dependencies>
 

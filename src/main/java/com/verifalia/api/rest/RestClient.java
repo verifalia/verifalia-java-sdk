@@ -79,11 +79,11 @@ public class RestClient {
 		conn.setUseCaches(false);
 		conn.setInstanceFollowRedirects(false);
 
-		switch(method)
-		{
+		switch(method){
 			case POST: {
 				conn.setRequestProperty("Accept", "application/json");
 				byte[] body = request.getEncodedEntries().getBytes("UTF-8");
+				System.out.println("Request Body: " + request.getEncodedEntries());
 				conn.setRequestProperty("Content-Length", Integer.toString(body.length));
 				conn.setDoOutput(true);
 				OutputStream out = conn.getOutputStream();

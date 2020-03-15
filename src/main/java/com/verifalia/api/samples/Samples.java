@@ -6,6 +6,8 @@ import java.net.URISyntaxException;
 import com.verifalia.api.VerifaliaRestClient;
 import com.verifalia.api.WaitForCompletionOptions;
 import com.verifalia.api.common.ServerPollingLoopEventListener;
+import com.verifalia.api.credits.models.CreditBalanceData;
+import com.verifalia.api.credits.models.CreditDailyUsage;
 import com.verifalia.api.emailvalidations.models.Validation;
 import com.verifalia.api.emailvalidations.models.ValidationEntryData;
 import com.verifalia.api.emailvalidations.models.ValidationStatus;
@@ -19,7 +21,15 @@ public class Samples {
 				Samples sample = new Samples();
 //				sample.queryVerifaliaServiceSample1(args[0], args[1]);
 //				sample.queryVerifaliaServiceSample2(args[0], args[1]);
-				sample.queryVerifaliaServiceSample3(args[0], args[1]);
+//				sample.queryVerifaliaServiceSample3(args[0], args[1]);
+//				sample.getCreditsBalanceSample(args[0], args[1]);
+				sample.getCreditsDailyUsageSample1(args[0], args[1]);
+				sample.getCreditsDailyUsageSample2(args[0], args[1]);
+				sample.getCreditsDailyUsageSample3(args[0], args[1]);
+				sample.getCreditsDailyUsageSample4(args[0], args[1]);
+				sample.getCreditsDailyUsageSample5(args[0], args[1]);
+				sample.getCreditsDailyUsageSample6(args[0], args[1]);
+				sample.getCreditsDailyUsageSample7(args[0], args[1]);
 			} catch(Exception ex) {
 				ex.printStackTrace();
 				System.exit(1);
@@ -54,8 +64,7 @@ public class Samples {
 			System.err.println("Request timeout expired");
 		else {
 			// Display results
-			for (ValidationEntryData entryData: result.getEntries().getData())
-			{
+			for (ValidationEntryData entryData: result.getEntries().getData()) {
 				System.out.printf("Address: %s => Result: %s\n",
 						entryData.getInputData(),
 						entryData.getStatus()
@@ -84,8 +93,7 @@ public class Samples {
 		class ServerPollingLoopEventListenerImpl implements ServerPollingLoopEventListener {
 			@Override
 			public void onPollingLoopEvent(ServerPollingLoopEvent event, Validation currentResult) {
-				switch(event)
-				{
+				switch(event) {
 					case ServerPollingLoopStarted: {
 						System.out.println("Info: Polling loop started.");
 						break;
@@ -172,8 +180,7 @@ public class Samples {
 		);
 
 		// Loop until request processing is completed or execution thread is interrupted
-		while (result.getOverview().getStatus() != ValidationStatus.Completed)
-		{
+		while (result.getOverview().getStatus() != ValidationStatus.Completed) {
 			result = restClient.getEmailValidations().query(result.getOverview().getId(), WaitForCompletionOptions.DontWait);
 			try {
 				Thread.sleep(5000);
@@ -194,6 +201,172 @@ public class Samples {
 						entryData.getInputData(),
 						entryData.getStatus()
 				);
+			}
+		}
+	}
+
+	void getCreditsBalanceSample(String accountSid, String authToken) throws VerifaliaException, IOException, URISyntaxException {
+
+		// Create REST client object with your credentials
+		VerifaliaRestClient restClient = new VerifaliaRestClient(accountSid, authToken);
+
+		// Submit email verification request with waiting parameters
+		CreditBalanceData result = restClient.getCredits().balance();
+
+		if (result == null) // Result is null if timeout expires
+			System.err.println("Request timeout expired");
+		else {
+			// Display result
+			System.out.printf("Credit Packs: %s => Free Credits: %s => Free Credits Reset In: %s\n",
+					result.getCreditPacks(),
+					result.getFreeCredits(),
+					result.getFreeCreditsResetIn());
+		}
+	}
+
+	void getCreditsDailyUsageSample1(String accountSid, String authToken) throws VerifaliaException, IOException, URISyntaxException {
+
+		// Create REST client object with your credentials
+		VerifaliaRestClient restClient = new VerifaliaRestClient(accountSid, authToken);
+
+		// Submit email verification request with waiting parameters
+		CreditDailyUsage result = restClient.getCredits().dailyUsage();
+
+		if (result == null) // Result is null if timeout expires
+			System.err.println("Request timeout expired");
+		else {
+			// Display results
+			for (CreditBalanceData creditBalanceData: result.getData()){
+				System.out.printf("Date: %s =>, Credit Packs: %s => Free Credits: %s\n",
+						creditBalanceData.getDate(),
+						creditBalanceData.getCreditPacks(),
+						creditBalanceData.getFreeCredits());
+			}
+		}
+	}
+
+	void getCreditsDailyUsageSample2(String accountSid, String authToken) throws VerifaliaException, IOException, URISyntaxException {
+
+		// Create REST client object with your credentials
+		VerifaliaRestClient restClient = new VerifaliaRestClient(accountSid, authToken);
+
+		// Submit email verification request with waiting parameters
+		CreditDailyUsage result = restClient.getCredits().dailyUsage("2020-03-12");
+
+		if (result == null) // Result is null if timeout expires
+			System.err.println("Request timeout expired");
+		else {
+			// Display results
+			for (CreditBalanceData creditBalanceData: result.getData()){
+				System.out.printf("Date: %s =>, Credit Packs: %s => Free Credits: %s\n",
+						creditBalanceData.getDate(),
+						creditBalanceData.getCreditPacks(),
+						creditBalanceData.getFreeCredits());
+			}
+		}
+	}
+
+	void getCreditsDailyUsageSample3(String accountSid, String authToken) throws VerifaliaException, IOException, URISyntaxException {
+
+		// Create REST client object with your credentials
+		VerifaliaRestClient restClient = new VerifaliaRestClient(accountSid, authToken);
+
+		// Submit email verification request with waiting parameters
+		CreditDailyUsage result = restClient.getCredits().dailyUsage("");
+
+		if (result == null) // Result is null if timeout expires
+			System.err.println("Request timeout expired");
+		else {
+			// Display results
+			for (CreditBalanceData creditBalanceData: result.getData()){
+				System.out.printf("Date: %s =>, Credit Packs: %s => Free Credits: %s\n",
+						creditBalanceData.getDate(),
+						creditBalanceData.getCreditPacks(),
+						creditBalanceData.getFreeCredits());
+			}
+		}
+	}
+
+	void getCreditsDailyUsageSample4(String accountSid, String authToken) throws VerifaliaException, IOException, URISyntaxException {
+
+		// Create REST client object with your credentials
+		VerifaliaRestClient restClient = new VerifaliaRestClient(accountSid, authToken);
+
+		// Submit email verification request with waiting parameters
+		CreditDailyUsage result = restClient.getCredits().dailyUsage("2020-03-12", "2020-03-13");
+
+		if (result == null) // Result is null if timeout expires
+			System.err.println("Request timeout expired");
+		else {
+			// Display results
+			for (CreditBalanceData creditBalanceData: result.getData()){
+				System.out.printf("Date: %s =>, Credit Packs: %s => Free Credits: %s\n",
+						creditBalanceData.getDate(),
+						creditBalanceData.getCreditPacks(),
+						creditBalanceData.getFreeCredits());
+			}
+		}
+	}
+
+	void getCreditsDailyUsageSample5(String accountSid, String authToken) throws VerifaliaException, IOException, URISyntaxException {
+
+		// Create REST client object with your credentials
+		VerifaliaRestClient restClient = new VerifaliaRestClient(accountSid, authToken);
+
+		// Submit email verification request with waiting parameters
+		CreditDailyUsage result = restClient.getCredits().dailyUsage("", "2020-03-13");
+
+		if (result == null) // Result is null if timeout expires
+			System.err.println("Request timeout expired");
+		else {
+			// Display results
+			for (CreditBalanceData creditBalanceData: result.getData()){
+				System.out.printf("Date: %s =>, Credit Packs: %s => Free Credits: %s\n",
+						creditBalanceData.getDate(),
+						creditBalanceData.getCreditPacks(),
+						creditBalanceData.getFreeCredits());
+			}
+		}
+	}
+
+	void getCreditsDailyUsageSample6(String accountSid, String authToken) throws VerifaliaException, IOException, URISyntaxException {
+
+		// Create REST client object with your credentials
+		VerifaliaRestClient restClient = new VerifaliaRestClient(accountSid, authToken);
+
+		// Submit email verification request with waiting parameters
+		CreditDailyUsage result = restClient.getCredits().dailyUsage("2020-03-12", "");
+
+		if (result == null) // Result is null if timeout expires
+			System.err.println("Request timeout expired");
+		else {
+			// Display results
+			for (CreditBalanceData creditBalanceData: result.getData()){
+				System.out.printf("Date: %s =>, Credit Packs: %s => Free Credits: %s\n",
+						creditBalanceData.getDate(),
+						creditBalanceData.getCreditPacks(),
+						creditBalanceData.getFreeCredits());
+			}
+		}
+	}
+
+	void getCreditsDailyUsageSample7(String accountSid, String authToken) throws VerifaliaException, IOException, URISyntaxException {
+
+		// Create REST client object with your credentials
+		VerifaliaRestClient restClient = new VerifaliaRestClient(accountSid, authToken);
+
+		// Submit email verification request with waiting parameters
+		CreditDailyUsage result = restClient.getCredits().dailyUsage("", "");
+
+		if (result == null) // Result is null if timeout expires
+			System.err.println("Request timeout expired");
+		else {
+			// Display results
+			for (CreditBalanceData creditBalanceData: result.getData()){
+				System.out.printf("Date: %s =>, Credit Packs: %s => Free Credits: %s\n",
+						creditBalanceData.getDate(),
+						creditBalanceData.getCreditPacks(),
+						creditBalanceData.getFreeCredits());
 			}
 		}
 	}
