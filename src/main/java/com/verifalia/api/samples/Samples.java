@@ -2,14 +2,22 @@ package com.verifalia.api.samples;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.Arrays;
 
 import com.verifalia.api.VerifaliaRestClient;
 import com.verifalia.api.WaitForCompletionOptions;
 import com.verifalia.api.common.ServerPollingLoopEventListener;
 import com.verifalia.api.credits.models.CreditBalanceData;
 import com.verifalia.api.credits.models.CreditDailyUsage;
+import com.verifalia.api.credits.models.CreditDailyUsageFilter;
 import com.verifalia.api.emailvalidations.models.Validation;
+import com.verifalia.api.emailvalidations.models.ValidationEntries;
+import com.verifalia.api.emailvalidations.models.ValidationEntriesFilter;
 import com.verifalia.api.emailvalidations.models.ValidationEntryData;
+import com.verifalia.api.emailvalidations.models.ValidationEntryDataStatus;
+import com.verifalia.api.emailvalidations.models.ValidationJobs;
+import com.verifalia.api.emailvalidations.models.ValidationJobsFilter;
+import com.verifalia.api.emailvalidations.models.ValidationOverview;
 import com.verifalia.api.emailvalidations.models.ValidationStatus;
 import com.verifalia.api.exceptions.VerifaliaException;
 
@@ -19,17 +27,19 @@ public class Samples {
 		if(args.length >= 2) {
 			try {
 				Samples sample = new Samples();
-//				sample.queryVerifaliaServiceSample1(args[0], args[1]);
-//				sample.queryVerifaliaServiceSample2(args[0], args[1]);
-//				sample.queryVerifaliaServiceSample3(args[0], args[1]);
-//				sample.getCreditsBalanceSample(args[0], args[1]);
-				sample.getCreditsDailyUsageSample1(args[0], args[1]);
-				sample.getCreditsDailyUsageSample2(args[0], args[1]);
-				sample.getCreditsDailyUsageSample3(args[0], args[1]);
-				sample.getCreditsDailyUsageSample4(args[0], args[1]);
-				sample.getCreditsDailyUsageSample5(args[0], args[1]);
-				sample.getCreditsDailyUsageSample6(args[0], args[1]);
-				sample.getCreditsDailyUsageSample7(args[0], args[1]);
+				// Email validations
+				sample.queryVerifaliaEmailValidationsServiceSample1(args[0], args[1]);
+				sample.queryVerifaliaEmailValidationsServiceSample2(args[0], args[1]);
+				sample.queryVerifaliaEmailValidationsServiceSample3(args[0], args[1]);
+				sample.queryVerifaliaEmailValidationsOverviewSample(args[0], args[1]);
+				sample.queryVerifaliaEmailValidationsEntriesSample(args[0], args[1]);
+				sample.queryVerifaliaEmailValidationsEntriesWithFiltersSample(args[0], args[1]);
+				sample.queryVerifaliaEmailValidationsJobsSample(args[0], args[1]);
+				sample.queryVerifaliaEmailValidationsJobsWithFiltersSample(args[0], args[1]);
+				// Credits
+				sample.getVerifaliaCreditsBalanceSample(args[0], args[1]);
+				sample.getVerifaliaCreditsDailyUsageSample(args[0], args[1]);
+				sample.getVerifaliaCreditsDailyUsageWithFiltersSample(args[0], args[1]);
 			} catch(Exception ex) {
 				ex.printStackTrace();
 				System.exit(1);
@@ -46,7 +56,9 @@ public class Samples {
 	 * @throws IOException
 	 * @throws URISyntaxException
 	 */
-	void queryVerifaliaServiceSample1(String accountSid, String authToken) throws VerifaliaException, IOException, URISyntaxException {
+	void queryVerifaliaEmailValidationsServiceSample1(String accountSid, String authToken) throws VerifaliaException, IOException, URISyntaxException {
+
+		System.out.println("------------------------ queryVerifaliaEmailValidationsServiceSample1 ------------------------");
 
 		// Create REST client object with your credentials
 		VerifaliaRestClient restClient = new VerifaliaRestClient(accountSid, authToken);
@@ -82,7 +94,9 @@ public class Samples {
 	 * @throws IOException
 	 * @throws URISyntaxException
 	 */
-	void queryVerifaliaServiceSample2(String accountSid, String authToken) throws VerifaliaException, IOException, URISyntaxException {
+	void queryVerifaliaEmailValidationsServiceSample2(String accountSid, String authToken) throws VerifaliaException, IOException, URISyntaxException {
+
+		System.out.println("------------------------ queryVerifaliaEmailValidationsServiceSample2 ------------------------");
 
 		// Create REST client object with your credentials
 		VerifaliaRestClient restClient = new VerifaliaRestClient(accountSid, authToken);
@@ -166,7 +180,9 @@ public class Samples {
 	 * @throws IOException
 	 * @throws URISyntaxException
 	 */
-	void queryVerifaliaServiceSample3(String accountSid, String authToken) throws VerifaliaException, IOException, URISyntaxException {
+	void queryVerifaliaEmailValidationsServiceSample3(String accountSid, String authToken) throws VerifaliaException, IOException, URISyntaxException {
+
+		System.out.println("------------------------ queryVerifaliaEmailValidationsServiceSample3 ------------------------");
 
 		// Create REST client object with your credentials
 		VerifaliaRestClient restClient = new VerifaliaRestClient(accountSid, authToken);
@@ -205,7 +221,267 @@ public class Samples {
 		}
 	}
 
-	void getCreditsBalanceSample(String accountSid, String authToken) throws VerifaliaException, IOException, URISyntaxException {
+	/**
+	 * This sample method demonstrates, how to use Verifalia API with preconfigured request timeout
+	 * and list for the status polling cycle events.
+	 * @param accountSid Your Verifalia sub-account SID
+	 * @param authToken Your Verifalia sub-account authentication token
+	 * @throws VerifaliaException
+	 * @throws IOException
+	 * @throws URISyntaxException
+	 */
+	void queryVerifaliaEmailValidationsOverviewSample(String accountSid, String authToken) throws VerifaliaException, IOException, URISyntaxException {
+
+		System.out.println("------------------------ queryVerifaliaEmailValidationsOverviewSample ------------------------");
+
+		// Create REST client object with your credentials
+		VerifaliaRestClient restClient = new VerifaliaRestClient(accountSid, authToken);
+
+		// Submit email verification request with method that return status immediately
+		ValidationOverview result = restClient.getEmailValidations().submit(new String[] {
+				"alice@example.com",
+				"bob@example.net",
+				"carol@example.org"
+			}
+		).getOverview();
+
+		// Loop until request processing is completed or execution thread is interrupted
+		while (result.getStatus() != ValidationStatus.Completed) {
+			result = restClient.getEmailValidations().queryOverview(result.getId());
+			try {
+				Thread.sleep(5000);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+				if(Thread.currentThread().isInterrupted())
+					break;
+			}
+		}
+
+		// If request completed, display result
+		if (result.getStatus() != ValidationStatus.Completed)
+			System.err.println("Request still pending.");
+		else {
+			// Display results
+			System.out.printf("No of Entries: %s => Status: %s => Completed on: %s\n",
+					result.getNoOfEntries(),
+					result.getStatus(),
+					result.getCompletedOn()
+			);
+		}
+	}
+
+
+	/**
+	 * This sample method demonstrates, how to use Verifalia API with preconfigured request timeout
+	 * and list for the status polling cycle events.
+	 * @param accountSid Your Verifalia sub-account SID
+	 * @param authToken Your Verifalia sub-account authentication token
+	 * @throws VerifaliaException
+	 * @throws IOException
+	 * @throws URISyntaxException
+	 */
+	void queryVerifaliaEmailValidationsEntriesSample(String accountSid, String authToken) throws VerifaliaException, IOException, URISyntaxException {
+
+		System.out.println("------------------------ queryVerifaliaEmailValidationsEntriesSample ------------------------");
+
+		// Create REST client object with your credentials
+		VerifaliaRestClient restClient = new VerifaliaRestClient(accountSid, authToken);
+
+		// Submit email verification request with method that return status immediately
+		ValidationOverview result = restClient.getEmailValidations().submit(new String[] {
+				"alice@example.com",
+				"bob@example.net",
+				"carol@example.org"
+			}
+		).getOverview();
+
+		// Loop until request processing is completed or execution thread is interrupted
+		while (result.getStatus() != ValidationStatus.Completed) {
+			result = restClient.getEmailValidations().queryOverview(result.getId());
+			try {
+				Thread.sleep(5000);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+				if(Thread.currentThread().isInterrupted())
+					break;
+			}
+		}
+
+		// If request completed, display result
+		if (result.getStatus() != ValidationStatus.Completed)
+			System.err.println("Request still pending.");
+		else {
+			// Display results
+			ValidationEntries entries = restClient.getEmailValidations().queryEntries(result.getId());
+			for (ValidationEntryData entryData: entries.getData()){
+				System.out.printf("Address: %s => Result: %s\n",
+						entryData.getInputData(),
+						entryData.getStatus()
+				);
+			}
+		}
+	}
+
+	/**
+	 * This sample method demonstrates, how to use Verifalia API with preconfigured request timeout
+	 * and list for the status polling cycle events.
+	 * @param accountSid Your Verifalia sub-account SID
+	 * @param authToken Your Verifalia sub-account authentication token
+	 * @throws VerifaliaException
+	 * @throws IOException
+	 * @throws URISyntaxException
+	 */
+	void queryVerifaliaEmailValidationsEntriesWithFiltersSample(String accountSid, String authToken) throws VerifaliaException,
+		IOException, URISyntaxException {
+
+		System.out.println("------------------------ queryVerifaliaEmailValidationsEntriesWithFiltersSample ------------------------");
+
+		// Create REST client object with your credentials
+		VerifaliaRestClient restClient = new VerifaliaRestClient(accountSid, authToken);
+
+		// Submit email verification request with method that return status immediately
+		ValidationOverview result = restClient.getEmailValidations().submit(new String[] {
+				"alice@example.com",
+				"bob@example.net",
+				"carol@example.org"
+			}
+		).getOverview();
+
+		// Submit request for getting entries with filter status
+		System.out.println("------------------------------------------------------");
+		ValidationEntries entries1 = restClient.getEmailValidations().queryEntries(result.getId(), new String[] {
+			ValidationEntryDataStatus.Success.name(),
+			ValidationEntryDataStatus.DomainHasNullMx.name(),
+		});
+		System.out.println("Entries results with filter status: " + entries1.getData().size());
+		for (ValidationEntryData entryData: entries1.getData()){
+			System.out.printf("Address: %s => Result: %s\n",
+					entryData.getInputData(),
+					entryData.getStatus()
+			);
+		}
+
+		// Submit request for getting entries with filter object
+		System.out.println("------------------------------------------------------");
+		ValidationEntriesFilter validationEntriesFilter = new ValidationEntriesFilter();
+		validationEntriesFilter.setExcludeStatuses(Arrays.asList(new String[] {
+			ValidationEntryDataStatus.Success.name(),
+			ValidationEntryDataStatus.DomainHasNullMx.name(),
+		}));
+		ValidationEntries entries2 = restClient.getEmailValidations().queryEntries(result.getId(), validationEntriesFilter);
+		System.out.println("Entries results with filter object: " + entries2.getData().size());
+		for (ValidationEntryData entryData: entries2.getData()){
+			System.out.printf("Address: %s => Result: %s\n",
+					entryData.getInputData(),
+					entryData.getStatus()
+			);
+		}
+	}
+
+	void queryVerifaliaEmailValidationsJobsSample(String accountSid, String authToken) throws VerifaliaException, IOException, URISyntaxException {
+
+		System.out.println("------------------------ queryVerifaliaEmailValidationsJobsSample ------------------------");
+
+		// Create REST client object with your credentials
+		VerifaliaRestClient restClient = new VerifaliaRestClient(accountSid, authToken);
+
+		// Submit email verification request with method that return status immediately
+		ValidationJobs jobs = restClient.getEmailValidations().listJobs();
+
+		for (ValidationOverview validationOverview: jobs.getData()){
+			System.out.printf("ID: %s => Status: %s => No of Entries: %s => Completed On: %s\n",
+					validationOverview.getId(),
+					validationOverview.getStatus(),
+					validationOverview.getNoOfEntries(),
+					validationOverview.getCompletedOn()
+			);
+		}
+	}
+
+	void queryVerifaliaEmailValidationsJobsWithFiltersSample(String accountSid, String authToken) throws VerifaliaException, IOException, URISyntaxException {
+
+		System.out.println("------------------------ queryVerifaliaEmailValidationsJobsWithFiltersSample ------------------------");
+
+		// Create REST client object with your credentials
+		VerifaliaRestClient restClient = new VerifaliaRestClient(accountSid, authToken);
+
+		// Submit request for listing job with filter createdOn
+		System.out.println("------------------------------------------------------");
+		ValidationJobs jobsResult1 = restClient.getEmailValidations().listJobs("2020-03-11");
+		System.out.println("Jobs results with filter createdOn: " + jobsResult1.getData().size());
+		for (ValidationOverview validationOverview: jobsResult1.getData()){
+			System.out.printf("ID: %s => Status: %s => No of Entries: %s\n",
+					validationOverview.getId(),
+					validationOverview.getStatus(),
+					validationOverview.getNoOfEntries()
+			);
+		}
+
+		// Submit request for listing job with filter createdOn, status
+		System.out.println("------------------------------------------------------");
+		ValidationJobs jobsResult2 = restClient.getEmailValidations().listJobs("2020-03-12", new String[] {
+			ValidationStatus.Completed.name(),
+			ValidationStatus.InProgress.name(),
+		});
+		System.out.println("Jobs results with filter createdOn and status: " + jobsResult2.getData().size());
+		for (ValidationOverview validationOverview: jobsResult2.getData()){
+			System.out.printf("ID: %s => Status: %s => No of Entries: %s\n",
+					validationOverview.getId(),
+					validationOverview.getStatus(),
+					validationOverview.getNoOfEntries()
+			);
+		}
+
+		// Submit request for listing job with filter filter createdOn and sort -createdOn
+		System.out.println("------------------------------------------------------");
+		ValidationJobs jobsResult3 = restClient.getEmailValidations().listJobs("2020-03-17", "-createdOn");
+		System.out.println("Jobs results with filter createdOn and sort -createdOn: " + jobsResult3.getData().size());
+		for (ValidationOverview validationOverview: jobsResult3.getData()){
+			System.out.printf("ID: %s => Status: %s => No of Entries: %s\n",
+					validationOverview.getId(),
+					validationOverview.getStatus(),
+					validationOverview.getNoOfEntries()
+			);
+		}
+
+		// Submit request for listing job with filter createdOn, status and sort createdOn
+		System.out.println("------------------------------------------------------");
+		ValidationJobs jobsResult4 = restClient.getEmailValidations().listJobs("2020-03-11", new String[] {
+				ValidationStatus.Completed.name(),
+				ValidationStatus.InProgress.name(),
+		}, "createdOn");
+		System.out.println("Jobs results with filter createdOn, status and sort createdOn: " + jobsResult4.getData().size());
+		for (ValidationOverview validationOverview: jobsResult4.getData()){
+			System.out.printf("ID: %s => Status: %s => No of Entries: %s\n",
+					validationOverview.getId(),
+					validationOverview.getStatus(),
+					validationOverview.getNoOfEntries()
+			);
+		}
+
+		// Submit request for listing job with object
+		System.out.println("------------------------------------------------------");
+		ValidationJobsFilter validationJobsFilter = new ValidationJobsFilter();
+		validationJobsFilter.setCreatedOnSince("2020-03-11");
+		validationJobsFilter.setCreatedOnUntil("2020-03-12");
+		validationJobsFilter.setExcludeStatuses(Arrays.asList(new String[] {
+				ValidationStatus.Expired.name(),
+		}));
+		validationJobsFilter.setSort("-createdOn");
+		ValidationJobs jobsResult5 = restClient.getEmailValidations().listJobs(validationJobsFilter);
+		System.out.println("Jobs results with object: " + jobsResult5.getData().size());
+		for (ValidationOverview validationOverview: jobsResult5.getData()){
+			System.out.printf("ID: %s => Status: %s => No of Entries: %s\n",
+					validationOverview.getId(),
+					validationOverview.getStatus(),
+					validationOverview.getNoOfEntries()
+			);
+		}
+	}
+
+	void getVerifaliaCreditsBalanceSample(String accountSid, String authToken) throws VerifaliaException, IOException, URISyntaxException {
+
+		System.out.println("------------------------ getVerifaliaCreditsBalanceSample ------------------------");
 
 		// Create REST client object with your credentials
 		VerifaliaRestClient restClient = new VerifaliaRestClient(accountSid, authToken);
@@ -224,7 +500,9 @@ public class Samples {
 		}
 	}
 
-	void getCreditsDailyUsageSample1(String accountSid, String authToken) throws VerifaliaException, IOException, URISyntaxException {
+	void getVerifaliaCreditsDailyUsageSample(String accountSid, String authToken) throws VerifaliaException, IOException, URISyntaxException {
+
+		System.out.println("------------------------ getVerifaliaCreditsDailyUsageSample ------------------------");
 
 		// Create REST client object with your credentials
 		VerifaliaRestClient restClient = new VerifaliaRestClient(accountSid, authToken);
@@ -245,19 +523,68 @@ public class Samples {
 		}
 	}
 
-	void getCreditsDailyUsageSample2(String accountSid, String authToken) throws VerifaliaException, IOException, URISyntaxException {
+	void getVerifaliaCreditsDailyUsageWithFiltersSample(String accountSid, String authToken) throws VerifaliaException, IOException, URISyntaxException {
+
+		System.out.println("------------------------ getVerifaliaCreditsDailyUsageWithFiltersSample ------------------------");
 
 		// Create REST client object with your credentials
 		VerifaliaRestClient restClient = new VerifaliaRestClient(accountSid, authToken);
 
-		// Submit email verification request with waiting parameters
-		CreditDailyUsage result = restClient.getCredits().dailyUsage("2020-03-12");
-
-		if (result == null) // Result is null if timeout expires
+		// Submit daily usage request with filter date
+		System.out.println("------------------------------------------------------");
+		CreditDailyUsage result1 = restClient.getCredits().dailyUsage("2020-03-12");
+		if (result1 == null) // Result is null if timeout expires
 			System.err.println("Request timeout expired");
 		else {
 			// Display results
-			for (CreditBalanceData creditBalanceData: result.getData()){
+			for (CreditBalanceData creditBalanceData: result1.getData()){
+				System.out.printf("Date: %s =>, Credit Packs: %s => Free Credits: %s\n",
+						creditBalanceData.getDate(),
+						creditBalanceData.getCreditPacks(),
+						creditBalanceData.getFreeCredits());
+			}
+		}
+
+		// Submit daily usage request with filter dateSince and filter dateUntil
+		System.out.println("------------------------------------------------------");
+		CreditDailyUsage result2 = restClient.getCredits().dailyUsage("2020-03-12", "2020-03-16");
+		if (result2 == null) // Result is null if timeout expires
+			System.err.println("Request timeout expired");
+		else {
+			// Display results
+			for (CreditBalanceData creditBalanceData: result2.getData()){
+				System.out.printf("Date: %s =>, Credit Packs: %s => Free Credits: %s\n",
+						creditBalanceData.getDate(),
+						creditBalanceData.getCreditPacks(),
+						creditBalanceData.getFreeCredits());
+			}
+		}
+
+		// Submit daily usage request with filter object
+		System.out.println("------------------------------------------------------");
+		CreditDailyUsageFilter creditDailyUsageFilter1 = new CreditDailyUsageFilter("2020-03-12");
+		CreditDailyUsage result3 = restClient.getCredits().dailyUsage(creditDailyUsageFilter1);
+		if (result2 == null) // Result is null if timeout expires
+			System.err.println("Request timeout expired");
+		else {
+			// Display results
+			for (CreditBalanceData creditBalanceData: result3.getData()){
+				System.out.printf("Date: %s =>, Credit Packs: %s => Free Credits: %s\n",
+						creditBalanceData.getDate(),
+						creditBalanceData.getCreditPacks(),
+						creditBalanceData.getFreeCredits());
+			}
+		}
+
+		// Submit daily usage request with filter object
+		System.out.println("------------------------------------------------------");
+		CreditDailyUsageFilter creditDailyUsageFilter2 = new CreditDailyUsageFilter("2020-03-12", "2020-03-16");
+		CreditDailyUsage result4 = restClient.getCredits().dailyUsage(creditDailyUsageFilter2);
+		if (result2 == null) // Result is null if timeout expires
+			System.err.println("Request timeout expired");
+		else {
+			// Display results
+			for (CreditBalanceData creditBalanceData: result4.getData()){
 				System.out.printf("Date: %s =>, Credit Packs: %s => Free Credits: %s\n",
 						creditBalanceData.getDate(),
 						creditBalanceData.getCreditPacks(),
@@ -265,110 +592,4 @@ public class Samples {
 			}
 		}
 	}
-
-	void getCreditsDailyUsageSample3(String accountSid, String authToken) throws VerifaliaException, IOException, URISyntaxException {
-
-		// Create REST client object with your credentials
-		VerifaliaRestClient restClient = new VerifaliaRestClient(accountSid, authToken);
-
-		// Submit email verification request with waiting parameters
-		CreditDailyUsage result = restClient.getCredits().dailyUsage("");
-
-		if (result == null) // Result is null if timeout expires
-			System.err.println("Request timeout expired");
-		else {
-			// Display results
-			for (CreditBalanceData creditBalanceData: result.getData()){
-				System.out.printf("Date: %s =>, Credit Packs: %s => Free Credits: %s\n",
-						creditBalanceData.getDate(),
-						creditBalanceData.getCreditPacks(),
-						creditBalanceData.getFreeCredits());
-			}
-		}
-	}
-
-	void getCreditsDailyUsageSample4(String accountSid, String authToken) throws VerifaliaException, IOException, URISyntaxException {
-
-		// Create REST client object with your credentials
-		VerifaliaRestClient restClient = new VerifaliaRestClient(accountSid, authToken);
-
-		// Submit email verification request with waiting parameters
-		CreditDailyUsage result = restClient.getCredits().dailyUsage("2020-03-12", "2020-03-13");
-
-		if (result == null) // Result is null if timeout expires
-			System.err.println("Request timeout expired");
-		else {
-			// Display results
-			for (CreditBalanceData creditBalanceData: result.getData()){
-				System.out.printf("Date: %s =>, Credit Packs: %s => Free Credits: %s\n",
-						creditBalanceData.getDate(),
-						creditBalanceData.getCreditPacks(),
-						creditBalanceData.getFreeCredits());
-			}
-		}
-	}
-
-	void getCreditsDailyUsageSample5(String accountSid, String authToken) throws VerifaliaException, IOException, URISyntaxException {
-
-		// Create REST client object with your credentials
-		VerifaliaRestClient restClient = new VerifaliaRestClient(accountSid, authToken);
-
-		// Submit email verification request with waiting parameters
-		CreditDailyUsage result = restClient.getCredits().dailyUsage("", "2020-03-13");
-
-		if (result == null) // Result is null if timeout expires
-			System.err.println("Request timeout expired");
-		else {
-			// Display results
-			for (CreditBalanceData creditBalanceData: result.getData()){
-				System.out.printf("Date: %s =>, Credit Packs: %s => Free Credits: %s\n",
-						creditBalanceData.getDate(),
-						creditBalanceData.getCreditPacks(),
-						creditBalanceData.getFreeCredits());
-			}
-		}
-	}
-
-	void getCreditsDailyUsageSample6(String accountSid, String authToken) throws VerifaliaException, IOException, URISyntaxException {
-
-		// Create REST client object with your credentials
-		VerifaliaRestClient restClient = new VerifaliaRestClient(accountSid, authToken);
-
-		// Submit email verification request with waiting parameters
-		CreditDailyUsage result = restClient.getCredits().dailyUsage("2020-03-12", "");
-
-		if (result == null) // Result is null if timeout expires
-			System.err.println("Request timeout expired");
-		else {
-			// Display results
-			for (CreditBalanceData creditBalanceData: result.getData()){
-				System.out.printf("Date: %s =>, Credit Packs: %s => Free Credits: %s\n",
-						creditBalanceData.getDate(),
-						creditBalanceData.getCreditPacks(),
-						creditBalanceData.getFreeCredits());
-			}
-		}
-	}
-
-	void getCreditsDailyUsageSample7(String accountSid, String authToken) throws VerifaliaException, IOException, URISyntaxException {
-
-		// Create REST client object with your credentials
-		VerifaliaRestClient restClient = new VerifaliaRestClient(accountSid, authToken);
-
-		// Submit email verification request with waiting parameters
-		CreditDailyUsage result = restClient.getCredits().dailyUsage("", "");
-
-		if (result == null) // Result is null if timeout expires
-			System.err.println("Request timeout expired");
-		else {
-			// Display results
-			for (CreditBalanceData creditBalanceData: result.getData()){
-				System.out.printf("Date: %s =>, Credit Packs: %s => Free Credits: %s\n",
-						creditBalanceData.getDate(),
-						creditBalanceData.getCreditPacks(),
-						creditBalanceData.getFreeCredits());
-			}
-		}
-	}
-
 }

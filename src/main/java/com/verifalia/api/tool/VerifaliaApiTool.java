@@ -51,7 +51,7 @@ public class VerifaliaApiTool {
 			System.err.println("Error: Too few arguments for the command '" + args[0] + "'.");
 			return 1;
 		}
-		System.out.println("Deleting job (uniqueId=" + args[1] + "...");
+		System.out.println("Deleting job (id=" + args[1] + "...");
 		VerifaliaRestClient client = new VerifaliaRestClient(args[2], args[3]);
 		client.getEmailValidations().delete(args[1]);
 		return 0;
@@ -73,8 +73,7 @@ public class VerifaliaApiTool {
 		class ServerPollingLoopEventListenerImpl implements ServerPollingLoopEventListener {
 			@Override
 			public void onPollingLoopEvent(ServerPollingLoopEvent event, Validation currentResult) {
-				switch(event)
-				{
+				switch(event) {
 					case ServerPollingLoopStarted: {
 						System.out.println("Info: Polling loop started.");
 						break;

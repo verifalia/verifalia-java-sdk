@@ -26,11 +26,11 @@ public class RestClientTest {
 
 	private static final String USER_AGENT = "agent/1.0";
 	private static final String RESOURCE = "email-verification";
-	
+
 	private static MiniHTTPD httpd;
 
 	private RestClient restClient;
-	
+
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
 		httpd = new MiniHTTPD(TestData.JSON_STRING);
@@ -43,16 +43,16 @@ public class RestClientTest {
 			httpd.stop();
 			httpd = null;
 		}
-	}	
+	}
 
 	@Before
 	public void setUp() throws Exception {
-		restClient = new RestClient("http://localhost:" + httpd.getPort(), "v1.1", "SID", "AUTH_TOKEN", USER_AGENT);
+		restClient = new RestClient("http://localhost:" + httpd.getPort(), "v2.1", "SID", "AUTH_TOKEN", USER_AGENT);
 	}
 
 	@Test
 	public void testRestClient() throws URISyntaxException {
-		RestClient client = new RestClient("http://localhost:" + httpd.getPort(), "v1.1", "SID", "AUTH_TOKEN", USER_AGENT);
+		RestClient client = new RestClient("http://localhost:" + httpd.getPort(), "v2.1", "SID", "AUTH_TOKEN", USER_AGENT);
 		System.out.println(client.toString());
 	}
 
@@ -84,13 +84,13 @@ public class RestClientTest {
 
 	@Test
 	public void testGetAPIVersion() {
-		assertEquals("v1.1", restClient.getAPIVersion());
+		assertEquals("v2.1", restClient.getApiVersion());
 	}
 
 	@Test
 	public void testSetAPIVersion() {
-		restClient.setAPIVersion("v2.0");
-		assertEquals("v2.0", restClient.getAPIVersion());
+		restClient.setApiVersion("v2.1");
+		assertEquals("v2.1", restClient.getApiVersion());
 	}
 
 	@Test

@@ -22,6 +22,8 @@ public class Constants {
 	 * API end points for functionalities provided
 	 */
 	public static final String EMAIL_VALIDATIONS_RESOURCE = "email-validations";
+	public static final String EMAIL_VALIDATIONS_OVERVIEW_RESOURCE = "overview";
+	public static final String EMAIL_VALIDATIONS_ENTRIES_RESOURCE = "entries";
 	public static final String CREDITS_RESOURCE = "credits";
 	public static final String CREDITS_BALANCE_RESOURCE = CREDITS_RESOURCE + "/balance";
 	public static final String CREDITS_DAILY_USAGE_RESOURCE = CREDITS_RESOURCE + "/daily-usage";

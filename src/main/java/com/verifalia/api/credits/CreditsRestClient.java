@@ -1,12 +1,19 @@
 package com.verifalia.api.credits;
 
+import static java.util.Objects.nonNull;
+
 import java.io.IOException;
+import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 
 import com.verifalia.api.common.Constants;
+import com.verifalia.api.common.Utils;
 import com.verifalia.api.credits.models.CreditBalanceData;
 import com.verifalia.api.credits.models.CreditDailyUsage;
+import com.verifalia.api.credits.models.CreditDailyUsageFilter;
 import com.verifalia.api.exceptions.VerifaliaException;
 import com.verifalia.api.rest.HttpRequestMethod;
 import com.verifalia.api.rest.HttpStatusCode;
@@ -35,6 +42,7 @@ public class CreditsRestClient {
      * @throws IOException
      */
     public CreditBalanceData balance() throws IOException {
+    	// Make rest request
     	RestRequest request = new RestRequest(HttpRequestMethod.GET, Constants.CREDITS_BALANCE_RESOURCE);
 
         // Sends the request to the Verifalia servers
@@ -52,15 +60,8 @@ public class CreditsRestClient {
      * @throws IOException
      */
     public CreditDailyUsage dailyUsage() throws IOException {
-    	RestRequest request = new RestRequest(HttpRequestMethod.GET, Constants.CREDITS_DAILY_USAGE_RESOURCE);
-
-        // Sends the request to the Verifalia servers
-        RestResponse response = restClient.execute(request, CreditDailyUsage.class);
-
-        if(response.getStatusCode() != HttpStatusCode.OK)
-        	throw new VerifaliaException(response);
-
-        return (CreditDailyUsage)response.getData();
+    	CreditDailyUsageFilter creditDailyUsageFilter = null;
+    	return dailyUsage(creditDailyUsageFilter);
     }
 
     /**
@@ -70,20 +71,8 @@ public class CreditsRestClient {
      * @throws IOException
      */
     public CreditDailyUsage dailyUsage(String date) throws IOException {
-    	String resource = Constants.CREDITS_DAILY_USAGE_RESOURCE;
-    	if(!StringUtils.isBlank(date)){
-    		resource += "?" + Constants.CREDITS_DAILY_UAGSE_PARAM_DATE + "=" + date;
-    	}
-
-    	RestRequest request = new RestRequest(HttpRequestMethod.GET, resource);
-
-        // Sends the request to the Verifalia servers
-        RestResponse response = restClient.execute(request, CreditDailyUsage.class);
-
-        if(response.getStatusCode() != HttpStatusCode.OK)
-        	throw new VerifaliaException(response);
-
-        return (CreditDailyUsage)response.getData();
+    	CreditDailyUsageFilter creditDailyUsageFilter = new CreditDailyUsageFilter(date);
+    	return dailyUsage(creditDailyUsageFilter);
     }
 
     /**
@@ -94,21 +83,26 @@ public class CreditsRestClient {
      * @throws IOException
      */
     public CreditDailyUsage dailyUsage(String dateSince, String dateUntil) throws IOException {
-    	String resource = Constants.CREDITS_DAILY_USAGE_RESOURCE;
-    	if(!StringUtils.isBlank(dateSince) || !StringUtils.isBlank(dateUntil)){
-    		resource += "?";
-    		if(!StringUtils.isBlank(dateSince)){
-    			resource += Constants.CREDITS_DAILY_UAGSE_PARAM_DATE_SINCE + "=" + dateSince;
-    		}
-    		if(!StringUtils.isBlank(dateUntil)){
-    			if(!StringUtils.isBlank(dateSince)){
-    				resource += "&";
-    			}
-    			resource += Constants.CREDITS_DAILY_UAGSE_PARAM_DATE_UNTIL + "=" + dateUntil;
-    		}
-    	}
+    	CreditDailyUsageFilter creditDailyUsageFilter = new CreditDailyUsageFilter(dateSince, dateUntil);
+    	return dailyUsage(creditDailyUsageFilter);
+    }
 
-    	RestRequest request = new RestRequest(HttpRequestMethod.GET, resource);
+    public CreditDailyUsage dailyUsage(CreditDailyUsageFilter creditDailyUsageFilter) throws IOException {
+    	// Build query string parameters map
+    	Map<String, String> paramMap = getDailyUsageParamMap(creditDailyUsageFilter);
+
+    	// Build request URI with the param map
+    	URI requestUri = Utils.getHttpUri(null, null, null, paramMap);
+
+    	// Build query entries resource string
+    	StringBuilder dailyUsageResource = new StringBuilder(Constants.CREDITS_DAILY_USAGE_RESOURCE);
+    	if(nonNull(requestUri) && !StringUtils.isBlank(requestUri.toString())){
+    		dailyUsageResource.append(requestUri.toString());
+    	}
+    	System.out.println("URI: " + dailyUsageResource.toString());
+
+    	// Make request object for the rest call
+    	RestRequest request = new RestRequest(HttpRequestMethod.GET, dailyUsageResource.toString());
 
         // Sends the request to the Verifalia servers
         RestResponse response = restClient.execute(request, CreditDailyUsage.class);
@@ -118,4 +112,25 @@ public class CreditsRestClient {
 
         return (CreditDailyUsage)response.getData();
     }
+
+    private Map<String, String> getDailyUsageParamMap(CreditDailyUsageFilter creditDailyUsageFilter){
+    	Map<String, String> paramMap = new HashMap<String, String>();
+    	if(nonNull(creditDailyUsageFilter)){
+    		// TODO - Validate daily usage filter
+	    	// Date filter
+	    	if(!StringUtils.isBlank(creditDailyUsageFilter.getDate())){
+	    		paramMap.put("date", creditDailyUsageFilter.getDate());
+	    	}
+	    	// Date since filter
+	    	if(!StringUtils.isBlank(creditDailyUsageFilter.getDateSince())){
+	    		paramMap.put("date:since", creditDailyUsageFilter.getDateSince());
+	    	}
+	    	// Date until filter
+	    	if(!StringUtils.isBlank(creditDailyUsageFilter.getDateUntil())){
+	    		paramMap.put("date:until", creditDailyUsageFilter.getDateUntil());
+	    	}
+    	}
+    	return paramMap;
+    }
+
 }

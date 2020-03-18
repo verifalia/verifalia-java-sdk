@@ -40,6 +40,7 @@
 		<junit.version>4.8.1</junit.version>
 		<lombok.version>1.18.4</lombok.version>
 		<apache.commons.version>3.9</apache.commons.version>
+		<http.client.version>4.5.12</http.client.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 	</properties>
@@ -70,6 +71,12 @@
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
 			<version>${apache.commons.version}</version>
+		</dependency>
+		<!-- Http Client -->
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+			<version>${http.client.version}</version>
 		</dependency>
 	</dependencies>
 

@@ -1,8 +1,13 @@
 package com.verifalia.api;
 
+import lombok.Getter;
+import lombok.Setter;
+
 /**
  * Represent the waiting options for a submission to the Verifalia API.
  */
+@Getter
+@Setter
 public class WaitForCompletionOptions {
     /**
      * Instructs the client to avoid waiting for the completion of the submission at the Verifalia side; will
@@ -15,28 +20,10 @@ public class WaitForCompletionOptions {
      */
     private int timeout;
 
-    public int getTimeout() {
-    	return timeout;
-    }
-
     /**
      * The polling interval for the completion check.
      */
     private int pollingInterval;
-
-    /**
-     * Returns polling interval for the completion check.
-     */
-    public int getPollingInterval() {
-    	return pollingInterval;
-    }
-
-    /**
-     * Sets polling interval for the completion check.
-     */
-    public void setPollingInterval(int pollingInterval) {
-    	this.pollingInterval = pollingInterval;
-    }
 
     /**
      * Default interval between subsequent polling requests.

@@ -11,10 +11,36 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 
+import lombok.Getter;
+import lombok.Setter;
+
 /***
  * Represents REST client
  */
+@Getter
+@Setter
 public class RestClient {
+
+	/**
+	 * Base URI
+	 */
+	private URI baseURI;
+
+	/**
+	 * API version
+	 */
+	private String apiVersion;
+
+	/**
+	 * User Agent string
+	 */
+	private String userAgent;
+
+	/**
+	 * Authentication string
+	 */
+	private String authString;
+
 	/**
 	 * Creates new object using given host name and API version.
 	 * @param baseURL Base URL of the server
@@ -58,7 +84,6 @@ public class RestClient {
 		HttpURLConnection conn = sendRequest(request);
 		int responseCode = conn.getResponseCode();
 		InputStream input = HttpStatusCode.isSuccess(responseCode) ? conn.getInputStream() : conn.getErrorStream();
-		System.out.println("RestClient :: execute :: Response Code: " + responseCode);
 		return new RestResponse(responseCode, input, responseObjectClass);
 	}
 
@@ -83,7 +108,6 @@ public class RestClient {
 			case POST: {
 				conn.setRequestProperty("Accept", "application/json");
 				byte[] body = request.getEncodedEntries().getBytes("UTF-8");
-				System.out.println("Request Body: " + request.getEncodedEntries());
 				conn.setRequestProperty("Content-Length", Integer.toString(body.length));
 				conn.setDoOutput(true);
 				OutputStream out = conn.getOutputStream();
@@ -102,60 +126,4 @@ public class RestClient {
 
 		return conn;
 	}
-
-
-	/**
-	 * Returns base URI
-	 */
-	public URI getBaseURI() {
-		return baseURI;
-	}
-
-	/**
-	 * Sets base URI
-	 */
-	public void setBaseURI(URI baseURI) {
-		this.baseURI = baseURI;
-	}
-
-	/**
-	 * Returns API version
-	 */
-	public String getAPIVersion() {
-		return apiVersion;
-	}
-
-	/**
-	 * Sets API version
-	 */
-	public void setAPIVersion(String apiVersion) {
-		this.apiVersion = apiVersion;
-	}
-
-	/**
-	 * Returns user agent string
-	 */
-	public String getUserAgent() {
-		return userAgent;
-	}
-
-	/**
-	 * Base URI
-	 */
-	private URI baseURI;
-
-	/**
-	 * API version
-	 */
-	private String apiVersion;
-
-	/**
-	 * User Agent string
-	 */
-	private String userAgent;
-
-	/**
-	 * Authentication string
-	 */
-	String authString;
 }
