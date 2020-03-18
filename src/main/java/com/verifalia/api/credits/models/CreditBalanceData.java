@@ -9,7 +9,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 /**
- * Represents a single credit balance details for Verifalia API service
+ * Represents a single credit balance details for Verifalia API service.
  */
 @Getter
 @Setter

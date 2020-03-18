@@ -49,15 +49,15 @@ public class EmailValidationsRestClient {
 
     /**
      * Initiates a new email validation batch. Makes a POST request to the "/email-validations" resource.
-     * <p>Upon initialization, batches usually are in the {@link ValidationStatus#Pending Pending} status.
-     * Validations are completed only when their {@link Validation#status} property
+     * <p>Upon initialization, batches usually are in the {@link ValidationStatus#InProgress InProgress} status.
+     * Validations are completed only when their {@link ValidationOverview#status} property
      * is {@link ValidationStatus#Completed Completed}. Use the {@link EmailValidationsRestClient#submit(String[], WaitForCompletionOptions)}
      * to wait for the completion of the batch without having to manually poll the API.
      * In order to retrieve the most up-to-date snapshot of a validation batch, call the {@link EmailValidationsRestClient#query(String) query}
-     * along with the batch's {@link Validation#uniqueID}.
+     * along with the batch's {@link ValidationOverview#id}.
      *
      * @param emailAddresses A collection of email addresses to validate
-     * @return An object representing the email validation batch
+     * @return An object representing the email validation batch.
      * @throws VerifaliaException
      * @throws IOException
      */
@@ -67,12 +67,12 @@ public class EmailValidationsRestClient {
 
     /**
      * Initiates a new email validation batch. Makes a POST request to the "/email-validations" resource.
-     * <p>Upon initialization, batches usually are in the {@link ValidationStatus#Pending Pending} status.
-     * Validations are completed only when their {@link Validation#status} property
+     * <p>Upon initialization, batches usually are in the {@link ValidationStatus#InProgress InProgress} status.
+     * Validations are completed only when their {@link ValidationOverview#status} property
      * is {@link ValidationStatus#Completed Completed}. Use the {@link EmailValidationsRestClient#submit(java.lang.Iterable, WaitForCompletionOptions)}
      * to wait for the completion of the batch without having to manually poll the API.
      * In order to retrieve the most up-to-date snapshot of a validation batch, call the {@link EmailValidationsRestClient#query(String) query}
-     * along with the batch's {@link Validation#uniqueID}.
+     * along with the batch's {@link ValidationOverview#id}.
      *
      * @param emailAddresses A collection of email addresses to validate
      * @return An object representing the email validation batch
@@ -85,12 +85,12 @@ public class EmailValidationsRestClient {
 
     /**
      * Initiates a new email validation batch. Makes a POST request to the "/email-validations" resource.
-     * <p>Upon initialization, batches usually are in the {@link ValidationStatus#Pending Pending} status.
-     * Validations are completed only when their {@link Validation#status} property.
+     * <p>Upon initialization, batches usually are in the {@link ValidationStatus#InProgress InProgress} status.
+     * Validations are completed only when their {@link ValidationOverview#status} property.
      * is {@link ValidationStatus#Completed Completed}; the <b>waitForCompletionOptions</b> parameter
      * allows to wait for the completion of the batch, without having to manually poll the API.
      * In order to retrieve the most up-to-date snapshot of a validation batch, call the {@link EmailValidationsRestClient#query(String)}
-     * along with the batch's {@link Validation#uniqueID}.
+     * along with the batch's {@link ValidationOverview#id}.
      *
      * @param emailAddresses A collection of email addresses to validate
      * @param waitForCompletionOptions The options about waiting for the validation completion
@@ -104,12 +104,12 @@ public class EmailValidationsRestClient {
 
     /**
      * Initiates a new email validation batch. Makes a POST request to the "/email-validations" resource.
-     * <p>Upon initialization, batches usually are in the {@link ValidationStatus#Pending Pending} status.
-     * Validations are completed only when their {@link Validation#status} property.
+     * <p>Upon initialization, batches usually are in the {@link ValidationStatus#InProgress InProgress} status.
+     * Validations are completed only when their {@link ValidationOverview#status} property.
      * is {@link ValidationStatus#Completed Completed}; the {@code waitForCompletionOptions} parameter
      * allows to wait for the completion of the batch, without having to manually poll the API.
      * In order to retrieve the most up-to-date snapshot of a validation batch, call the {@link EmailValidationsRestClient#query(String)}
-     * along with the batch's {@link Validation#uniqueID}.
+     * along with the batch's {@link ValidationOverview#id}.
      *
      * @param emailAddresses A collection of email addresses to validate
      * @param waitForCompletionOptions The options about waiting for the validation completion
@@ -128,7 +128,6 @@ public class EmailValidationsRestClient {
             throw new IllegalArgumentException("Can't validate an empty batch (emailAddresses)");
 
         // Build the REST request
-
         RestRequest request = new RestRequest(HttpRequestMethod.POST, Constants.EMAIL_VALIDATIONS_RESOURCE);
         request.addEntries(emailAddresses);
 
@@ -174,10 +173,10 @@ public class EmailValidationsRestClient {
 
     /**
      * Returns an object representing an email validation batch, identified by the specified unique identifier.
-     * Makes a GET request to the <b>"/email-validations/{uniqueId}"</b> resource.
+     * Makes a GET request to the <b>"/email-validations/{id}"</b> resource.
      * <p>To initiate a new email validation batch, please use {@link EmailValidationsRestClient#submit(java.lang.Iterable)}
      * @param id The identifier for an email validation batch to be retrieved.
-     * @return An object representing the current status of the requested email validation batch.
+     * @return Validation An object representing the current status of the requested email validation batch.
      * @throws IOException
      */
     public Validation query(String id) throws IOException {
@@ -190,7 +189,7 @@ public class EmailValidationsRestClient {
      * <p>To initiate a new email validation batch, please use {@link EmailValidationsRestClient#submit(java.lang.Iterable)}
      * @param id The identifier for an email validation batch to be retrieved.
      * @param waitOptions The options about waiting for the validation completion.
-     * @return An object representing the current status of the requested email validation batch.
+     * @return Validation An object representing the current status of the requested email validation batch.
      * @throws IOException
      */
     public Validation query(final String id, final WaitForCompletionOptions waitOptions) throws IOException {
@@ -336,7 +335,7 @@ public class EmailValidationsRestClient {
      * @param id The identifier for an email validation batch to be retrieved.
      * @return An object representing the current status of the requested email validation batch.
      */
-    Validation queryOnce(String id) throws IOException {
+    public Validation queryOnce(String id) throws IOException {
         RestRequest request = new RestRequest(HttpRequestMethod.GET, Constants.EMAIL_VALIDATIONS_RESOURCE + "/" + id);
 
         // Sends the request to the Verifalia servers
@@ -369,7 +368,7 @@ public class EmailValidationsRestClient {
      * Makes a GET request to the <b>"/email-validations/{id}/overview"</b> resource.
      * <p>To initiate a new email validation batch, please use {@link EmailValidationsRestClient#submit(java.lang.Iterable)}
      * @param id The identifier for an email validation batch to be retrieved.
-     * @return An object representing the overview of the requested email validation batch.
+     * @return ValidationOverview An object representing the overview of the requested email validation batch.
      */
     public ValidationOverview queryOverview(String id) throws IOException {
         RestRequest request = new RestRequest(HttpRequestMethod.GET, Constants.EMAIL_VALIDATIONS_RESOURCE + "/" + id
@@ -405,25 +404,49 @@ public class EmailValidationsRestClient {
      * Makes a GET request to the <b>"/email-validations/{id}/entries"</b> resource.
      * <p>To initiate a new email validation batch, please use {@link EmailValidationsRestClient#submit(java.lang.Iterable)}
      * @param id The identifier for an email validation batch to be retrieved.
-     * @return An object representing the entries of the requested email validation batch.
+     * @return ValidationEntries An object representing the entries of the requested email validation batch.
      */
     public ValidationEntries queryEntries(String id) throws IOException {
     	ValidationEntriesFilter validationEntriesFilter = null;
     	return queryEntries(id, validationEntriesFilter);
     }
 
+    /**
+     * Returns an object representing an email validation batch entries, identified by the specified unique identifier and with specified statuses.
+     * Makes a GET request to the <b>"/email-validations/{id}/entries"</b> resource.
+     * <p>To initiate a new email validation batch, please use {@link EmailValidationsRestClient#submit(java.lang.Iterable)}
+     * @param id The identifier for an email validation batch to be retrieved.
+     * @param statuses A collection of statuses for which the entries needs to be retrieved.
+     * @return ValidationEntries An object representing the entries of the requested email validation batch.
+     */
     public ValidationEntries queryEntries(String id, String[] statuses) throws IOException {
     	ValidationEntriesFilter validationEntriesFilter = new ValidationEntriesFilter();
     	validationEntriesFilter.setStatuses(Arrays.asList(statuses));
     	return queryEntries(id, validationEntriesFilter);
     }
 
+    /**
+     * Returns an object representing an email validation batch entries, identified by the specified unique identifier and with specified statuses.
+     * Makes a GET request to the <b>"/email-validations/{id}/entries"</b> resource.
+     * <p>To initiate a new email validation batch, please use {@link EmailValidationsRestClient#submit(java.lang.Iterable)}
+     * @param id The identifier for an email validation batch to be retrieved.
+     * @param statuses A collection of statuses for which the entries needs to be retrieved.
+     * @return ValidationEntries An object representing the entries of the requested email validation batch.
+     */
     public ValidationEntries queryEntries(String id, Iterable<String> statuses) throws IOException {
     	ValidationEntriesFilter validationEntriesFilter = new ValidationEntriesFilter();
     	validationEntriesFilter.setStatuses(statuses);
     	return queryEntries(id, validationEntriesFilter);
     }
 
+    /**
+     * Returns an object representing an email validation batch entries, identified by the specified unique identifier and with specified statuses.
+     * Makes a GET request to the <b>"/email-validations/{id}/entries"</b> resource.
+     * <p>To initiate a new email validation batch, please use {@link EmailValidationsRestClient#submit(java.lang.Iterable)}
+     * @param id The identifier for an email validation batch to be retrieved.
+     * @param validationEntriesFilter An object with the various filters mentioned when retrieving entries.
+     * @return ValidationEntries An object representing the entries of the requested email validation batch.
+     */
     public ValidationEntries queryEntries(String id, ValidationEntriesFilter validationEntriesFilter)
     		throws IOException{
     	// Build query string parameters map
@@ -472,18 +495,38 @@ public class EmailValidationsRestClient {
     	return paramMap;
     }
 
-
+    /**
+     * Returns an object representing the various email validations jobs initiated.
+     * Makes a GET request to the <b>"/email-validations"</b> resource.
+     * <p>To initiate a new email validation batch, please use {@link EmailValidationsRestClient#submit(java.lang.Iterable)}
+     * @return ValidationJobs An object representing the email validation jobs.
+     */
     public ValidationJobs listJobs() throws IOException{
     	ValidationJobsFilter validationJobsFilter = null;
     	return listJobs(validationJobsFilter);
     }
 
+    /**
+     * Returns an object representing the various email validations jobs initiated for the input date.
+     * Makes a GET request to the <b>"/email-validations"</b> resource.
+     * <p>To initiate a new email validation batch, please use {@link EmailValidationsRestClient#submit(java.lang.Iterable)}
+     * @param filterCreatedOn Date in format YYYY-MM-DD for which usage job details needs to be fetched. If null or blank value is passed, it will not consider the param when making request.
+     * @return ValidationJobs An object representing the email validation jobs.
+     */
     public ValidationJobs listJobs(String filterCreatedOn) throws IOException{
     	ValidationJobsFilter validationJobsFilter = new ValidationJobsFilter();
     	validationJobsFilter.setCreatedOn(filterCreatedOn);
     	return listJobs(validationJobsFilter);
     }
 
+    /**
+     * Returns an object representing the various email validations jobs initiated for the input date and with given statuses.
+     * Makes a GET request to the <b>"/email-validations"</b> resource.
+     * <p>To initiate a new email validation batch, please use {@link EmailValidationsRestClient#submit(java.lang.Iterable)}
+     * @param filterCreatedOn Date in format YYYY-MM-DD for which usage job details needs to be fetched. If null or blank value is passed, it will not consider the param when making request.
+     * @param statuses  A collection of statuses for which the jobs needs to be retrieved.
+     * @return ValidationJobs An object representing the email validation jobs.
+     */
     public ValidationJobs listJobs(String filterCreatedOn, String[] statuses) throws IOException{
     	ValidationJobsFilter validationJobsFilter = new ValidationJobsFilter();
     	validationJobsFilter.setCreatedOn(filterCreatedOn);
@@ -491,6 +534,14 @@ public class EmailValidationsRestClient {
     	return listJobs(validationJobsFilter);
     }
 
+    /**
+     * Returns an object representing the various email validations jobs initiated for the input date and with given sort direction
+     * Makes a GET request to the <b>"/email-validations"</b> resource.
+     * <p>To initiate a new email validation batch, please use {@link EmailValidationsRestClient#submit(java.lang.Iterable)}
+     * @param filterCreatedOn Date in format YYYY-MM-DD for which usage job details needs to be fetched. If null or blank value is passed, it will not consider the param when making request.
+     * @param sort String based on which sort needs to be applied when fetching results.
+     * @return ValidationJobs An object representing the email validation jobs.
+     */
     public ValidationJobs listJobs(String filterCreatedOn, String sort) throws IOException{
     	ValidationJobsFilter validationJobsFilter = new ValidationJobsFilter();
     	validationJobsFilter.setCreatedOn(filterCreatedOn);
@@ -498,6 +549,15 @@ public class EmailValidationsRestClient {
     	return listJobs(validationJobsFilter);
     }
 
+    /**
+     * Returns an object representing the various email validations jobs initiated for the input date, given statuses and with given sort direction
+     * Makes a GET request to the <b>"/email-validations"</b> resource.
+     * <p>To initiate a new email validation batch, please use {@link EmailValidationsRestClient#submit(java.lang.Iterable)}
+     * @param filterCreatedOn Date in format YYYY-MM-DD for which usage job details needs to be fetched. If null or blank value is passed, it will not consider the param when making request.
+     * @param statuses  A collection of statuses for which the jobs needs to be retrieved.
+     * @param sort String based on which sort needs to be applied when fetching results.
+     * @return ValidationJobs An object representing the email validation jobs.
+     */
     public ValidationJobs listJobs(String filterCreatedOn, String[] statuses, String sort) throws IOException{
     	ValidationJobsFilter validationJobsFilter = new ValidationJobsFilter();
     	validationJobsFilter.setCreatedOn(filterCreatedOn);
@@ -506,6 +566,13 @@ public class EmailValidationsRestClient {
     	return listJobs(validationJobsFilter);
     }
 
+    /**
+     * Returns an object representing the various email validations jobs initiated based on filter and sort options passed.
+     * Makes a GET request to the <b>"/email-validations"</b> resource.
+     * <p>To initiate a new email validation batch, please use {@link EmailValidationsRestClient#submit(java.lang.Iterable)}
+     * @param validationJobFilter Object with options for filters and sort options supported.
+     * @return ValidationJobs An object representing the email validation jobs.
+     */
     public ValidationJobs listJobs(ValidationJobsFilter validationJobFilter) throws IOException{
     	// Build query string param map
     	Map<String, String> paramMap = getListJobsParamMap(validationJobFilter);
@@ -572,7 +639,7 @@ public class EmailValidationsRestClient {
     /**
      * Deletes an email validation batch, identified by the specified unique identifier.
      * Makes a DELETE request to the <b>"/email-validations/{id}"</b> resource.
-     * @param uniqueId The unique identifier for an email validation batch to be deleted
+     * @param id The identifier for an email validation batch to be deleted.
      * @throws IOException
      */
     public void delete(String id) throws IOException {

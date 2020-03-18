@@ -9,7 +9,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 /**
- * Represents a snapshot of an email validation batch.
+ * Represents a snapshot of entries for email validation batch.
  */
 @Getter
 @Setter

@@ -5,7 +5,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 /**
- * Represents a snapshot of an email validation batch.
+ * Represents meta information for all Verifalia API responses
  */
 @Getter
 @Setter

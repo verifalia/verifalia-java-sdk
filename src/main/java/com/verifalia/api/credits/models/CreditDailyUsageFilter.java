@@ -7,7 +7,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 /**
- * Filter object for fetching credit daily usage
+ * Filter object for various parameters when making API call to daily usage details.
  */
 @Getter
 @Setter

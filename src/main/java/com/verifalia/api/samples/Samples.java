@@ -222,8 +222,7 @@ public class Samples {
 	}
 
 	/**
-	 * This sample method demonstrates, how to use Verifalia API with preconfigured request timeout
-	 * and list for the status polling cycle events.
+	 * This sample method demonstrates, how to use Verifalia API to get overview information related to email validation job.
 	 * @param accountSid Your Verifalia sub-account SID
 	 * @param authToken Your Verifalia sub-account authentication token
 	 * @throws VerifaliaException
@@ -272,8 +271,7 @@ public class Samples {
 
 
 	/**
-	 * This sample method demonstrates, how to use Verifalia API with preconfigured request timeout
-	 * and list for the status polling cycle events.
+	 * This sample method demonstrates, how to use Verifalia API to get email validation entries information related to email validation job.
 	 * @param accountSid Your Verifalia sub-account SID
 	 * @param authToken Your Verifalia sub-account authentication token
 	 * @throws VerifaliaException
@@ -323,8 +321,7 @@ public class Samples {
 	}
 
 	/**
-	 * This sample method demonstrates, how to use Verifalia API with preconfigured request timeout
-	 * and list for the status polling cycle events.
+	 * This sample method demonstrates, how to use Verifalia API to get email validation entries information related to email validation with options for filters available.
 	 * @param accountSid Your Verifalia sub-account SID
 	 * @param authToken Your Verifalia sub-account authentication token
 	 * @throws VerifaliaException
@@ -378,6 +375,14 @@ public class Samples {
 		}
 	}
 
+	/**
+	 * This sample method demonstrates, how to use Verifalia API to get email validation jobs information for all submitted email validation batches.
+	 * @param accountSid Your Verifalia sub-account SID
+	 * @param authToken Your Verifalia sub-account authentication token
+	 * @throws VerifaliaException
+	 * @throws IOException
+	 * @throws URISyntaxException
+	 */
 	void queryVerifaliaEmailValidationsJobsSample(String accountSid, String authToken) throws VerifaliaException, IOException, URISyntaxException {
 
 		System.out.println("------------------------ queryVerifaliaEmailValidationsJobsSample ------------------------");
@@ -398,6 +403,14 @@ public class Samples {
 		}
 	}
 
+	/**
+	 * This sample method demonstrates, how to use Verifalia API to get email validation jobs information for all submitted email validation batches with options for filters available.
+	 * @param accountSid Your Verifalia sub-account SID
+	 * @param authToken Your Verifalia sub-account authentication token
+	 * @throws VerifaliaException
+	 * @throws IOException
+	 * @throws URISyntaxException
+	 */
 	void queryVerifaliaEmailValidationsJobsWithFiltersSample(String accountSid, String authToken) throws VerifaliaException, IOException, URISyntaxException {
 
 		System.out.println("------------------------ queryVerifaliaEmailValidationsJobsWithFiltersSample ------------------------");
@@ -479,6 +492,14 @@ public class Samples {
 		}
 	}
 
+	/**
+	 * This sample method demonstrates, how to use Verifalia API to get account credit balance information.
+	 * @param accountSid Your Verifalia sub-account SID
+	 * @param authToken Your Verifalia sub-account authentication token
+	 * @throws VerifaliaException
+	 * @throws IOException
+	 * @throws URISyntaxException
+	 */
 	void getVerifaliaCreditsBalanceSample(String accountSid, String authToken) throws VerifaliaException, IOException, URISyntaxException {
 
 		System.out.println("------------------------ getVerifaliaCreditsBalanceSample ------------------------");
@@ -500,6 +521,14 @@ public class Samples {
 		}
 	}
 
+	/**
+	 * This sample method demonstrates, how to use Verifalia API to get account balance daily usage details.
+	 * @param accountSid Your Verifalia sub-account SID
+	 * @param authToken Your Verifalia sub-account authentication token
+	 * @throws VerifaliaException
+	 * @throws IOException
+	 * @throws URISyntaxException
+	 */
 	void getVerifaliaCreditsDailyUsageSample(String accountSid, String authToken) throws VerifaliaException, IOException, URISyntaxException {
 
 		System.out.println("------------------------ getVerifaliaCreditsDailyUsageSample ------------------------");
@@ -523,6 +552,14 @@ public class Samples {
 		}
 	}
 
+	/**
+	 * This sample method demonstrates, how to use Verifalia API to get account balance daily usage details with details of filters available.
+	 * @param accountSid Your Verifalia sub-account SID
+	 * @param authToken Your Verifalia sub-account authentication token
+	 * @throws VerifaliaException
+	 * @throws IOException
+	 * @throws URISyntaxException
+	 */
 	void getVerifaliaCreditsDailyUsageWithFiltersSample(String accountSid, String authToken) throws VerifaliaException, IOException, URISyntaxException {
 
 		System.out.println("------------------------ getVerifaliaCreditsDailyUsageWithFiltersSample ------------------------");

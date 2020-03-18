@@ -1,4 +1,4 @@
-![Verifalia API](https://img.shields.io/badge/Verifalia%20API-v1.1-green)
+![Verifalia API](https://img.shields.io/badge/Verifalia%20API-v2.1-green)
 [![Build Status](https://travis-ci.org/verifalia/verifalia-java-sdk.png?branch=master)](https://travis-ci.org/verifalia/verifalia-java-sdk)
 
 Verifalia REST API - Java SDK and helper library
@@ -30,7 +30,7 @@ $ cd verifalia-java-sdk-master
 $ mvn install       # Requires maven, download from http://maven.apache.org/download.html
 ```
 
-This will also build the javadoc in twilio-java/target/apidocs. You can open the index.html located there to view it locally.
+This will also build the javadoc in target/apidocs. You can open the index.html located there to view it locally.
 
 ## Adding to Java Project ##
 
@@ -46,7 +46,7 @@ Specify the Verifalia REST API Java SDK as a dependency of your Java project:
 ```
 
 
-### Sample usage ###
+## Validating email addresses ##
 
 The example below shows how to validate a couple of email addresses using the Verifalia REST API Java SDK:
 
@@ -218,6 +218,84 @@ else {
 			entry.getStatus()
 		);
 	}
+}
+```
+
+### Don't forget to clean up, when you are done ###
+
+Verifalia automatically deletes completed jobs after 30 days since their completion: deleting completed jobs is a best practice, for privacy and security reasons. To do that, you can invoke the delete() method passing the job Id you wish to get rid of:
+
+```java
+
+VerifaliaRestClient restClient = new VerifaliaRestClient(accountSid, authToken);
+
+restClient.getEmailValidations().delete(id);
+```
+
+Once deleted, a job is gone and there is no way to retrieve its email validation(s).
+
+### Iterating over your email validation jobs ###
+
+For management and reporting purposes, you may want to obtain a detailed list of your past email validation jobs. This SDK library allows to do that through the listJobs() method, which allows to iterate asynchronously over a collection of ValidationOverview instances (the same type of the Overview property of the results returned by submit()).
+
+Here is how to iterate over your jobs, from the most recent to the oldest one for a given date:
+
+```java
+
+VerifaliaRestClient restClient = new VerifaliaRestClient(accountSid, authToken);
+
+ValidationJobs jobs = restClient.getEmailValidations().listJobs("2020-03-17", "-createdOn");
+
+for (ValidationOverview validationOverview: jobs.getData()){
+	System.out.printf("ID: %s => Status: %s => No of Entries: %s\n",
+		validationOverview.getId(),
+		validationOverview.getStatus(),
+		validationOverview.getNoOfEntries()
+	);
+}
+
+```
+
+## Managing credits ##
+
+To manage the Verifalia credits for your account you can use the Credits property exposed by the VerifaliaRestClient instance created above. Like for the previous topic, in the next few paragraphs we are looking at the most used operations, so it is strongly advisable to explore the library and look at the embedded xmldoc help for other opportunities.
+
+### Getting the credits balance ###
+
+One of the most common tasks you may need to perform on your account is retrieving the available number of free daily credits and credit packs. To do that, you can use the balance() method, which returns a Balance object, as shown in the next example:
+
+```java
+VerifaliaRestClient restClient = new VerifaliaRestClient(accountSid, authToken);
+
+CreditBalanceData result = restClient.getCredits().balance();
+
+System.out.printf("Credit Packs: %s => Free Credits: %s => Free Credits Reset In: %s\n",
+	result.getCreditPacks(),
+	result.getFreeCredits(),
+	result.getFreeCreditsResetIn());
+```
+
+### Retrieving credits usage statistics ###
+
+As a way to monitor and forecast the credits consumption for your account, the method dailyUsage() allows to retrieve statistics about historical credits usage, returning an asynchronously iterable collection of CreditBalanceData instances. The method also allows to limit the period of interest by passing a CreditDailyUsageFilter instance. Elements are returned only for the dates where consumption (either of free credits, credit packs or both) occurred.
+
+Here is how to retrieve the daily credits consumption for the specific date period:
+
+```java
+
+VerifaliaRestClient restClient = new VerifaliaRestClient(accountSid, authToken);
+
+//CreditDailyUsage usageResult = restClient.getCredits().dailyUsage("2020-03-12", "2020-03-16");
+
+CreditDailyUsageFilter creditDailyUsageFilter = new CreditDailyUsageFilter("2020-03-12", "2020-03-16");
+CreditDailyUsage usageResult = restClient.getCredits().dailyUsage(creditDailyUsageFilter);
+
+// Display results
+for (CreditBalanceData creditBalanceData: usageResult.getData()){
+	System.out.printf("Date: %s =>, Credit Packs: %s => Free Credits: %s\n",
+		creditBalanceData.getDate(),
+		creditBalanceData.getCreditPacks(),
+		creditBalanceData.getFreeCredits());
 }
 ```
 

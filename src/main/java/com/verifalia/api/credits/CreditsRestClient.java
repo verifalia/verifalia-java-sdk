@@ -23,7 +23,7 @@ import com.verifalia.api.rest.RestResponse;
 
 /**
  * Allows to submit and manage credits for the Verifalia service.
- * <p>The functionalities of this type are exposed by way of the {@link com.verifalia.api.VerifaliaRestClient#getEmailValidations getmailValidations()}
+ * <p>The functionalities of this type are exposed by way of the {@link com.verifalia.api.VerifaliaRestClient#getCredits}
  * of {@link com.verifalia.api.VerifaliaRestClient VerifaliaRestClient}.
  */
 public class CreditsRestClient {
@@ -39,6 +39,7 @@ public class CreditsRestClient {
     /**
      * Gets Verifalia API current credit balance information.
      * Makes a GET request to the <b>"/credits/balance"</b> resource.
+     * @return CreditBalanceData representing the credit balance data.
      * @throws IOException
      */
     public CreditBalanceData balance() throws IOException {
@@ -57,6 +58,7 @@ public class CreditsRestClient {
     /**
      * Gets Verifalia API daily usage credit balance information.
      * Makes a GET request to the <b>"/credits/daily-usage"</b> resource.
+     * @return CreditDailyUsage Object representing the credit daily usage details.
      * @throws IOException
      */
     public CreditDailyUsage dailyUsage() throws IOException {
@@ -68,6 +70,7 @@ public class CreditsRestClient {
      * Gets Verifalia API daily usage credit balance information for a given date
      * Makes a GET request to the <b>"/credits/daily-usage?date={DATE_YYYY-MM-DD}"</b> resource.
      * @param date Date in format YYYY-MM-DD for which usage details needs to be fetched. If null or blank value is passed, it will not consider the param when making request.
+     * @return CreditDailyUsage Object representing the credit daily usage details.
      * @throws IOException
      */
     public CreditDailyUsage dailyUsage(String date) throws IOException {
@@ -76,10 +79,11 @@ public class CreditsRestClient {
     }
 
     /**
-     * Gets Verifalia API daily usage credit balance information for a given date
-     * Makes a GET request to the <b>"/credits/daily-usage?date={DATE_YYYY-MM-DD}"</b> resource.
+     * Gets Verifalia API daily usage credit balance information for a given date range
+     * Makes a GET request to the <b>"/credits/daily-usage?date:since={DATE_YYYY-MM-DD}&date:until={DATE_YYYY-MM-DD}"</b> resource.
      * @param dateSince Date in format YYYY-MM-DD from which usage details needs to be fetched. If null or blank value is passed, it will not consider the param when making request.
      * @param dateUntil Date in format YYYY-MM-DD till which usage details needs to be fetched. If null or blank value is passed, it will not consider the param when making request.
+     * @return CreditDailyUsage Object representing the credit daily usage details.
      * @throws IOException
      */
     public CreditDailyUsage dailyUsage(String dateSince, String dateUntil) throws IOException {
@@ -87,6 +91,13 @@ public class CreditsRestClient {
     	return dailyUsage(creditDailyUsageFilter);
     }
 
+    /**
+     * Gets Verifalia API daily usage credit balance information for given options defined in the filter object
+     * Makes a GET request to the <b>"/credits/daily-usage"</b> resource with the set of filters defined in the input object.
+     * @param creditDailyUsageFilter Object representing the daily usage filter options possible for the API.
+     * @return CreditDailyUsage Object representing the credit daily usage details.
+     * @throws IOException
+     */
     public CreditDailyUsage dailyUsage(CreditDailyUsageFilter creditDailyUsageFilter) throws IOException {
     	// Build query string parameters map
     	Map<String, String> paramMap = getDailyUsageParamMap(creditDailyUsageFilter);

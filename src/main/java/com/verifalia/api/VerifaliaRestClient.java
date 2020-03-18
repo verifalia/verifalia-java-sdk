@@ -51,7 +51,7 @@ public class VerifaliaRestClient {
 	}
 
 	/**
-	 * Creates new object using {@link VerifaliaRestClient#DEFAULT_BASE_URL} and given API version.
+	 * Creates new object using {@link Constants#DEFAULT_BASE_URL} and given API version.
          * <p>Your account SID and authentication token values can be retrieved in your client area,
          * upon clicking on your subscription details, on Verifalia web site at: <a href="https://verifalia.com/client-area/subscriptions">https://verifalia.com/client-area/subscriptions</a>
 	 * @param apiVersion API version name
@@ -64,7 +64,7 @@ public class VerifaliaRestClient {
 	}
 
 	/**
-	 * Creates new object using {@link VerifaliaRestClient#DEFAULT_BASE_URL} and {@link VerifaliaRestClient#DEFAULT_API_VERSION}.
+	 * Creates new object using {@link Constants#DEFAULT_BASE_URL} and {@link Constants#DEFAULT_API_VERSION}.
          * <p>Your account SID and authentication token values can be retrieved in your client area,
          * upon clicking on your subscription details, on Verifalia web site at: <a href="https://verifalia.com/client-area/subscriptions">https://verifalia.com/client-area/subscriptions</a>
 	 * @param accountSid Account SID

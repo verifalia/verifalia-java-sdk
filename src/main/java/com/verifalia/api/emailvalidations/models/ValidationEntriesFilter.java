@@ -5,7 +5,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 /**
- * Filter object represents the various filters that can be applied when fetching validation entries
+ * Filter object represents the various filters that can be applied when fetching validation entries.
  */
 @Getter
 @Setter
