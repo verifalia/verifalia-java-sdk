@@ -299,4 +299,4 @@ for (CreditBalanceData creditBalanceData: usageResult.getData()){
 }
 ```
 
-You may find these samples in the bundled file [Samples.java](https://github.com/verifalia/verifalia-java-sdk/tree/master/src/main/java/com/verifalia/api/samples/Samples.java)
+You may find these samples in the bundled file [Samples.java](https://github.com/verifalia/verifalia-java-sdk/blob/apiVersionUpgradeFrom1.0To2.1/src/main/java/com/verifalia/api/samples/Samples.java)
