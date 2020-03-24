@@ -4,6 +4,8 @@ import static java.util.Objects.nonNull;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -92,6 +94,19 @@ public class Utils {
     public static String convertStringIteratorToString(Iterable<String> iterable, String separator){
     	if(nonNull(iterable)){
     		return StringUtils.join(iterable, separator);
+    	}
+    	return StringUtils.EMPTY;
+    }
+
+    /**
+     * Converts java.lang.Iterable to a string with each elements in the iterable seperated by the input seperator.
+     * @param iterable java.lang.Iterable which needs to be converted to string.
+     * @param separator String separator which needs to be used to separate individual elements of iterable to construct the output string.
+     * @return String Converted string from iterable with the mentioned seperator.
+     */
+    public static String convertLocalDateToString(LocalDate localDate, String dateFormat){
+    	if(nonNull(localDate)){
+    		return localDate.format(DateTimeFormatter.ofPattern(dateFormat));
     	}
     	return StringUtils.EMPTY;
     }

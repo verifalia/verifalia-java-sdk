@@ -65,17 +65,17 @@ public class ValidationOverview {
     private String retention;
 
     /**
-     * A string representing the timestamp of the eventual submission of the job, in the ISO 8601 format
+     * A date representing the timestamp of the eventual submission of the job, in the ISO 8601 format
      */
     private Date submittedOn;
 
     /**
-     * A string representing the timestamp of the creation of the job, in the ISO 8601 format.
+     * A date representing the timestamp of the creation of the job, in the ISO 8601 format.
      */
     private Date createdOn;
 
     /**
-     * A string representing the timestamp of the eventual completion of the job, in the ISO 8601 format.
+     * A date representing the timestamp of the eventual completion of the job, in the ISO 8601 format.
      */
     private Date completedOn;
 }

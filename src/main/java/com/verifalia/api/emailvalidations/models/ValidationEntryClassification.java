@@ -3,7 +3,7 @@ package com.verifalia.api.emailvalidations.models;
 /**
  * Provides enumerated values that specify the supported classification of a single email address validation entry.
  */
-public enum ValidationEntryDataClassification {
+public enum ValidationEntryClassification {
     /**
      * Signifies that email address should be able to accept messages into its mailbox
      */

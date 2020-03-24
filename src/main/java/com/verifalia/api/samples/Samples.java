@@ -2,6 +2,7 @@ package com.verifalia.api.samples;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.time.LocalDate;
 import java.util.Arrays;
 
 import com.verifalia.api.VerifaliaRestClient;
@@ -9,14 +10,16 @@ import com.verifalia.api.WaitForCompletionOptions;
 import com.verifalia.api.common.ServerPollingLoopEventListener;
 import com.verifalia.api.credits.models.CreditBalanceData;
 import com.verifalia.api.credits.models.CreditDailyUsage;
+import com.verifalia.api.credits.models.CreditDailyUsageData;
 import com.verifalia.api.credits.models.CreditDailyUsageFilter;
 import com.verifalia.api.emailvalidations.models.Validation;
 import com.verifalia.api.emailvalidations.models.ValidationEntries;
 import com.verifalia.api.emailvalidations.models.ValidationEntriesFilter;
-import com.verifalia.api.emailvalidations.models.ValidationEntryData;
-import com.verifalia.api.emailvalidations.models.ValidationEntryDataStatus;
+import com.verifalia.api.emailvalidations.models.ValidationEntry;
+import com.verifalia.api.emailvalidations.models.ValidationEntryStatus;
 import com.verifalia.api.emailvalidations.models.ValidationJobs;
 import com.verifalia.api.emailvalidations.models.ValidationJobsFilter;
+import com.verifalia.api.emailvalidations.models.ValidationJobsSort;
 import com.verifalia.api.emailvalidations.models.ValidationOverview;
 import com.verifalia.api.emailvalidations.models.ValidationStatus;
 import com.verifalia.api.exceptions.VerifaliaException;
@@ -76,7 +79,7 @@ public class Samples {
 			System.err.println("Request timeout expired");
 		else {
 			// Display results
-			for (ValidationEntryData entryData: result.getEntries().getData()) {
+			for (ValidationEntry entryData: result.getEntries().getData()) {
 				System.out.printf("Address: %s => Result: %s\n",
 						entryData.getInputData(),
 						entryData.getStatus()
@@ -163,7 +166,7 @@ public class Samples {
 			System.err.println("Request timeout expired");
 		else {
 			// Display results
-			for (ValidationEntryData entryData: result.getEntries().getData()){
+			for (ValidationEntry entryData: result.getEntries().getData()){
 				System.out.printf("Address: %s => Result: %s\n",
 						entryData.getInputData(),
 						entryData.getStatus()
@@ -212,7 +215,7 @@ public class Samples {
 			System.err.println("Request still pending.");
 		else {
 			// Display results
-			for (ValidationEntryData entryData: result.getEntries().getData()){
+			for (ValidationEntry entryData: result.getEntries().getData()){
 				System.out.printf("Address: %s => Result: %s\n",
 						entryData.getInputData(),
 						entryData.getStatus()
@@ -311,7 +314,7 @@ public class Samples {
 		else {
 			// Display results
 			ValidationEntries entries = restClient.getEmailValidations().queryEntries(result.getId());
-			for (ValidationEntryData entryData: entries.getData()){
+			for (ValidationEntry entryData: entries.getData()){
 				System.out.printf("Address: %s => Result: %s\n",
 						entryData.getInputData(),
 						entryData.getStatus()
@@ -346,12 +349,12 @@ public class Samples {
 
 		// Submit request for getting entries with filter status
 		System.out.println("------------------------------------------------------");
-		ValidationEntries entries1 = restClient.getEmailValidations().queryEntries(result.getId(), new String[] {
-			ValidationEntryDataStatus.Success.name(),
-			ValidationEntryDataStatus.DomainHasNullMx.name(),
+		ValidationEntries entries1 = restClient.getEmailValidations().queryEntries(result.getId(), new ValidationEntryStatus[] {
+			ValidationEntryStatus.Success,
+			ValidationEntryStatus.DomainHasNullMx
 		});
 		System.out.println("Entries results with filter status: " + entries1.getData().size());
-		for (ValidationEntryData entryData: entries1.getData()){
+		for (ValidationEntry entryData: entries1.getData()){
 			System.out.printf("Address: %s => Result: %s\n",
 					entryData.getInputData(),
 					entryData.getStatus()
@@ -361,13 +364,13 @@ public class Samples {
 		// Submit request for getting entries with filter object
 		System.out.println("------------------------------------------------------");
 		ValidationEntriesFilter validationEntriesFilter = new ValidationEntriesFilter();
-		validationEntriesFilter.setExcludeStatuses(Arrays.asList(new String[] {
-			ValidationEntryDataStatus.Success.name(),
-			ValidationEntryDataStatus.DomainHasNullMx.name(),
+		validationEntriesFilter.setExcludeStatuses(Arrays.asList(new ValidationEntryStatus[] {
+			ValidationEntryStatus.Success,
+			ValidationEntryStatus.DomainHasNullMx
 		}));
 		ValidationEntries entries2 = restClient.getEmailValidations().queryEntries(result.getId(), validationEntriesFilter);
 		System.out.println("Entries results with filter object: " + entries2.getData().size());
-		for (ValidationEntryData entryData: entries2.getData()){
+		for (ValidationEntry entryData: entries2.getData()){
 			System.out.printf("Address: %s => Result: %s\n",
 					entryData.getInputData(),
 					entryData.getStatus()
@@ -420,7 +423,7 @@ public class Samples {
 
 		// Submit request for listing job with filter createdOn
 		System.out.println("------------------------------------------------------");
-		ValidationJobs jobsResult1 = restClient.getEmailValidations().listJobs("2020-03-11");
+		ValidationJobs jobsResult1 = restClient.getEmailValidations().listJobs(LocalDate.parse("2020-03-11"));
 		System.out.println("Jobs results with filter createdOn: " + jobsResult1.getData().size());
 		for (ValidationOverview validationOverview: jobsResult1.getData()){
 			System.out.printf("ID: %s => Status: %s => No of Entries: %s\n",
@@ -432,9 +435,9 @@ public class Samples {
 
 		// Submit request for listing job with filter createdOn, status
 		System.out.println("------------------------------------------------------");
-		ValidationJobs jobsResult2 = restClient.getEmailValidations().listJobs("2020-03-12", new String[] {
-			ValidationStatus.Completed.name(),
-			ValidationStatus.InProgress.name(),
+		ValidationJobs jobsResult2 = restClient.getEmailValidations().listJobs(LocalDate.parse("2020-03-12"), new ValidationStatus[] {
+			ValidationStatus.Completed,
+			ValidationStatus.InProgress,
 		});
 		System.out.println("Jobs results with filter createdOn and status: " + jobsResult2.getData().size());
 		for (ValidationOverview validationOverview: jobsResult2.getData()){
@@ -447,7 +450,8 @@ public class Samples {
 
 		// Submit request for listing job with filter filter createdOn and sort -createdOn
 		System.out.println("------------------------------------------------------");
-		ValidationJobs jobsResult3 = restClient.getEmailValidations().listJobs("2020-03-17", "-createdOn");
+		ValidationJobs jobsResult3 = restClient.getEmailValidations().listJobs(LocalDate.parse("2020-03-17"),
+				ValidationJobsSort.CreatedOnDesc);
 		System.out.println("Jobs results with filter createdOn and sort -createdOn: " + jobsResult3.getData().size());
 		for (ValidationOverview validationOverview: jobsResult3.getData()){
 			System.out.printf("ID: %s => Status: %s => No of Entries: %s\n",
@@ -459,10 +463,10 @@ public class Samples {
 
 		// Submit request for listing job with filter createdOn, status and sort createdOn
 		System.out.println("------------------------------------------------------");
-		ValidationJobs jobsResult4 = restClient.getEmailValidations().listJobs("2020-03-11", new String[] {
-				ValidationStatus.Completed.name(),
-				ValidationStatus.InProgress.name(),
-		}, "createdOn");
+		ValidationJobs jobsResult4 = restClient.getEmailValidations().listJobs(LocalDate.parse("2020-03-11"), new ValidationStatus[] {
+				ValidationStatus.Completed,
+				ValidationStatus.InProgress
+		}, ValidationJobsSort.CreatedOnAsc);
 		System.out.println("Jobs results with filter createdOn, status and sort createdOn: " + jobsResult4.getData().size());
 		for (ValidationOverview validationOverview: jobsResult4.getData()){
 			System.out.printf("ID: %s => Status: %s => No of Entries: %s\n",
@@ -475,12 +479,12 @@ public class Samples {
 		// Submit request for listing job with object
 		System.out.println("------------------------------------------------------");
 		ValidationJobsFilter validationJobsFilter = new ValidationJobsFilter();
-		validationJobsFilter.setCreatedOnSince("2020-03-11");
-		validationJobsFilter.setCreatedOnUntil("2020-03-12");
-		validationJobsFilter.setExcludeStatuses(Arrays.asList(new String[] {
-				ValidationStatus.Expired.name(),
+		validationJobsFilter.setCreatedOnSince(LocalDate.parse("2020-03-11"));
+		validationJobsFilter.setCreatedOnUntil(LocalDate.parse("2020-03-12"));
+		validationJobsFilter.setExcludeStatuses(Arrays.asList(new ValidationStatus[] {
+				ValidationStatus.Expired
 		}));
-		validationJobsFilter.setSort("-createdOn");
+		validationJobsFilter.setSort(ValidationJobsSort.CreatedOnDesc);
 		ValidationJobs jobsResult5 = restClient.getEmailValidations().listJobs(validationJobsFilter);
 		System.out.println("Jobs results with object: " + jobsResult5.getData().size());
 		for (ValidationOverview validationOverview: jobsResult5.getData()){
@@ -508,7 +512,7 @@ public class Samples {
 		VerifaliaRestClient restClient = new VerifaliaRestClient(accountSid, authToken);
 
 		// Submit email verification request with waiting parameters
-		CreditBalanceData result = restClient.getCredits().balance();
+		CreditBalanceData result = restClient.getCredits().getBalance();
 
 		if (result == null) // Result is null if timeout expires
 			System.err.println("Request timeout expired");
@@ -537,17 +541,17 @@ public class Samples {
 		VerifaliaRestClient restClient = new VerifaliaRestClient(accountSid, authToken);
 
 		// Submit email verification request with waiting parameters
-		CreditDailyUsage result = restClient.getCredits().dailyUsage();
+		CreditDailyUsage result = restClient.getCredits().getDailyUsage();
 
 		if (result == null) // Result is null if timeout expires
 			System.err.println("Request timeout expired");
 		else {
 			// Display results
-			for (CreditBalanceData creditBalanceData: result.getData()){
+			for (CreditDailyUsageData creditDailyUsageData: result.getData()){
 				System.out.printf("Date: %s =>, Credit Packs: %s => Free Credits: %s\n",
-						creditBalanceData.getDate(),
-						creditBalanceData.getCreditPacks(),
-						creditBalanceData.getFreeCredits());
+						creditDailyUsageData.getDate(),
+						creditDailyUsageData.getCreditPacks(),
+						creditDailyUsageData.getFreeCredits());
 			}
 		}
 	}
@@ -569,63 +573,65 @@ public class Samples {
 
 		// Submit daily usage request with filter date
 		System.out.println("------------------------------------------------------");
-		CreditDailyUsage result1 = restClient.getCredits().dailyUsage("2020-03-12");
+		CreditDailyUsage result1 = restClient.getCredits().getDailyUsage(LocalDate.parse("2020-03-12"));
 		if (result1 == null) // Result is null if timeout expires
 			System.err.println("Request timeout expired");
 		else {
 			// Display results
-			for (CreditBalanceData creditBalanceData: result1.getData()){
+			for (CreditDailyUsageData creditDailyUsageData: result1.getData()){
 				System.out.printf("Date: %s =>, Credit Packs: %s => Free Credits: %s\n",
-						creditBalanceData.getDate(),
-						creditBalanceData.getCreditPacks(),
-						creditBalanceData.getFreeCredits());
+						creditDailyUsageData.getDate(),
+						creditDailyUsageData.getCreditPacks(),
+						creditDailyUsageData.getFreeCredits());
 			}
 		}
 
 		// Submit daily usage request with filter dateSince and filter dateUntil
 		System.out.println("------------------------------------------------------");
-		CreditDailyUsage result2 = restClient.getCredits().dailyUsage("2020-03-12", "2020-03-16");
+		CreditDailyUsage result2 = restClient.getCredits().getDailyUsage(LocalDate.parse("2020-03-12"),
+				LocalDate.parse("2020-03-16"));
 		if (result2 == null) // Result is null if timeout expires
 			System.err.println("Request timeout expired");
 		else {
 			// Display results
-			for (CreditBalanceData creditBalanceData: result2.getData()){
+			for (CreditDailyUsageData creditDailyUsageData: result2.getData()){
 				System.out.printf("Date: %s =>, Credit Packs: %s => Free Credits: %s\n",
-						creditBalanceData.getDate(),
-						creditBalanceData.getCreditPacks(),
-						creditBalanceData.getFreeCredits());
+						creditDailyUsageData.getDate(),
+						creditDailyUsageData.getCreditPacks(),
+						creditDailyUsageData.getFreeCredits());
 			}
 		}
 
 		// Submit daily usage request with filter object
 		System.out.println("------------------------------------------------------");
-		CreditDailyUsageFilter creditDailyUsageFilter1 = new CreditDailyUsageFilter("2020-03-12");
-		CreditDailyUsage result3 = restClient.getCredits().dailyUsage(creditDailyUsageFilter1);
+		CreditDailyUsageFilter creditDailyUsageFilter1 = new CreditDailyUsageFilter(LocalDate.parse("2020-03-12"));
+		CreditDailyUsage result3 = restClient.getCredits().getDailyUsage(creditDailyUsageFilter1);
 		if (result2 == null) // Result is null if timeout expires
 			System.err.println("Request timeout expired");
 		else {
 			// Display results
-			for (CreditBalanceData creditBalanceData: result3.getData()){
+			for (CreditDailyUsageData creditDailyUsageData: result3.getData()){
 				System.out.printf("Date: %s =>, Credit Packs: %s => Free Credits: %s\n",
-						creditBalanceData.getDate(),
-						creditBalanceData.getCreditPacks(),
-						creditBalanceData.getFreeCredits());
+						creditDailyUsageData.getDate(),
+						creditDailyUsageData.getCreditPacks(),
+						creditDailyUsageData.getFreeCredits());
 			}
 		}
 
 		// Submit daily usage request with filter object
 		System.out.println("------------------------------------------------------");
-		CreditDailyUsageFilter creditDailyUsageFilter2 = new CreditDailyUsageFilter("2020-03-12", "2020-03-16");
-		CreditDailyUsage result4 = restClient.getCredits().dailyUsage(creditDailyUsageFilter2);
+		CreditDailyUsageFilter creditDailyUsageFilter2 = new CreditDailyUsageFilter(LocalDate.parse("2020-03-12"),
+				LocalDate.parse("2020-03-16"));
+		CreditDailyUsage result4 = restClient.getCredits().getDailyUsage(creditDailyUsageFilter2);
 		if (result2 == null) // Result is null if timeout expires
 			System.err.println("Request timeout expired");
 		else {
 			// Display results
-			for (CreditBalanceData creditBalanceData: result4.getData()){
+			for (CreditDailyUsageData creditDailyUsageData: result4.getData()){
 				System.out.printf("Date: %s =>, Credit Packs: %s => Free Credits: %s\n",
-						creditBalanceData.getDate(),
-						creditBalanceData.getCreditPacks(),
-						creditBalanceData.getFreeCredits());
+						creditDailyUsageData.getDate(),
+						creditDailyUsageData.getCreditPacks(),
+						creditDailyUsageData.getFreeCredits());
 			}
 		}
 	}

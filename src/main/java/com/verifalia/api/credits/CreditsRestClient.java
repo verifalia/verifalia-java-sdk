@@ -4,6 +4,7 @@ import static java.util.Objects.nonNull;
 
 import java.io.IOException;
 import java.net.URI;
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -42,7 +43,7 @@ public class CreditsRestClient {
      * @return CreditBalanceData representing the credit balance data.
      * @throws IOException
      */
-    public CreditBalanceData balance() throws IOException {
+    public CreditBalanceData getBalance() throws IOException {
     	// Make rest request
     	RestRequest request = new RestRequest(HttpRequestMethod.GET, Constants.CREDITS_BALANCE_RESOURCE);
 
@@ -61,34 +62,34 @@ public class CreditsRestClient {
      * @return CreditDailyUsage Object representing the credit daily usage details.
      * @throws IOException
      */
-    public CreditDailyUsage dailyUsage() throws IOException {
+    public CreditDailyUsage getDailyUsage() throws IOException {
     	CreditDailyUsageFilter creditDailyUsageFilter = null;
-    	return dailyUsage(creditDailyUsageFilter);
+    	return getDailyUsage(creditDailyUsageFilter);
     }
 
     /**
      * Gets Verifalia API daily usage credit balance information for a given date
      * Makes a GET request to the <b>"/credits/daily-usage?date={DATE_YYYY-MM-DD}"</b> resource.
-     * @param date Date in format YYYY-MM-DD for which usage details needs to be fetched. If null or blank value is passed, it will not consider the param when making request.
+     * @param date Local date for which usage details needs to be fetched. If null or blank value is passed, it will not consider the param when making request.
      * @return CreditDailyUsage Object representing the credit daily usage details.
      * @throws IOException
      */
-    public CreditDailyUsage dailyUsage(String date) throws IOException {
+    public CreditDailyUsage getDailyUsage(LocalDate date) throws IOException {
     	CreditDailyUsageFilter creditDailyUsageFilter = new CreditDailyUsageFilter(date);
-    	return dailyUsage(creditDailyUsageFilter);
+    	return getDailyUsage(creditDailyUsageFilter);
     }
 
     /**
      * Gets Verifalia API daily usage credit balance information for a given date range
      * Makes a GET request to the <b>"/credits/daily-usage?date:since={DATE_YYYY-MM-DD}&date:until={DATE_YYYY-MM-DD}"</b> resource.
-     * @param dateSince Date in format YYYY-MM-DD from which usage details needs to be fetched. If null or blank value is passed, it will not consider the param when making request.
-     * @param dateUntil Date in format YYYY-MM-DD till which usage details needs to be fetched. If null or blank value is passed, it will not consider the param when making request.
+     * @param dateSince Local date from which usage details needs to be fetched. If null or blank value is passed, it will not consider the param when making request.
+     * @param dateUntil Local date till which usage details needs to be fetched. If null or blank value is passed, it will not consider the param when making request.
      * @return CreditDailyUsage Object representing the credit daily usage details.
      * @throws IOException
      */
-    public CreditDailyUsage dailyUsage(String dateSince, String dateUntil) throws IOException {
+    public CreditDailyUsage getDailyUsage(LocalDate dateSince, LocalDate dateUntil) throws IOException {
     	CreditDailyUsageFilter creditDailyUsageFilter = new CreditDailyUsageFilter(dateSince, dateUntil);
-    	return dailyUsage(creditDailyUsageFilter);
+    	return getDailyUsage(creditDailyUsageFilter);
     }
 
     /**
@@ -98,7 +99,7 @@ public class CreditsRestClient {
      * @return CreditDailyUsage Object representing the credit daily usage details.
      * @throws IOException
      */
-    public CreditDailyUsage dailyUsage(CreditDailyUsageFilter creditDailyUsageFilter) throws IOException {
+    public CreditDailyUsage getDailyUsage(CreditDailyUsageFilter creditDailyUsageFilter) throws IOException {
     	// Build query string parameters map
     	Map<String, String> paramMap = getDailyUsageParamMap(creditDailyUsageFilter);
 
@@ -129,16 +130,19 @@ public class CreditsRestClient {
     	if(nonNull(creditDailyUsageFilter)){
     		// TODO - Validate daily usage filter
 	    	// Date filter
-	    	if(!StringUtils.isBlank(creditDailyUsageFilter.getDate())){
-	    		paramMap.put("date", creditDailyUsageFilter.getDate());
+	    	if(nonNull(creditDailyUsageFilter.getDate())){
+	    		paramMap.put("date", Utils.convertLocalDateToString(creditDailyUsageFilter.getDate(),
+	    				Constants.DATE_FORMAT));
 	    	}
 	    	// Date since filter
-	    	if(!StringUtils.isBlank(creditDailyUsageFilter.getDateSince())){
-	    		paramMap.put("date:since", creditDailyUsageFilter.getDateSince());
+	    	if(nonNull(creditDailyUsageFilter.getDateSince())){
+	    		paramMap.put("date:since", Utils.convertLocalDateToString(creditDailyUsageFilter.getDateSince(),
+	    				Constants.DATE_FORMAT));
 	    	}
 	    	// Date until filter
-	    	if(!StringUtils.isBlank(creditDailyUsageFilter.getDateUntil())){
-	    		paramMap.put("date:until", creditDailyUsageFilter.getDateUntil());
+	    	if(nonNull(creditDailyUsageFilter.getDateUntil())){
+	    		paramMap.put("date:until", Utils.convertLocalDateToString(creditDailyUsageFilter.getDateUntil(),
+	    				Constants.DATE_FORMAT));
 	    	}
     	}
     	return paramMap;

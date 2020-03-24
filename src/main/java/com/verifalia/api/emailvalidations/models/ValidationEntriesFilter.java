@@ -14,10 +14,10 @@ public class ValidationEntriesFilter {
 	/**
 	 * One or more job status codes representing the values you wish to include from the API result. Multiple values are separated with the comma (,) symbol.
 	 */
-	private Iterable<String> statuses;
+	private Iterable<ValidationEntryStatus> statuses;
 
 	/**
 	 * One or more job status codes representing the values you wish to exclude from the API result. Multiple values are separated with the comma (,) symbol.
 	 */
-	private Iterable<String> excludeStatuses;
+	private Iterable<ValidationEntryStatus> excludeStatuses;
 }

@@ -24,7 +24,7 @@ public class CreditDailyUsage {
     private ResponseMeta meta;
 
     /**
-     * Credit balance data for indiviual dates
+     * Credit daily usage data for individual dates
      */
-    private List<CreditBalanceData> data;
+    private List<CreditDailyUsageData> data;
 }

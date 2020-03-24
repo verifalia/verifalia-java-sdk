@@ -64,4 +64,6 @@ public class Constants {
 	// Other constants
 	public static final char CR = '\r';
 	public static final char LF = '\n';
+	public static final String STRING_SEPERATOR_COMMA = ",";
+	public static final String DATE_FORMAT = "yyyy-MM-dd";
 }

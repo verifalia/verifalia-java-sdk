@@ -24,5 +24,5 @@ public class ValidationEntries {
 	/**
      * List of all the validation entry data object submitted with the request
      */
-	private List<ValidationEntryData> data;
+	private List<ValidationEntry> data;
 }

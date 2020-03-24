@@ -15,7 +15,7 @@ import lombok.ToString;
 @Setter
 @ToString
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class ValidationEntryData {
+public class ValidationEntry {
 	 /**
      * A number with the zero-based index of the entry, with respect to the whole job; this value is mostly useful in the event the API consumer requests a filtered entries set.
      */
@@ -29,12 +29,12 @@ public class ValidationEntryData {
     /**
      * Represents the name of the classification for the email validation, which groups related email validation status codes.
      */
-    private ValidationEntryDataClassification classification;
+    private ValidationEntryClassification classification;
 
     /**
      * A detailed status information for the validation result.
      */
-    private ValidationEntryDataStatus status;
+    private ValidationEntryStatus status;
 
     /**
      * A string with the eventually recognized email address, without any comment or FWS (folding white space) symbol.
@@ -108,13 +108,13 @@ public class ValidationEntryData {
     /**
      * Constructs new object.
      */
-	protected ValidationEntryData() {}
+	protected ValidationEntry() {}
 
     /**
      * Constructs new object.
      * @param inputData Input data to be validated (typically, email address)
      */
-    public ValidationEntryData(String inputData) {
+    public ValidationEntry(String inputData) {
     	this.inputData = inputData;
     }
 }

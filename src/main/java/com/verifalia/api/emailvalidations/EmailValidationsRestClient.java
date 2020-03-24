@@ -4,6 +4,7 @@ import static java.util.Objects.nonNull;
 
 import java.io.IOException;
 import java.net.URI;
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -19,8 +20,10 @@ import com.verifalia.api.common.Utils;
 import com.verifalia.api.emailvalidations.models.Validation;
 import com.verifalia.api.emailvalidations.models.ValidationEntries;
 import com.verifalia.api.emailvalidations.models.ValidationEntriesFilter;
+import com.verifalia.api.emailvalidations.models.ValidationEntryStatus;
 import com.verifalia.api.emailvalidations.models.ValidationJobs;
 import com.verifalia.api.emailvalidations.models.ValidationJobsFilter;
+import com.verifalia.api.emailvalidations.models.ValidationJobsSort;
 import com.verifalia.api.emailvalidations.models.ValidationOverview;
 import com.verifalia.api.emailvalidations.models.ValidationStatus;
 import com.verifalia.api.exceptions.AuthorizationException;
@@ -419,7 +422,7 @@ public class EmailValidationsRestClient {
      * @param statuses A collection of statuses for which the entries needs to be retrieved.
      * @return ValidationEntries An object representing the entries of the requested email validation batch.
      */
-    public ValidationEntries queryEntries(String id, String[] statuses) throws IOException {
+    public ValidationEntries queryEntries(String id, ValidationEntryStatus[] statuses) throws IOException {
     	ValidationEntriesFilter validationEntriesFilter = new ValidationEntriesFilter();
     	validationEntriesFilter.setStatuses(Arrays.asList(statuses));
     	return queryEntries(id, validationEntriesFilter);
@@ -433,7 +436,7 @@ public class EmailValidationsRestClient {
      * @param statuses A collection of statuses for which the entries needs to be retrieved.
      * @return ValidationEntries An object representing the entries of the requested email validation batch.
      */
-    public ValidationEntries queryEntries(String id, Iterable<String> statuses) throws IOException {
+    public ValidationEntries queryEntries(String id, Iterable<ValidationEntryStatus> statuses) throws IOException {
     	ValidationEntriesFilter validationEntriesFilter = new ValidationEntriesFilter();
     	validationEntriesFilter.setStatuses(statuses);
     	return queryEntries(id, validationEntriesFilter);
@@ -482,17 +485,26 @@ public class EmailValidationsRestClient {
     	if(nonNull(validationEntriesFilter)){
     		// TODO - Validate list job filter
 	    	// Status filter
-	    	String statusesStr = Utils.convertStringIteratorToString(validationEntriesFilter.getStatuses(), ",");
+	    	String statusesStr = convertValidationEntryDataStatusEnumIteratorToString(validationEntriesFilter.getStatuses(),
+	    			Constants.STRING_SEPERATOR_COMMA);
 	    	if(!StringUtils.isBlank(statusesStr)){
 	    		paramMap.put("status", statusesStr);
 	    	}
 	    	// Exclude status filter
-	    	String excludeStatusesStr = Utils.convertStringIteratorToString(validationEntriesFilter.getExcludeStatuses(), ",");
+	    	String excludeStatusesStr = convertValidationEntryDataStatusEnumIteratorToString(validationEntriesFilter.getExcludeStatuses(),
+	    			Constants.STRING_SEPERATOR_COMMA);
 	    	if(!StringUtils.isBlank(excludeStatusesStr)){
 	    		paramMap.put("status:exclude", excludeStatusesStr);
 	    	}
     	}
     	return paramMap;
+    }
+
+    private String convertValidationEntryDataStatusEnumIteratorToString(Iterable<ValidationEntryStatus> statusIterable, String separator){
+    	if(nonNull(statusIterable)){
+    		return StringUtils.join(statusIterable, separator);
+    	}
+    	return StringUtils.EMPTY;
     }
 
     /**
@@ -510,10 +522,10 @@ public class EmailValidationsRestClient {
      * Returns an object representing the various email validations jobs initiated for the input date.
      * Makes a GET request to the <b>"/email-validations"</b> resource.
      * <p>To initiate a new email validation batch, please use {@link EmailValidationsRestClient#submit(java.lang.Iterable)}
-     * @param filterCreatedOn Date in format YYYY-MM-DD for which usage job details needs to be fetched. If null or blank value is passed, it will not consider the param when making request.
+     * @param filterCreatedOn Local date for which usage job details needs to be fetched. If null or blank value is passed, it will not consider the param when making request.
      * @return ValidationJobs An object representing the email validation jobs.
      */
-    public ValidationJobs listJobs(String filterCreatedOn) throws IOException{
+    public ValidationJobs listJobs(LocalDate filterCreatedOn) throws IOException{
     	ValidationJobsFilter validationJobsFilter = new ValidationJobsFilter();
     	validationJobsFilter.setCreatedOn(filterCreatedOn);
     	return listJobs(validationJobsFilter);
@@ -523,11 +535,11 @@ public class EmailValidationsRestClient {
      * Returns an object representing the various email validations jobs initiated for the input date and with given statuses.
      * Makes a GET request to the <b>"/email-validations"</b> resource.
      * <p>To initiate a new email validation batch, please use {@link EmailValidationsRestClient#submit(java.lang.Iterable)}
-     * @param filterCreatedOn Date in format YYYY-MM-DD for which usage job details needs to be fetched. If null or blank value is passed, it will not consider the param when making request.
+     * @param filterCreatedOn Local date for which usage job details needs to be fetched. If null or blank value is passed, it will not consider the param when making request.
      * @param statuses  A collection of statuses for which the jobs needs to be retrieved.
      * @return ValidationJobs An object representing the email validation jobs.
      */
-    public ValidationJobs listJobs(String filterCreatedOn, String[] statuses) throws IOException{
+    public ValidationJobs listJobs(LocalDate filterCreatedOn, ValidationStatus[] statuses) throws IOException{
     	ValidationJobsFilter validationJobsFilter = new ValidationJobsFilter();
     	validationJobsFilter.setCreatedOn(filterCreatedOn);
     	validationJobsFilter.setStatuses(Arrays.asList(statuses));
@@ -538,11 +550,11 @@ public class EmailValidationsRestClient {
      * Returns an object representing the various email validations jobs initiated for the input date and with given sort direction
      * Makes a GET request to the <b>"/email-validations"</b> resource.
      * <p>To initiate a new email validation batch, please use {@link EmailValidationsRestClient#submit(java.lang.Iterable)}
-     * @param filterCreatedOn Date in format YYYY-MM-DD for which usage job details needs to be fetched. If null or blank value is passed, it will not consider the param when making request.
+     * @param filterCreatedOn Local date for which usage job details needs to be fetched. If null or blank value is passed, it will not consider the param when making request.
      * @param sort String based on which sort needs to be applied when fetching results.
      * @return ValidationJobs An object representing the email validation jobs.
      */
-    public ValidationJobs listJobs(String filterCreatedOn, String sort) throws IOException{
+    public ValidationJobs listJobs(LocalDate filterCreatedOn, ValidationJobsSort sort) throws IOException{
     	ValidationJobsFilter validationJobsFilter = new ValidationJobsFilter();
     	validationJobsFilter.setCreatedOn(filterCreatedOn);
     	validationJobsFilter.setSort(sort);
@@ -558,7 +570,7 @@ public class EmailValidationsRestClient {
      * @param sort String based on which sort needs to be applied when fetching results.
      * @return ValidationJobs An object representing the email validation jobs.
      */
-    public ValidationJobs listJobs(String filterCreatedOn, String[] statuses, String sort) throws IOException{
+    public ValidationJobs listJobs(LocalDate filterCreatedOn, ValidationStatus[] statuses, ValidationJobsSort sort) throws IOException{
     	ValidationJobsFilter validationJobsFilter = new ValidationJobsFilter();
     	validationJobsFilter.setCreatedOn(filterCreatedOn);
     	validationJobsFilter.setStatuses(Arrays.asList(statuses));
@@ -603,24 +615,29 @@ public class EmailValidationsRestClient {
     	if(nonNull(validationJobFilter)){
     		// TODO - Validate list job filter
 	    	// Created on filter
-	    	if(!StringUtils.isBlank(validationJobFilter.getCreatedOn())){
-	    		paramMap.put("createdOn", validationJobFilter.getCreatedOn());
+	    	if(nonNull(validationJobFilter.getCreatedOn())){
+	    		paramMap.put("createdOn", Utils.convertLocalDateToString(validationJobFilter.getCreatedOn(),
+	    				Constants.DATE_FORMAT));
 	    	}
 	    	// Created on since filter
-	    	if(!StringUtils.isBlank(validationJobFilter.getCreatedOnSince())){
-	    		paramMap.put("createdOn:since", validationJobFilter.getCreatedOnSince());
+	    	if(nonNull(validationJobFilter.getCreatedOnSince())){
+	    		paramMap.put("createdOn:since", Utils.convertLocalDateToString(validationJobFilter.getCreatedOnSince(),
+	    				Constants.DATE_FORMAT));
 	    	}
 	    	// Created on until filter
-	    	if(!StringUtils.isBlank(validationJobFilter.getCreatedOnUntil())){
-	    		paramMap.put("createdOn:until", validationJobFilter.getCreatedOnUntil());
+	    	if(nonNull(validationJobFilter.getCreatedOnUntil())){
+	    		paramMap.put("createdOn:until", Utils.convertLocalDateToString(validationJobFilter.getCreatedOnUntil(),
+	    				Constants.DATE_FORMAT));
 	    	}
 	    	// Status filter
-	    	String statusesStr = Utils.convertStringIteratorToString(validationJobFilter.getStatuses(), ",");
+	    	String statusesStr = convertValidationStatusEnumIteratorToString(validationJobFilter.getStatuses(),
+	    			Constants.STRING_SEPERATOR_COMMA);
 	    	if(!StringUtils.isBlank(statusesStr)){
 	    		paramMap.put("status", statusesStr);
 	    	}
 	    	// Exclude status filter
-	    	String excludeStatusesStr = Utils.convertStringIteratorToString(validationJobFilter.getExcludeStatuses(), ",");
+	    	String excludeStatusesStr = convertValidationStatusEnumIteratorToString(validationJobFilter.getExcludeStatuses(),
+	    			Constants.STRING_SEPERATOR_COMMA);
 	    	if(!StringUtils.isBlank(excludeStatusesStr)){
 	    		paramMap.put("status:exclude", excludeStatusesStr);
 	    	}
@@ -629,11 +646,18 @@ public class EmailValidationsRestClient {
 	    		paramMap.put("owner", validationJobFilter.getOwner());
 	    	}
 	    	// Sort
-	    	if(!StringUtils.isBlank(validationJobFilter.getSort())){
-	    		paramMap.put("sort", validationJobFilter.getSort());
+	    	if(nonNull(validationJobFilter.getSort())){
+	    		paramMap.put("sort", validationJobFilter.getSort().getValidationJobsSort());
 	    	}
     	}
     	return paramMap;
+    }
+
+    private String convertValidationStatusEnumIteratorToString(Iterable<ValidationStatus> statusIterable, String separator){
+    	if(nonNull(statusIterable)){
+    		return StringUtils.join(statusIterable, separator);
+    	}
+    	return StringUtils.EMPTY;
     }
 
     /**
