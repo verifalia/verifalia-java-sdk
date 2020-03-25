@@ -232,6 +232,7 @@ public class EmailValidationsRestClient {
 	        RestResponse response = restClient.execute(request, Validation.class);
 	        Validation data = (Validation)response.getData();
 
+	        // Handle response based on status code
 	        switch (response.getStatusCode()) {
 	            case HttpStatusCode.OK: {
 	                // The batch has been completed in real time
@@ -241,7 +242,6 @@ public class EmailValidationsRestClient {
 
 	            case HttpStatusCode.ACCEPTED: {
 	                // The batch has been accepted but is not yet completed
-
 	                if (waitForCompletionOptions == WaitForCompletionOptions.DontWait) {
 	                	data.getOverview().setStatus(ValidationStatus.InProgress);
 	                    return data;
@@ -362,7 +362,6 @@ public class EmailValidationsRestClient {
     public Validation query(final String id, final WaitForCompletionOptions waitOptions,
     		final ServerPollingLoopEventListener pollingLoopEventListener) throws IOException {
         // Handle the case when the client wishes to avoid waiting for completion
-
         if (waitOptions == WaitForCompletionOptions.DontWait)
             return queryOnce(id);
 
@@ -497,6 +496,7 @@ public class EmailValidationsRestClient {
 	        RestResponse response = restClient.execute(request, Validation.class);
 	        Validation data = (Validation) response.getData();
 
+	        // Handle response based on status code
 	        switch (response.getStatusCode()) {
 	            case HttpStatusCode.OK: {
 	            	data.getOverview().setStatus(ValidationStatus.Completed);
@@ -545,6 +545,7 @@ public class EmailValidationsRestClient {
 	        RestResponse response = restClient.execute(request, ValidationOverview.class);
 	        ValidationOverview data = (ValidationOverview) response.getData();
 
+	        // Handle response based on status code
 	        switch (response.getStatusCode()) {
 	            case HttpStatusCode.OK: {
 	            	data.setStatus(ValidationStatus.Completed);
@@ -635,17 +636,30 @@ public class EmailValidationsRestClient {
 	    	if(nonNull(requestUri) && !StringUtils.isBlank(requestUri.toString())){
 	    		queryEntriesResource.append(requestUri.toString());
 	    	}
-	    	System.out.println("URI: " + queryEntriesResource.toString());
 
 	    	// Make request object for the rest call
 	    	RestRequest request = new RestRequest(HttpRequestMethod.GET, queryEntriesResource.toString());
 
 	        // Sends the request to the Verifalia servers
 	        RestResponse response = restClient.execute(request, ValidationEntries.class);
+	        ValidationEntries data = (ValidationEntries) response.getData();
 
-	        if(response.getStatusCode() != HttpStatusCode.OK && response.getStatusCode() != HttpStatusCode.ACCEPTED)
-	        	throw new VerifaliaException(response);
-	        return (ValidationEntries) response.getData();
+	        // Handle response based on status code
+	        switch (response.getStatusCode()) {
+	            case HttpStatusCode.OK:
+	            case HttpStatusCode.ACCEPTED: {
+	                return data;
+	            }
+
+	            case HttpStatusCode.GONE:
+	            case HttpStatusCode.NOT_FOUND: {
+	                return null;
+	            }
+
+	            default: {
+	            	throw new VerifaliaException(response);
+	            }
+	        }
     	} else {
     		throw new IllegalArgumentException("Job ID cannot be blank");
     	}
