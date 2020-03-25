@@ -47,7 +47,7 @@ public class VerifaliaRestClient {
 	 * @throws URISyntaxException
 	 */
 	public VerifaliaRestClient(String baseURL, String apiVersion, String accountSid, String authToken) throws URISyntaxException {
-		restClient = new RestClient(baseURL, apiVersion, accountSid, authToken, Constants.USER_AGENT_BASE + Constants.CLIENT_VERSION);
+		restClient = new RestClient(baseURL, apiVersion, accountSid, authToken, Constants.USER_AGENT);
 	}
 
 	/**
@@ -60,7 +60,7 @@ public class VerifaliaRestClient {
 	 * @throws URISyntaxException
 	 */
 	public VerifaliaRestClient(String apiVersion, String accountSid, String authToken) throws URISyntaxException {
-		restClient = new RestClient(Constants.DEFAULT_BASE_URL, apiVersion, accountSid, authToken, Constants.USER_AGENT_BASE + Constants.CLIENT_VERSION);
+		restClient = new RestClient(apiVersion, accountSid, authToken);
 	}
 
 	/**
@@ -72,8 +72,7 @@ public class VerifaliaRestClient {
 	 * @throws URISyntaxException
 	 */
 	public VerifaliaRestClient(String accountSid, String authToken) throws URISyntaxException {
-		restClient = new RestClient(Constants.DEFAULT_BASE_URL, Constants.DEFAULT_API_VERSION, accountSid, authToken,
-				Constants.USER_AGENT_BASE + Constants.CLIENT_VERSION);
+		restClient = new RestClient(accountSid, authToken);
 	}
 
 	/**

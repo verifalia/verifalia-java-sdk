@@ -1,6 +1,10 @@
-package com.verifalia.api.emailvalidations.models;
+package com.verifalia.api.emailvalidations.models.output;
 
 import java.util.Date;
+
+import com.verifalia.api.emailvalidations.models.ValidationDeDuplication;
+import com.verifalia.api.emailvalidations.models.ValidationQuality;
+import com.verifalia.api.emailvalidations.models.ValidationStatus;
 
 import lombok.Getter;
 import lombok.Setter;

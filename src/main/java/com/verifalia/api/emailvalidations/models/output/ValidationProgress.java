@@ -1,4 +1,4 @@
-package com.verifalia.api.emailvalidations.models;
+package com.verifalia.api.emailvalidations.models.output;
 
 import lombok.Getter;
 import lombok.Setter;

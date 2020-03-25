@@ -16,7 +16,7 @@ import org.junit.Test;
 import com.verifalia.api.rest.HttpStatusCode;
 import com.verifalia.api.rest.RestClient;
 import com.verifalia.api.rest.RestRequest;
-import com.verifalia.api.emailvalidations.models.Validation;
+import com.verifalia.api.emailvalidations.models.output.Validation;
 import com.verifalia.api.rest.HttpRequestMethod;
 import com.verifalia.api.rest.RestResponse;
 import com.verifalia.api.test.utils.MiniHTTPD;

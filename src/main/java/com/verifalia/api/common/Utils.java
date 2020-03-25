@@ -2,6 +2,7 @@ package com.verifalia.api.common;
 
 import static java.util.Objects.nonNull;
 
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.LocalDate;
@@ -11,6 +12,9 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.utils.URIBuilder;
+import org.codehaus.jackson.JsonGenerationException;
+import org.codehaus.jackson.map.JsonMappingException;
+import org.codehaus.jackson.map.ObjectMapper;
 
 /**
  * Utility methods/functions used throughout the SDK
@@ -99,14 +103,27 @@ public class Utils {
     }
 
     /**
-     * Converts java.lang.Iterable to a string with each elements in the iterable seperated by the input seperator.
-     * @param iterable java.lang.Iterable which needs to be converted to string.
-     * @param separator String separator which needs to be used to separate individual elements of iterable to construct the output string.
-     * @return String Converted string from iterable with the mentioned seperator.
+     * Converts local date to string based on the input format.
+     * @param localDate LocalDate object which needs to be formatted.
+     * @param dateFormat Date format in which the local date object needs to be formatted.
+     * @return String Converted local date to string as per the input format.
      */
     public static String convertLocalDateToString(LocalDate localDate, String dateFormat){
     	if(nonNull(localDate)){
     		return localDate.format(DateTimeFormatter.ofPattern(dateFormat));
+    	}
+    	return StringUtils.EMPTY;
+    }
+
+    /**
+     * Converts an object to JSON string
+     * @param obj Object which needs to be converted to JSON format.
+     * @return String JSON string for the input object
+     */
+    public static String convertObjectToJsonString(Object obj) throws JsonGenerationException, JsonMappingException, IOException {
+    	if(nonNull(obj)){
+    		ObjectMapper mapper = new ObjectMapper();
+			return mapper.writeValueAsString(obj);
     	}
     	return StringUtils.EMPTY;
     }

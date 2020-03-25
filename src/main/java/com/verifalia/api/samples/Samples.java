@@ -12,16 +12,16 @@ import com.verifalia.api.credits.models.CreditBalanceData;
 import com.verifalia.api.credits.models.CreditDailyUsage;
 import com.verifalia.api.credits.models.CreditDailyUsageData;
 import com.verifalia.api.credits.models.CreditDailyUsageFilter;
-import com.verifalia.api.emailvalidations.models.Validation;
-import com.verifalia.api.emailvalidations.models.ValidationEntries;
 import com.verifalia.api.emailvalidations.models.ValidationEntriesFilter;
-import com.verifalia.api.emailvalidations.models.ValidationEntry;
 import com.verifalia.api.emailvalidations.models.ValidationEntryStatus;
-import com.verifalia.api.emailvalidations.models.ValidationJobs;
 import com.verifalia.api.emailvalidations.models.ValidationJobsFilter;
 import com.verifalia.api.emailvalidations.models.ValidationJobsSort;
-import com.verifalia.api.emailvalidations.models.ValidationOverview;
 import com.verifalia.api.emailvalidations.models.ValidationStatus;
+import com.verifalia.api.emailvalidations.models.output.Validation;
+import com.verifalia.api.emailvalidations.models.output.ValidationEntries;
+import com.verifalia.api.emailvalidations.models.output.ValidationEntry;
+import com.verifalia.api.emailvalidations.models.output.ValidationJobs;
+import com.verifalia.api.emailvalidations.models.output.ValidationOverview;
 import com.verifalia.api.exceptions.VerifaliaException;
 
 public class Samples {

@@ -5,9 +5,11 @@ import static java.util.Objects.nonNull;
 import java.io.IOException;
 import java.net.URI;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
@@ -17,15 +19,17 @@ import com.verifalia.api.common.Constants;
 import com.verifalia.api.common.ServerPollingLoopEventListener;
 import com.verifalia.api.common.ServerPollingLoopEventListener.ServerPollingLoopEvent;
 import com.verifalia.api.common.Utils;
-import com.verifalia.api.emailvalidations.models.Validation;
-import com.verifalia.api.emailvalidations.models.ValidationEntries;
 import com.verifalia.api.emailvalidations.models.ValidationEntriesFilter;
 import com.verifalia.api.emailvalidations.models.ValidationEntryStatus;
-import com.verifalia.api.emailvalidations.models.ValidationJobs;
 import com.verifalia.api.emailvalidations.models.ValidationJobsFilter;
 import com.verifalia.api.emailvalidations.models.ValidationJobsSort;
-import com.verifalia.api.emailvalidations.models.ValidationOverview;
 import com.verifalia.api.emailvalidations.models.ValidationStatus;
+import com.verifalia.api.emailvalidations.models.input.ValidationInput;
+import com.verifalia.api.emailvalidations.models.input.ValidationEntryInput;
+import com.verifalia.api.emailvalidations.models.output.Validation;
+import com.verifalia.api.emailvalidations.models.output.ValidationEntries;
+import com.verifalia.api.emailvalidations.models.output.ValidationJobs;
+import com.verifalia.api.emailvalidations.models.output.ValidationOverview;
 import com.verifalia.api.exceptions.AuthorizationException;
 import com.verifalia.api.exceptions.InsufficientCreditException;
 import com.verifalia.api.exceptions.VerifaliaException;
@@ -65,14 +69,15 @@ public class EmailValidationsRestClient {
      * @throws IOException
      */
     public Validation submit(String[] emailAddresses) throws IOException, VerifaliaException {
-        return submit(emailAddresses, WaitForCompletionOptions.DontWait);
+    	ValidationInput validationInput = getValidationInput(Arrays.asList(emailAddresses));
+        return submit(validationInput, WaitForCompletionOptions.DontWait);
     }
 
     /**
      * Initiates a new email validation batch. Makes a POST request to the "/email-validations" resource.
      * <p>Upon initialization, batches usually are in the {@link ValidationStatus#InProgress InProgress} status.
      * Validations are completed only when their {@link ValidationOverview#status} property
-     * is {@link ValidationStatus#Completed Completed}. Use the {@link EmailValidationsRestClient#submit(java.lang.Iterable, WaitForCompletionOptions)}
+     * is {@link ValidationStatus#Completed Completed}. Use the {@link EmailValidationsRestClient#submit(com.verifalia.api.emailvalidations.models.input.ValidationInput, WaitForCompletionOptions)}
      * to wait for the completion of the batch without having to manually poll the API.
      * In order to retrieve the most up-to-date snapshot of a validation batch, call the {@link EmailValidationsRestClient#query(String) query}
      * along with the batch's {@link ValidationOverview#id}.
@@ -83,7 +88,8 @@ public class EmailValidationsRestClient {
      * @throws IOException
      */
     public Validation submit(Iterable<String> emailAddresses) throws IOException, VerifaliaException {
-        return submit(emailAddresses, WaitForCompletionOptions.DontWait);
+    	ValidationInput validationInput = getValidationInput(emailAddresses);
+        return submit(validationInput, WaitForCompletionOptions.DontWait);
     }
 
     /**
@@ -102,7 +108,24 @@ public class EmailValidationsRestClient {
      * @throws VerifaliaException
      */
     public Validation submit(String[] emailAddresses, WaitForCompletionOptions waitForCompletionOptions) throws IOException, VerifaliaException {
-    	return submit(Arrays.asList(emailAddresses), waitForCompletionOptions);
+    	ValidationInput validationInput = getValidationInput(Arrays.asList(emailAddresses));
+    	return submit(validationInput, waitForCompletionOptions);
+    }
+
+    private ValidationInput getValidationInput(Iterable<String> emailAddresses){
+    	// TODO - Check for input validation
+    	if (emailAddresses == null)
+            throw new IllegalArgumentException("emailAddresses");
+    	if (!emailAddresses.iterator().hasNext())
+            throw new IllegalArgumentException("Can't validate an empty batch (emailAddresses)");
+
+    	List<ValidationEntryInput> entries = new ArrayList<ValidationEntryInput>();
+    	for(String emailAddress: emailAddresses){
+    		entries.add(new ValidationEntryInput(StringUtils.defaultString(emailAddress)));
+    	}
+    	ValidationInput validationInput = new ValidationInput();
+    	validationInput.setEntries(entries);
+    	return validationInput;
     }
 
     /**
@@ -114,25 +137,21 @@ public class EmailValidationsRestClient {
      * In order to retrieve the most up-to-date snapshot of a validation batch, call the {@link EmailValidationsRestClient#query(String)}
      * along with the batch's {@link ValidationOverview#id}.
      *
-     * @param emailAddresses A collection of email addresses to validate
+     * @param validationInput An object representing the input for email validation requests
      * @param waitForCompletionOptions The options about waiting for the validation completion
-     * @return An object representing the email validation batch.
+     * @return Validation An object representing the email validation batch.
      * @throws IOException
      * @throws VerifaliaException
      */
-    public Validation submit(Iterable<String> emailAddresses, WaitForCompletionOptions waitForCompletionOptions) throws IOException, VerifaliaException {
-        if (emailAddresses == null)
-            throw new IllegalArgumentException("emailAddresses");
-
+    public Validation submit(ValidationInput validationInput,
+    		WaitForCompletionOptions waitForCompletionOptions) throws IOException, VerifaliaException {
         if (waitForCompletionOptions == null)
             throw new IllegalArgumentException("waitForCompletionOptions");
 
-        if (!emailAddresses.iterator().hasNext())
-            throw new IllegalArgumentException("Can't validate an empty batch (emailAddresses)");
-
         // Build the REST request
-        RestRequest request = new RestRequest(HttpRequestMethod.POST, Constants.EMAIL_VALIDATIONS_RESOURCE);
-        request.addEntries(emailAddresses);
+        String requestData = Utils.convertObjectToJsonString(validationInput);
+        System.out.println("Request Data: " + requestData);
+        RestRequest request = new RestRequest(HttpRequestMethod.POST, Constants.EMAIL_VALIDATIONS_RESOURCE, requestData);
 
         // Send the request to the Verifalia servers
         RestResponse response = restClient.execute(request, Validation.class);

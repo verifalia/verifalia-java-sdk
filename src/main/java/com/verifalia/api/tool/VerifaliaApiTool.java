@@ -12,7 +12,7 @@ import com.verifalia.api.VerifaliaRestClient;
 import com.verifalia.api.WaitForCompletionOptions;
 import com.verifalia.api.common.Constants;
 import com.verifalia.api.common.ServerPollingLoopEventListener;
-import com.verifalia.api.emailvalidations.models.Validation;
+import com.verifalia.api.emailvalidations.models.output.Validation;
 
 public class VerifaliaApiTool {
 

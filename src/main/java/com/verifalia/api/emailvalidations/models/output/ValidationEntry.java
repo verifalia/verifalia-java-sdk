@@ -1,8 +1,11 @@
-package com.verifalia.api.emailvalidations.models;
+package com.verifalia.api.emailvalidations.models.output;
 
 import java.util.Date;
 
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
+
+import com.verifalia.api.emailvalidations.models.ValidationEntryClassification;
+import com.verifalia.api.emailvalidations.models.ValidationEntryStatus;
 
 import lombok.Getter;
 import lombok.Setter;
