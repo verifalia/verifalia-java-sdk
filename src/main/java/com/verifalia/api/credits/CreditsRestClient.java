@@ -128,24 +128,41 @@ public class CreditsRestClient {
     private Map<String, String> getDailyUsageParamMap(CreditDailyUsageFilter creditDailyUsageFilter){
     	Map<String, String> paramMap = new HashMap<String, String>();
     	if(nonNull(creditDailyUsageFilter)){
-    		// TODO - Validate daily usage filter
-	    	// Date filter
-	    	if(nonNull(creditDailyUsageFilter.getDate())){
-	    		paramMap.put("date", Utils.convertLocalDateToString(creditDailyUsageFilter.getDate(),
-	    				Constants.DATE_FORMAT));
-	    	}
-	    	// Date since filter
-	    	if(nonNull(creditDailyUsageFilter.getDateSince())){
-	    		paramMap.put("date:since", Utils.convertLocalDateToString(creditDailyUsageFilter.getDateSince(),
-	    				Constants.DATE_FORMAT));
-	    	}
-	    	// Date until filter
-	    	if(nonNull(creditDailyUsageFilter.getDateUntil())){
-	    		paramMap.put("date:until", Utils.convertLocalDateToString(creditDailyUsageFilter.getDateUntil(),
-	    				Constants.DATE_FORMAT));
-	    	}
+    		if(validateDailyUsageFilterInputs(creditDailyUsageFilter)){ // Validate the daily usage request filter
+		    	// Date filter
+		    	if(nonNull(creditDailyUsageFilter.getDate())){
+		    		paramMap.put("date", Utils.convertLocalDateToString(creditDailyUsageFilter.getDate(),
+		    				Constants.DATE_FORMAT));
+		    	}
+		    	// Date since filter
+		    	if(nonNull(creditDailyUsageFilter.getDateSince())){
+		    		paramMap.put("date:since", Utils.convertLocalDateToString(creditDailyUsageFilter.getDateSince(),
+		    				Constants.DATE_FORMAT));
+		    	}
+		    	// Date until filter
+		    	if(nonNull(creditDailyUsageFilter.getDateUntil())){
+		    		paramMap.put("date:until", Utils.convertLocalDateToString(creditDailyUsageFilter.getDateUntil(),
+		    				Constants.DATE_FORMAT));
+		    	}
+    		}
     	}
     	return paramMap;
+    }
+
+    private boolean validateDailyUsageFilterInputs(CreditDailyUsageFilter creditDailyUsageFilter){
+    	// Validation related to dates
+    	if(nonNull(creditDailyUsageFilter.getDate())
+    			&& (nonNull(creditDailyUsageFilter.getDateSince()) || nonNull(creditDailyUsageFilter.getDateUntil()))){
+    		throw new IllegalArgumentException("One cannot have both date and date since or date until or both when making request");
+    	}
+    	// Validation related to dates
+    	if(nonNull(creditDailyUsageFilter.getDateSince())
+    			&& nonNull(creditDailyUsageFilter.getDateUntil())){
+    		if(creditDailyUsageFilter.getDateUntil().isBefore(creditDailyUsageFilter.getDateSince())){
+    			throw new IllegalArgumentException("One cannot have created until date before created on date");
+    		}
+    	}
+    	return true;
     }
 
 }

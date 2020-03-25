@@ -167,7 +167,6 @@ public class RestClient {
 
 			default: break;
 		}
-
 		return response;
 	}
 

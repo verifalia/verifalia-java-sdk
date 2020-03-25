@@ -1,5 +1,7 @@
 package com.verifalia.api.samples;
 
+import static java.util.Objects.nonNull;
+
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.time.LocalDate;
@@ -12,10 +14,12 @@ import com.verifalia.api.credits.models.CreditBalanceData;
 import com.verifalia.api.credits.models.CreditDailyUsage;
 import com.verifalia.api.credits.models.CreditDailyUsageData;
 import com.verifalia.api.credits.models.CreditDailyUsageFilter;
+import com.verifalia.api.emailvalidations.models.ValidationDeDuplication;
 import com.verifalia.api.emailvalidations.models.ValidationEntriesFilter;
 import com.verifalia.api.emailvalidations.models.ValidationEntryStatus;
 import com.verifalia.api.emailvalidations.models.ValidationJobsFilter;
 import com.verifalia.api.emailvalidations.models.ValidationJobsSort;
+import com.verifalia.api.emailvalidations.models.ValidationQuality;
 import com.verifalia.api.emailvalidations.models.ValidationStatus;
 import com.verifalia.api.emailvalidations.models.output.Validation;
 import com.verifalia.api.emailvalidations.models.output.ValidationEntries;
@@ -150,7 +154,7 @@ public class Samples {
 				"alice@example.com",
 				"bob@example.net",
 				"carol@example.org"
-			}
+			}, ValidationQuality.High, WaitForCompletionOptions.DontWait
 		);
 
 		// If request not completed, wait and display progress.
@@ -195,7 +199,7 @@ public class Samples {
 				"alice@example.com",
 				"bob@example.net",
 				"carol@example.org"
-			}
+			}, ValidationQuality.Standard, ValidationDeDuplication.Relaxed, 255, WaitForCompletionOptions.DontWait
 		);
 
 		// Loop until request processing is completed or execution thread is interrupted
@@ -353,12 +357,16 @@ public class Samples {
 			ValidationEntryStatus.Success,
 			ValidationEntryStatus.DomainHasNullMx
 		});
-		System.out.println("Entries results with filter status: " + entries1.getData().size());
-		for (ValidationEntry entryData: entries1.getData()){
-			System.out.printf("Address: %s => Result: %s\n",
-					entryData.getInputData(),
-					entryData.getStatus()
-			);
+		if(nonNull(entries1.getData())){
+			System.out.println("Entries results with filter status: " + entries1.getData().size());
+			for (ValidationEntry entryData: entries1.getData()){
+				System.out.printf("Address: %s => Result: %s\n",
+						entryData.getInputData(),
+						entryData.getStatus()
+				);
+			}
+		} else {
+			System.out.println("Entries results with filter status is in progress");
 		}
 
 		// Submit request for getting entries with filter object
@@ -369,12 +377,16 @@ public class Samples {
 			ValidationEntryStatus.DomainHasNullMx
 		}));
 		ValidationEntries entries2 = restClient.getEmailValidations().queryEntries(result.getId(), validationEntriesFilter);
-		System.out.println("Entries results with filter object: " + entries2.getData().size());
-		for (ValidationEntry entryData: entries2.getData()){
-			System.out.printf("Address: %s => Result: %s\n",
-					entryData.getInputData(),
-					entryData.getStatus()
-			);
+		if(nonNull(entries2.getData())){
+			System.out.println("Entries results with filter object: " + entries2.getData().size());
+			for (ValidationEntry entryData: entries2.getData()){
+				System.out.printf("Address: %s => Result: %s\n",
+						entryData.getInputData(),
+						entryData.getStatus()
+				);
+			}
+		} else {
+			System.out.println("Entries results with filter status is in progress");
 		}
 	}
 
@@ -573,7 +585,7 @@ public class Samples {
 
 		// Submit daily usage request with filter date
 		System.out.println("------------------------------------------------------");
-		CreditDailyUsage result1 = restClient.getCredits().getDailyUsage(LocalDate.parse("2020-03-12"));
+		CreditDailyUsage result1 = restClient.getCredits().getDailyUsage(LocalDate.parse("2020-03-25"));
 		if (result1 == null) // Result is null if timeout expires
 			System.err.println("Request timeout expired");
 		else {
@@ -588,8 +600,8 @@ public class Samples {
 
 		// Submit daily usage request with filter dateSince and filter dateUntil
 		System.out.println("------------------------------------------------------");
-		CreditDailyUsage result2 = restClient.getCredits().getDailyUsage(LocalDate.parse("2020-03-12"),
-				LocalDate.parse("2020-03-16"));
+		CreditDailyUsage result2 = restClient.getCredits().getDailyUsage(LocalDate.parse("2020-03-24"),
+				LocalDate.parse("2020-03-25"));
 		if (result2 == null) // Result is null if timeout expires
 			System.err.println("Request timeout expired");
 		else {
@@ -604,7 +616,7 @@ public class Samples {
 
 		// Submit daily usage request with filter object
 		System.out.println("------------------------------------------------------");
-		CreditDailyUsageFilter creditDailyUsageFilter1 = new CreditDailyUsageFilter(LocalDate.parse("2020-03-12"));
+		CreditDailyUsageFilter creditDailyUsageFilter1 = new CreditDailyUsageFilter(LocalDate.parse("2020-03-25"));
 		CreditDailyUsage result3 = restClient.getCredits().getDailyUsage(creditDailyUsageFilter1);
 		if (result2 == null) // Result is null if timeout expires
 			System.err.println("Request timeout expired");
@@ -620,8 +632,8 @@ public class Samples {
 
 		// Submit daily usage request with filter object
 		System.out.println("------------------------------------------------------");
-		CreditDailyUsageFilter creditDailyUsageFilter2 = new CreditDailyUsageFilter(LocalDate.parse("2020-03-12"),
-				LocalDate.parse("2020-03-16"));
+		CreditDailyUsageFilter creditDailyUsageFilter2 = new CreditDailyUsageFilter(LocalDate.parse("2020-03-24"),
+				LocalDate.parse("2020-03-25"));
 		CreditDailyUsage result4 = restClient.getCredits().getDailyUsage(creditDailyUsageFilter2);
 		if (result2 == null) // Result is null if timeout expires
 			System.err.println("Request timeout expired");

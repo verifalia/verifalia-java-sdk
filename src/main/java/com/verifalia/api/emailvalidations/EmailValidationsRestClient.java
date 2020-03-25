@@ -19,10 +19,12 @@ import com.verifalia.api.common.Constants;
 import com.verifalia.api.common.ServerPollingLoopEventListener;
 import com.verifalia.api.common.ServerPollingLoopEventListener.ServerPollingLoopEvent;
 import com.verifalia.api.common.Utils;
+import com.verifalia.api.emailvalidations.models.ValidationDeDuplication;
 import com.verifalia.api.emailvalidations.models.ValidationEntriesFilter;
 import com.verifalia.api.emailvalidations.models.ValidationEntryStatus;
 import com.verifalia.api.emailvalidations.models.ValidationJobsFilter;
 import com.verifalia.api.emailvalidations.models.ValidationJobsSort;
+import com.verifalia.api.emailvalidations.models.ValidationQuality;
 import com.verifalia.api.emailvalidations.models.ValidationStatus;
 import com.verifalia.api.emailvalidations.models.input.ValidationInput;
 import com.verifalia.api.emailvalidations.models.input.ValidationEntryInput;
@@ -112,20 +114,94 @@ public class EmailValidationsRestClient {
     	return submit(validationInput, waitForCompletionOptions);
     }
 
-    private ValidationInput getValidationInput(Iterable<String> emailAddresses){
-    	// TODO - Check for input validation
-    	if (emailAddresses == null)
-            throw new IllegalArgumentException("emailAddresses");
-    	if (!emailAddresses.iterator().hasNext())
-            throw new IllegalArgumentException("Can't validate an empty batch (emailAddresses)");
+    /**
+     * Initiates a new email validation batch. Makes a POST request to the "/email-validations" resource.
+     * <p>Upon initialization, batches usually are in the {@link ValidationStatus#InProgress InProgress} status.
+     * Validations are completed only when their {@link ValidationOverview#status} property.
+     * is {@link ValidationStatus#Completed Completed}; the <b>waitForCompletionOptions</b> parameter
+     * allows to wait for the completion of the batch, without having to manually poll the API.
+     * In order to retrieve the most up-to-date snapshot of a validation batch, call the {@link EmailValidationsRestClient#query(String)}
+     * along with the batch's {@link ValidationOverview#id}.
+     *
+     * @param emailAddresses A collection of email addresses to validate
+     * @param quality Validation quality based on which request needs to be proceessed
+     * @param waitForCompletionOptions The options about waiting for the validation completion
+     * @return An object representing the email validation batch.
+     * @throws IOException
+     * @throws VerifaliaException
+     */
+    public Validation submit(String[] emailAddresses, ValidationQuality quality, WaitForCompletionOptions waitForCompletionOptions)
+    		throws IOException, VerifaliaException {
+    	ValidationInput validationInput = getValidationInput(Arrays.asList(emailAddresses), quality);
+    	return submit(validationInput, waitForCompletionOptions);
+    }
 
-    	List<ValidationEntryInput> entries = new ArrayList<ValidationEntryInput>();
-    	for(String emailAddress: emailAddresses){
-    		entries.add(new ValidationEntryInput(StringUtils.defaultString(emailAddress)));
-    	}
-    	ValidationInput validationInput = new ValidationInput();
-    	validationInput.setEntries(entries);
-    	return validationInput;
+    /**
+     * Initiates a new email validation batch. Makes a POST request to the "/email-validations" resource.
+     * <p>Upon initialization, batches usually are in the {@link ValidationStatus#InProgress InProgress} status.
+     * Validations are completed only when their {@link ValidationOverview#status} property.
+     * is {@link ValidationStatus#Completed Completed}; the <b>waitForCompletionOptions</b> parameter
+     * allows to wait for the completion of the batch, without having to manually poll the API.
+     * In order to retrieve the most up-to-date snapshot of a validation batch, call the {@link EmailValidationsRestClient#query(String)}
+     * along with the batch's {@link ValidationOverview#id}.
+     *
+     * @param emailAddresses A collection of email addresses to validate
+     * @param deDuplication Validation deduplication based on which request needs to be proceessed
+     * @param waitForCompletionOptions The options about waiting for the validation completion
+     * @return An object representing the email validation batch.
+     * @throws IOException
+     * @throws VerifaliaException
+     */
+    public Validation submit(String[] emailAddresses, ValidationDeDuplication deDuplication, WaitForCompletionOptions waitForCompletionOptions)
+    		throws IOException, VerifaliaException {
+    	ValidationInput validationInput = getValidationInput(Arrays.asList(emailAddresses), deDuplication);
+    	return submit(validationInput, waitForCompletionOptions);
+    }
+
+    /**
+     * Initiates a new email validation batch. Makes a POST request to the "/email-validations" resource.
+     * <p>Upon initialization, batches usually are in the {@link ValidationStatus#InProgress InProgress} status.
+     * Validations are completed only when their {@link ValidationOverview#status} property.
+     * is {@link ValidationStatus#Completed Completed}; the <b>waitForCompletionOptions</b> parameter
+     * allows to wait for the completion of the batch, without having to manually poll the API.
+     * In order to retrieve the most up-to-date snapshot of a validation batch, call the {@link EmailValidationsRestClient#query(String)}
+     * along with the batch's {@link ValidationOverview#id}.
+     *
+     * @param emailAddresses A collection of email addresses to validate
+     * @param quality Validation quality based on which request needs to be processed
+     * @param deDuplication Validation de-duplication based on which request needs to be processed
+     * @param waitForCompletionOptions The options about waiting for the validation completion
+     * @return An object representing the email validation batch.
+     * @throws IOException
+     * @throws VerifaliaException
+     */
+    public Validation submit(String[] emailAddresses, ValidationQuality quality, ValidationDeDuplication deDuplication,
+    		WaitForCompletionOptions waitForCompletionOptions) throws IOException, VerifaliaException {
+    	ValidationInput validationInput = getValidationInput(Arrays.asList(emailAddresses), quality, deDuplication);
+    	return submit(validationInput, waitForCompletionOptions);
+    }
+
+    /**
+     * Initiates a new email validation batch. Makes a POST request to the "/email-validations" resource.
+     * <p>Upon initialization, batches usually are in the {@link ValidationStatus#InProgress InProgress} status.
+     * Validations are completed only when their {@link ValidationOverview#status} property.
+     * is {@link ValidationStatus#Completed Completed}; the <b>waitForCompletionOptions</b> parameter
+     * allows to wait for the completion of the batch, without having to manually poll the API.
+     * In order to retrieve the most up-to-date snapshot of a validation batch, call the {@link EmailValidationsRestClient#query(String)}
+     * along with the batch's {@link ValidationOverview#id}.
+     *
+     * @param emailAddresses A collection of email addresses to validate
+     * @param quality Validation quality based on which request needs to be processed
+     * @param deDuplication Validation de-duplication based on which request needs to be processed
+     * @param waitForCompletionOptions The options about waiting for the validation completion
+     * @return An object representing the email validation batch.
+     * @throws IOException
+     * @throws VerifaliaException
+     */
+    public Validation submit(String[] emailAddresses, ValidationQuality quality, ValidationDeDuplication deDuplication,
+    		Integer priority, WaitForCompletionOptions waitForCompletionOptions) throws IOException, VerifaliaException {
+    	ValidationInput validationInput = getValidationInput(Arrays.asList(emailAddresses), quality, deDuplication, priority);
+    	return submit(validationInput, waitForCompletionOptions);
     }
 
     /**
@@ -147,50 +223,105 @@ public class EmailValidationsRestClient {
     		WaitForCompletionOptions waitForCompletionOptions) throws IOException, VerifaliaException {
         if (waitForCompletionOptions == null)
             throw new IllegalArgumentException("waitForCompletionOptions");
+        if(validateEmailValidationInputs(validationInput)){ // If validation input object is valid
+ 	        // Build the REST request
+	        String requestData = Utils.convertObjectToJsonString(validationInput);
+	        RestRequest request = new RestRequest(HttpRequestMethod.POST, Constants.EMAIL_VALIDATIONS_RESOURCE, requestData);
 
-        // Build the REST request
-        String requestData = Utils.convertObjectToJsonString(validationInput);
-        System.out.println("Request Data: " + requestData);
-        RestRequest request = new RestRequest(HttpRequestMethod.POST, Constants.EMAIL_VALIDATIONS_RESOURCE, requestData);
+	        // Send the request to the Verifalia servers
+	        RestResponse response = restClient.execute(request, Validation.class);
+	        Validation data = (Validation)response.getData();
 
-        // Send the request to the Verifalia servers
-        RestResponse response = restClient.execute(request, Validation.class);
-        Validation data = (Validation)response.getData();
+	        switch (response.getStatusCode()) {
+	            case HttpStatusCode.OK: {
+	                // The batch has been completed in real time
+	                data.getOverview().setStatus(ValidationStatus.Completed);
+	                return data;
+	            }
 
-        switch (response.getStatusCode()) {
-            case HttpStatusCode.OK: {
-                // The batch has been completed in real time
-                data.getOverview().setStatus(ValidationStatus.Completed);
-                return data;
-            }
+	            case HttpStatusCode.ACCEPTED: {
+	                // The batch has been accepted but is not yet completed
 
-            case HttpStatusCode.ACCEPTED: {
-                // The batch has been accepted but is not yet completed
+	                if (waitForCompletionOptions == WaitForCompletionOptions.DontWait) {
+	                	data.getOverview().setStatus(ValidationStatus.InProgress);
+	                    return data;
+	                } else {
+		                // Poll the service until completion
+		                return query(data.getOverview().getId(), waitForCompletionOptions);
+	                }
+	            }
 
-                if (waitForCompletionOptions == WaitForCompletionOptions.DontWait) {
-                	data.getOverview().setStatus(ValidationStatus.InProgress);
-                    return data;
-                } else {
-	                // Poll the service until completion
-	                return query(data.getOverview().getId(), waitForCompletionOptions);
-                }
-            }
+	            case HttpStatusCode.UNAUTHORIZED: {
+	                // The batch has NOT been accepted because of an issue with the supplied credentials
+	                throw new AuthorizationException(response);
+	            }
 
-            case HttpStatusCode.UNAUTHORIZED: {
-                // The batch has NOT been accepted because of an issue with the supplied credentials
-                throw new AuthorizationException(response);
-            }
+	            case HttpStatusCode.PAYMENT_REQUIRED: {
+	                // The batch has NOT been accepted because of low account credit
+	                throw new InsufficientCreditException(response);
+	            }
 
-            case HttpStatusCode.PAYMENT_REQUIRED: {
-                // The batch has NOT been accepted because of low account credit
-                throw new InsufficientCreditException(response);
-            }
-
-            default: {
-                // An unhandled exception happened at the Verifalia side
-                throw new VerifaliaException(response);
-            }
+	            default: {
+	                // An unhandled exception happened at the Verifalia side
+	                throw new VerifaliaException(response);
+	            }
+	        }
         }
+        return null;
+    }
+
+    private ValidationInput getValidationInput(Iterable<String> emailAddresses){
+    	return getValidationInput(emailAddresses, null, null, null);
+    }
+
+    private ValidationInput getValidationInput(Iterable<String> emailAddresses, ValidationQuality quality){
+    	return getValidationInput(emailAddresses, quality, null, null);
+    }
+
+    private ValidationInput getValidationInput(Iterable<String> emailAddresses, ValidationDeDuplication deDuplication){
+    	return getValidationInput(emailAddresses, null, deDuplication, null);
+    }
+
+    private ValidationInput getValidationInput(Iterable<String> emailAddresses, ValidationQuality quality,
+    		ValidationDeDuplication deDuplication){
+    	return getValidationInput(emailAddresses, quality, deDuplication, null);
+    }
+
+    private ValidationInput getValidationInput(Iterable<String> emailAddresses, ValidationQuality quality,
+    		ValidationDeDuplication deDuplication, Integer priority){
+    	// Populate validation input object
+    	List<ValidationEntryInput> entries = new ArrayList<ValidationEntryInput>();
+    	for(String emailAddress: emailAddresses){
+    		entries.add(new ValidationEntryInput(StringUtils.defaultString(emailAddress)));
+    	}
+    	ValidationInput validationInput = new ValidationInput();
+    	validationInput.setEntries(entries);
+    	if(nonNull(quality)){
+    		validationInput.setQuality(quality);
+    	}
+    	if(nonNull(deDuplication)){
+    		validationInput.setDeduplication(deDuplication);
+    	}
+    	if(nonNull(priority)){
+    		validationInput.setPriority(priority);
+    	}
+    	return validationInput;
+    }
+
+    private boolean validateEmailValidationInputs(ValidationInput validationInput){
+    	if (validationInput.getEntries() == null) {
+    		throw new IllegalArgumentException("emailAddresses cannot be null");
+    	}
+    	if (validationInput.getEntries().size() == 0){
+            throw new IllegalArgumentException("Can't validate an empty batch (emailAddresses)");
+    	}
+    	if(nonNull(validationInput.getPriority())){
+    		if(validationInput.getPriority() < Constants.VALIDATION_INPUT_PRIORITY_MIN_VALUE
+    				|| validationInput.getPriority() > Constants.VALIDATION_INPUT_PRIORITY_MAX_VALUE){
+    			throw new IllegalArgumentException("Invalid priority value. It must be in range 0 to 255");
+    		}
+    	}
+    	return true;
     }
 
     /**
@@ -358,31 +489,36 @@ public class EmailValidationsRestClient {
      * @return An object representing the current status of the requested email validation batch.
      */
     public Validation queryOnce(String id) throws IOException {
-        RestRequest request = new RestRequest(HttpRequestMethod.GET, Constants.EMAIL_VALIDATIONS_RESOURCE + "/" + id);
+    	if(!StringUtils.isBlank(id)){
+    		// Build request
+	        RestRequest request = new RestRequest(HttpRequestMethod.GET, Constants.EMAIL_VALIDATIONS_RESOURCE + "/" + id);
 
-        // Sends the request to the Verifalia servers
-        RestResponse response = restClient.execute(request, Validation.class);
-        Validation data = (Validation) response.getData();
+	        // Sends the request to the Verifalia servers
+	        RestResponse response = restClient.execute(request, Validation.class);
+	        Validation data = (Validation) response.getData();
 
-        switch (response.getStatusCode()) {
-            case HttpStatusCode.OK: {
-            	data.getOverview().setStatus(ValidationStatus.Completed);
-            	return data;
-            }
+	        switch (response.getStatusCode()) {
+	            case HttpStatusCode.OK: {
+	            	data.getOverview().setStatus(ValidationStatus.Completed);
+	            	return data;
+	            }
 
-            case HttpStatusCode.ACCEPTED: {
-                data.getOverview().setStatus(ValidationStatus.InProgress);
-                return data;
-            }
+	            case HttpStatusCode.ACCEPTED: {
+	                data.getOverview().setStatus(ValidationStatus.InProgress);
+	                return data;
+	            }
 
-            case HttpStatusCode.GONE:
-            case HttpStatusCode.NOT_FOUND: {
-                return null;
-            }
+	            case HttpStatusCode.GONE:
+	            case HttpStatusCode.NOT_FOUND: {
+	                return null;
+	            }
 
-            default:
-            	throw new VerifaliaException(response);
-        }
+	            default:
+	            	throw new VerifaliaException(response);
+	        }
+    	} else {
+    		throw new IllegalArgumentException("Job ID cannot be blank");
+    	}
     }
 
     /**
@@ -393,32 +529,44 @@ public class EmailValidationsRestClient {
      * @return ValidationOverview An object representing the overview of the requested email validation batch.
      */
     public ValidationOverview queryOverview(String id) throws IOException {
-        RestRequest request = new RestRequest(HttpRequestMethod.GET, Constants.EMAIL_VALIDATIONS_RESOURCE + "/" + id
-        		+ "/" + Constants.EMAIL_VALIDATIONS_OVERVIEW_RESOURCE);
+    	if(!StringUtils.isBlank(id)){
+    		// Build URL
+    		StringBuilder requestUrlBuilder = new StringBuilder();
+    		requestUrlBuilder.append(Constants.EMAIL_VALIDATIONS_RESOURCE);
+    		requestUrlBuilder.append("/");
+    		requestUrlBuilder.append(id);
+    		requestUrlBuilder.append("/");
+    		requestUrlBuilder.append(Constants.EMAIL_VALIDATIONS_OVERVIEW_RESOURCE);
 
-        // Sends the request to the Verifalia servers
-        RestResponse response = restClient.execute(request, ValidationOverview.class);
-        ValidationOverview data = (ValidationOverview) response.getData();
+    		// Construct request object
+	        RestRequest request = new RestRequest(HttpRequestMethod.GET, requestUrlBuilder.toString());
 
-        switch (response.getStatusCode()) {
-            case HttpStatusCode.OK: {
-            	data.setStatus(ValidationStatus.Completed);
-                return data;
-            }
+	        // Sends the request to the Verifalia servers
+	        RestResponse response = restClient.execute(request, ValidationOverview.class);
+	        ValidationOverview data = (ValidationOverview) response.getData();
 
-            case HttpStatusCode.ACCEPTED: {
-            	data.setStatus(ValidationStatus.InProgress);
-                return data;
-            }
+	        switch (response.getStatusCode()) {
+	            case HttpStatusCode.OK: {
+	            	data.setStatus(ValidationStatus.Completed);
+	                return data;
+	            }
 
-            case HttpStatusCode.GONE:
-            case HttpStatusCode.NOT_FOUND: {
-                return null;
-            }
+	            case HttpStatusCode.ACCEPTED: {
+	            	data.setStatus(ValidationStatus.InProgress);
+	                return data;
+	            }
 
-            default:
-            	throw new VerifaliaException(response);
-        }
+	            case HttpStatusCode.GONE:
+	            case HttpStatusCode.NOT_FOUND: {
+	                return null;
+	            }
+
+	            default:
+	            	throw new VerifaliaException(response);
+	        }
+    	} else {
+    		throw new IllegalArgumentException("Job ID cannot be blank");
+    	}
     }
 
     /**
@@ -471,52 +619,67 @@ public class EmailValidationsRestClient {
      */
     public ValidationEntries queryEntries(String id, ValidationEntriesFilter validationEntriesFilter)
     		throws IOException{
-    	// Build query string parameters map
-    	Map<String, String> paramMap = getValidationEntriesParamMap(validationEntriesFilter);
+    	if(!StringUtils.isBlank(id)){
+	    	// Build query string parameters map
+	    	Map<String, String> paramMap = getValidationEntriesParamMap(validationEntriesFilter);
 
-    	// Build request URI with the param map
-    	URI requestUri = Utils.getHttpUri(null, null, null, paramMap);
+	    	// Build request URI with the param map
+	    	URI requestUri = Utils.getHttpUri(null, null, null, paramMap);
 
-    	// Build query entries resource string
-    	StringBuilder queryEntriesResource = new StringBuilder(Constants.EMAIL_VALIDATIONS_RESOURCE);
-    	queryEntriesResource.append("/");
-    	queryEntriesResource.append(id);
-    	queryEntriesResource.append("/");
-    	queryEntriesResource.append(Constants.EMAIL_VALIDATIONS_ENTRIES_RESOURCE);
-    	if(nonNull(requestUri) && !StringUtils.isBlank(requestUri.toString())){
-    		queryEntriesResource.append(requestUri.toString());
+	    	// Build query entries resource string
+	    	StringBuilder queryEntriesResource = new StringBuilder(Constants.EMAIL_VALIDATIONS_RESOURCE);
+	    	queryEntriesResource.append("/");
+	    	queryEntriesResource.append(id);
+	    	queryEntriesResource.append("/");
+	    	queryEntriesResource.append(Constants.EMAIL_VALIDATIONS_ENTRIES_RESOURCE);
+	    	if(nonNull(requestUri) && !StringUtils.isBlank(requestUri.toString())){
+	    		queryEntriesResource.append(requestUri.toString());
+	    	}
+	    	System.out.println("URI: " + queryEntriesResource.toString());
+
+	    	// Make request object for the rest call
+	    	RestRequest request = new RestRequest(HttpRequestMethod.GET, queryEntriesResource.toString());
+
+	        // Sends the request to the Verifalia servers
+	        RestResponse response = restClient.execute(request, ValidationEntries.class);
+
+	        if(response.getStatusCode() != HttpStatusCode.OK && response.getStatusCode() != HttpStatusCode.ACCEPTED)
+	        	throw new VerifaliaException(response);
+	        return (ValidationEntries) response.getData();
+    	} else {
+    		throw new IllegalArgumentException("Job ID cannot be blank");
     	}
-    	System.out.println("URI: " + queryEntriesResource.toString());
-
-    	// Make request object for the rest call
-    	RestRequest request = new RestRequest(HttpRequestMethod.GET, queryEntriesResource.toString());
-
-        // Sends the request to the Verifalia servers
-        RestResponse response = restClient.execute(request, ValidationEntries.class);
-
-        if(response.getStatusCode() != HttpStatusCode.OK && response.getStatusCode() != HttpStatusCode.ACCEPTED)
-        	throw new VerifaliaException(response);
-        return (ValidationEntries) response.getData();
     }
 
     private Map<String, String> getValidationEntriesParamMap(ValidationEntriesFilter validationEntriesFilter){
     	Map<String, String> paramMap = new HashMap<String, String>();
     	if(nonNull(validationEntriesFilter)){
-    		// TODO - Validate list job filter
-	    	// Status filter
-	    	String statusesStr = convertValidationEntryDataStatusEnumIteratorToString(validationEntriesFilter.getStatuses(),
-	    			Constants.STRING_SEPERATOR_COMMA);
-	    	if(!StringUtils.isBlank(statusesStr)){
-	    		paramMap.put("status", statusesStr);
-	    	}
-	    	// Exclude status filter
-	    	String excludeStatusesStr = convertValidationEntryDataStatusEnumIteratorToString(validationEntriesFilter.getExcludeStatuses(),
-	    			Constants.STRING_SEPERATOR_COMMA);
-	    	if(!StringUtils.isBlank(excludeStatusesStr)){
-	    		paramMap.put("status:exclude", excludeStatusesStr);
-	    	}
+    		if(validateEntriesFilterInputs(validationEntriesFilter)){
+		    	// Status filter
+		    	String statusesStr = convertValidationEntryDataStatusEnumIteratorToString(validationEntriesFilter.getStatuses(),
+		    			Constants.STRING_SEPERATOR_COMMA);
+		    	if(!StringUtils.isBlank(statusesStr)){
+		    		paramMap.put("status", statusesStr);
+		    	}
+		    	// Exclude status filter
+		    	String excludeStatusesStr = convertValidationEntryDataStatusEnumIteratorToString(validationEntriesFilter.getExcludeStatuses(),
+		    			Constants.STRING_SEPERATOR_COMMA);
+		    	if(!StringUtils.isBlank(excludeStatusesStr)){
+		    		paramMap.put("status:exclude", excludeStatusesStr);
+		    	}
+    		}
     	}
     	return paramMap;
+    }
+
+    private boolean validateEntriesFilterInputs(ValidationEntriesFilter validationEntriesFilter){
+    	if(nonNull(validationEntriesFilter.getStatuses()) && nonNull(validationEntriesFilter.getExcludeStatuses())){
+    		if(validationEntriesFilter.getStatuses().iterator().hasNext()
+    				&& validationEntriesFilter.getExcludeStatuses().iterator().hasNext()){
+    			throw new IllegalArgumentException("One cannot have both statuses and exclude statuses when making request");
+    		}
+    	}
+    	return true;
     }
 
     private String convertValidationEntryDataStatusEnumIteratorToString(Iterable<ValidationEntryStatus> statusIterable, String separator){
@@ -632,44 +795,68 @@ public class EmailValidationsRestClient {
     private Map<String, String> getListJobsParamMap(ValidationJobsFilter validationJobFilter){
     	Map<String, String> paramMap = new HashMap<String, String>();
     	if(nonNull(validationJobFilter)){
-    		// TODO - Validate list job filter
-	    	// Created on filter
-	    	if(nonNull(validationJobFilter.getCreatedOn())){
-	    		paramMap.put("createdOn", Utils.convertLocalDateToString(validationJobFilter.getCreatedOn(),
-	    				Constants.DATE_FORMAT));
-	    	}
-	    	// Created on since filter
-	    	if(nonNull(validationJobFilter.getCreatedOnSince())){
-	    		paramMap.put("createdOn:since", Utils.convertLocalDateToString(validationJobFilter.getCreatedOnSince(),
-	    				Constants.DATE_FORMAT));
-	    	}
-	    	// Created on until filter
-	    	if(nonNull(validationJobFilter.getCreatedOnUntil())){
-	    		paramMap.put("createdOn:until", Utils.convertLocalDateToString(validationJobFilter.getCreatedOnUntil(),
-	    				Constants.DATE_FORMAT));
-	    	}
-	    	// Status filter
-	    	String statusesStr = convertValidationStatusEnumIteratorToString(validationJobFilter.getStatuses(),
-	    			Constants.STRING_SEPERATOR_COMMA);
-	    	if(!StringUtils.isBlank(statusesStr)){
-	    		paramMap.put("status", statusesStr);
-	    	}
-	    	// Exclude status filter
-	    	String excludeStatusesStr = convertValidationStatusEnumIteratorToString(validationJobFilter.getExcludeStatuses(),
-	    			Constants.STRING_SEPERATOR_COMMA);
-	    	if(!StringUtils.isBlank(excludeStatusesStr)){
-	    		paramMap.put("status:exclude", excludeStatusesStr);
-	    	}
-	    	// Owner filter
-	    	if(!StringUtils.isBlank(validationJobFilter.getOwner())){
-	    		paramMap.put("owner", validationJobFilter.getOwner());
-	    	}
-	    	// Sort
-	    	if(nonNull(validationJobFilter.getSort())){
-	    		paramMap.put("sort", validationJobFilter.getSort().getValidationJobsSort());
-	    	}
+    		if(validateJobsFilterInputs(validationJobFilter)){ // If data is valid
+		    	// Created on filter
+		    	if(nonNull(validationJobFilter.getCreatedOn())){
+		    		paramMap.put("createdOn", Utils.convertLocalDateToString(validationJobFilter.getCreatedOn(),
+		    				Constants.DATE_FORMAT));
+		    	}
+		    	// Created on since filter
+		    	if(nonNull(validationJobFilter.getCreatedOnSince())){
+		    		paramMap.put("createdOn:since", Utils.convertLocalDateToString(validationJobFilter.getCreatedOnSince(),
+		    				Constants.DATE_FORMAT));
+		    	}
+		    	// Created on until filter
+		    	if(nonNull(validationJobFilter.getCreatedOnUntil())){
+		    		paramMap.put("createdOn:until", Utils.convertLocalDateToString(validationJobFilter.getCreatedOnUntil(),
+		    				Constants.DATE_FORMAT));
+		    	}
+		    	// Status filter
+		    	String statusesStr = convertValidationStatusEnumIteratorToString(validationJobFilter.getStatuses(),
+		    			Constants.STRING_SEPERATOR_COMMA);
+		    	if(!StringUtils.isBlank(statusesStr)){
+		    		paramMap.put("status", statusesStr);
+		    	}
+		    	// Exclude status filter
+		    	String excludeStatusesStr = convertValidationStatusEnumIteratorToString(validationJobFilter.getExcludeStatuses(),
+		    			Constants.STRING_SEPERATOR_COMMA);
+		    	if(!StringUtils.isBlank(excludeStatusesStr)){
+		    		paramMap.put("status:exclude", excludeStatusesStr);
+		    	}
+		    	// Owner filter
+		    	if(!StringUtils.isBlank(validationJobFilter.getOwner())){
+		    		paramMap.put("owner", validationJobFilter.getOwner());
+		    	}
+		    	// Sort
+		    	if(nonNull(validationJobFilter.getSort())){
+		    		paramMap.put("sort", validationJobFilter.getSort().getValidationJobsSort());
+		    	}
+    		}
     	}
     	return paramMap;
+    }
+
+    private boolean validateJobsFilterInputs(ValidationJobsFilter validationJobFilter){
+    	// Validation related to dates
+    	if(nonNull(validationJobFilter.getCreatedOn())
+    			&& (nonNull(validationJobFilter.getCreatedOnSince()) || nonNull(validationJobFilter.getCreatedOnUntil()))){
+    		throw new IllegalArgumentException("One cannot have both created on date and created on since or created on until or both when making request");
+    	}
+    	// Validation related to dates
+    	if(nonNull(validationJobFilter.getCreatedOnSince())
+    			&& nonNull(validationJobFilter.getCreatedOnUntil())){
+    		if(validationJobFilter.getCreatedOnUntil().isBefore(validationJobFilter.getCreatedOnSince())){
+    			throw new IllegalArgumentException("One cannot have created until date before created on date");
+    		}
+    	}
+    	// Validation related to statuses and exclude statuses
+    	if(nonNull(validationJobFilter.getStatuses()) && nonNull(validationJobFilter.getExcludeStatuses())){
+    		if(validationJobFilter.getStatuses().iterator().hasNext()
+    				&& validationJobFilter.getExcludeStatuses().iterator().hasNext()){
+    			throw new IllegalArgumentException("One cannot have both statuses and exclude statuses when making request");
+    		}
+    	}
+    	return true;
     }
 
     private String convertValidationStatusEnumIteratorToString(Iterable<ValidationStatus> statusIterable, String separator){
@@ -686,12 +873,16 @@ public class EmailValidationsRestClient {
      * @throws IOException
      */
     public void delete(String id) throws IOException {
-    	RestRequest request = new RestRequest(HttpRequestMethod.DELETE, Constants.EMAIL_VALIDATIONS_RESOURCE + "/" + id);
+    	if(!StringUtils.isBlank(id)){
+	    	RestRequest request = new RestRequest(HttpRequestMethod.DELETE, Constants.EMAIL_VALIDATIONS_RESOURCE + "/" + id);
 
-        // Sends the request to the Verifalia servers
-        RestResponse response = restClient.execute(request, Validation.class);
+	        // Sends the request to the Verifalia servers
+	        RestResponse response = restClient.execute(request, Validation.class);
 
-        if(response.getStatusCode() != HttpStatusCode.OK)
-        	throw new VerifaliaException(response);
+	        if(response.getStatusCode() != HttpStatusCode.OK)
+	        	throw new VerifaliaException(response);
+    	} else {
+    		throw new IllegalArgumentException("Job ID cannot be blank");
+    	}
     }
 }
