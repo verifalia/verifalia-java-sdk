@@ -19,6 +19,7 @@ import com.verifalia.api.common.Constants;
 import com.verifalia.api.common.ServerPollingLoopEventListener;
 import com.verifalia.api.common.ServerPollingLoopEventListener.ServerPollingLoopEvent;
 import com.verifalia.api.common.Utils;
+import com.verifalia.api.common.models.ResponseMeta;
 import com.verifalia.api.emailvalidations.models.ValidationDeDuplication;
 import com.verifalia.api.emailvalidations.models.ValidationEntriesFilter;
 import com.verifalia.api.emailvalidations.models.ValidationEntryStatus;
@@ -26,8 +27,8 @@ import com.verifalia.api.emailvalidations.models.ValidationJobsFilter;
 import com.verifalia.api.emailvalidations.models.ValidationJobsSort;
 import com.verifalia.api.emailvalidations.models.ValidationQuality;
 import com.verifalia.api.emailvalidations.models.ValidationStatus;
-import com.verifalia.api.emailvalidations.models.input.ValidationInput;
 import com.verifalia.api.emailvalidations.models.input.ValidationEntryInput;
+import com.verifalia.api.emailvalidations.models.input.ValidationInput;
 import com.verifalia.api.emailvalidations.models.output.Validation;
 import com.verifalia.api.emailvalidations.models.output.ValidationEntries;
 import com.verifalia.api.emailvalidations.models.output.ValidationJobs;
@@ -707,9 +708,9 @@ public class EmailValidationsRestClient {
      * Returns an object representing the various email validations jobs initiated.
      * Makes a GET request to the <b>"/email-validations"</b> resource.
      * <p>To initiate a new email validation batch, please use {@link EmailValidationsRestClient#submit(java.lang.Iterable)}
-     * @return ValidationJobs An object representing the email validation jobs.
+     * @return List<ValidationOverview> An object list representing the information related to each validation job.
      */
-    public ValidationJobs listJobs() throws IOException{
+    public List<ValidationOverview> listJobs() throws IOException {
     	ValidationJobsFilter validationJobsFilter = null;
     	return listJobs(validationJobsFilter);
     }
@@ -719,9 +720,9 @@ public class EmailValidationsRestClient {
      * Makes a GET request to the <b>"/email-validations"</b> resource.
      * <p>To initiate a new email validation batch, please use {@link EmailValidationsRestClient#submit(java.lang.Iterable)}
      * @param filterCreatedOn Local date for which usage job details needs to be fetched. If null or blank value is passed, it will not consider the param when making request.
-     * @return ValidationJobs An object representing the email validation jobs.
+     * @return List<ValidationOverview> An object list representing the information related to each validation job.
      */
-    public ValidationJobs listJobs(LocalDate filterCreatedOn) throws IOException{
+    public List<ValidationOverview> listJobs(LocalDate filterCreatedOn) throws IOException {
     	ValidationJobsFilter validationJobsFilter = new ValidationJobsFilter();
     	validationJobsFilter.setCreatedOn(filterCreatedOn);
     	return listJobs(validationJobsFilter);
@@ -733,9 +734,9 @@ public class EmailValidationsRestClient {
      * <p>To initiate a new email validation batch, please use {@link EmailValidationsRestClient#submit(java.lang.Iterable)}
      * @param filterCreatedOn Local date for which usage job details needs to be fetched. If null or blank value is passed, it will not consider the param when making request.
      * @param statuses  A collection of statuses for which the jobs needs to be retrieved.
-     * @return ValidationJobs An object representing the email validation jobs.
+     * @return List<ValidationOverview> An object list representing the information related to each validation job.
      */
-    public ValidationJobs listJobs(LocalDate filterCreatedOn, ValidationStatus[] statuses) throws IOException{
+    public List<ValidationOverview> listJobs(LocalDate filterCreatedOn, ValidationStatus[] statuses) throws IOException {
     	ValidationJobsFilter validationJobsFilter = new ValidationJobsFilter();
     	validationJobsFilter.setCreatedOn(filterCreatedOn);
     	validationJobsFilter.setStatuses(Arrays.asList(statuses));
@@ -748,9 +749,9 @@ public class EmailValidationsRestClient {
      * <p>To initiate a new email validation batch, please use {@link EmailValidationsRestClient#submit(java.lang.Iterable)}
      * @param filterCreatedOn Local date for which usage job details needs to be fetched. If null or blank value is passed, it will not consider the param when making request.
      * @param sort String based on which sort needs to be applied when fetching results.
-     * @return ValidationJobs An object representing the email validation jobs.
+     * @return List<ValidationOverview> An object list representing the information related to each validation job.
      */
-    public ValidationJobs listJobs(LocalDate filterCreatedOn, ValidationJobsSort sort) throws IOException{
+    public List<ValidationOverview> listJobs(LocalDate filterCreatedOn, ValidationJobsSort sort) throws IOException {
     	ValidationJobsFilter validationJobsFilter = new ValidationJobsFilter();
     	validationJobsFilter.setCreatedOn(filterCreatedOn);
     	validationJobsFilter.setSort(sort);
@@ -764,9 +765,10 @@ public class EmailValidationsRestClient {
      * @param filterCreatedOn Date in format YYYY-MM-DD for which usage job details needs to be fetched. If null or blank value is passed, it will not consider the param when making request.
      * @param statuses  A collection of statuses for which the jobs needs to be retrieved.
      * @param sort String based on which sort needs to be applied when fetching results.
-     * @return ValidationJobs An object representing the email validation jobs.
+     * @return List<ValidationOverview> An object list representing the information related to each validation job.
      */
-    public ValidationJobs listJobs(LocalDate filterCreatedOn, ValidationStatus[] statuses, ValidationJobsSort sort) throws IOException{
+    public List<ValidationOverview> listJobs(LocalDate filterCreatedOn, ValidationStatus[] statuses, ValidationJobsSort sort)
+    		throws IOException {
     	ValidationJobsFilter validationJobsFilter = new ValidationJobsFilter();
     	validationJobsFilter.setCreatedOn(filterCreatedOn);
     	validationJobsFilter.setStatuses(Arrays.asList(statuses));
@@ -779,74 +781,95 @@ public class EmailValidationsRestClient {
      * Makes a GET request to the <b>"/email-validations"</b> resource.
      * <p>To initiate a new email validation batch, please use {@link EmailValidationsRestClient#submit(java.lang.Iterable)}
      * @param validationJobFilter Object with options for filters and sort options supported.
-     * @return ValidationJobs An object representing the email validation jobs.
+     * @return List<ValidationOverview> An object list representing the information related to each validation job.
      */
-    public ValidationJobs listJobs(ValidationJobsFilter validationJobFilter) throws IOException{
-    	// Build query string param map
-    	Map<String, String> paramMap = getListJobsParamMap(validationJobFilter);
+    public List<ValidationOverview> listJobs(ValidationJobsFilter validationJobFilter) throws IOException {
+    	// Assign with default values to handle pagination
+    	String cursor = StringUtils.EMPTY;
+    	Boolean isTruncated = Boolean.TRUE;
+    	List<ValidationOverview> validationJobsData = new ArrayList<ValidationOverview>();
 
-    	// Build request URI with the param map
-    	URI requestUri = Utils.getHttpUri(null, null, null, paramMap);
+    	// Run through responses to handle pagination
+    	while(isTruncated){
+	    	// Build query string param map
+	    	Map<String, String> paramMap = getListJobsParamMap(validationJobFilter, cursor);
 
-    	// Build query entries resource string
-    	StringBuilder listJobsResource = new StringBuilder(Constants.EMAIL_VALIDATIONS_RESOURCE);
-    	if(nonNull(requestUri) && !StringUtils.isBlank(requestUri.toString())){
-    		listJobsResource.append(requestUri.toString());
+	    	// Build request URI with the param map
+	    	URI requestUri = Utils.getHttpUri(null, null, null, paramMap);
+
+	    	// Build query entries resource string
+	    	StringBuilder listJobsResource = new StringBuilder(Constants.EMAIL_VALIDATIONS_RESOURCE);
+	    	if(nonNull(requestUri) && !StringUtils.isBlank(requestUri.toString())){
+	    		listJobsResource.append(requestUri.toString());
+	    	}
+	    	System.out.println("URI: " + listJobsResource.toString());
+
+	    	// Make request object for the rest call
+	    	RestRequest request = new RestRequest(HttpRequestMethod.GET, listJobsResource.toString());
+
+	        // Sends the request to the Verifalia servers
+	        RestResponse response = restClient.execute(request, ValidationJobs.class);
+
+	        // Check for response. If not appropriate, throw error
+	        if(response.getStatusCode() != HttpStatusCode.OK)
+	        	throw new VerifaliaException(response);
+
+	        // Handle pagination with meta details
+	        ValidationJobs validationJobs = ((ValidationJobs)response.getData());
+	        validationJobsData.addAll(validationJobs.getData());
+	        ResponseMeta meta = validationJobs.getMeta();
+	        isTruncated = meta.getIsTruncated();
+	        cursor = meta.getCursor();
     	}
-    	System.out.println("URI: " + listJobsResource.toString());
-
-    	// Make request object for the rest call
-    	RestRequest request = new RestRequest(HttpRequestMethod.GET, listJobsResource.toString());
-
-        // Sends the request to the Verifalia servers
-        RestResponse response = restClient.execute(request, ValidationJobs.class);
-
-        if(response.getStatusCode() != HttpStatusCode.OK)
-        	throw new VerifaliaException(response);
-        return (ValidationJobs) response.getData();
+    	return validationJobsData;
     }
 
-    private Map<String, String> getListJobsParamMap(ValidationJobsFilter validationJobFilter){
+    private Map<String, String> getListJobsParamMap(ValidationJobsFilter validationJobFilter, String cursor){
     	Map<String, String> paramMap = new HashMap<String, String>();
-    	if(nonNull(validationJobFilter)){
-    		if(validateJobsFilterInputs(validationJobFilter)){ // If data is valid
-		    	// Created on filter
-		    	if(nonNull(validationJobFilter.getCreatedOn())){
-		    		paramMap.put("createdOn", Utils.convertLocalDateToString(validationJobFilter.getCreatedOn(),
-		    				Constants.DATE_FORMAT));
-		    	}
-		    	// Created on since filter
-		    	if(nonNull(validationJobFilter.getCreatedOnSince())){
-		    		paramMap.put("createdOn:since", Utils.convertLocalDateToString(validationJobFilter.getCreatedOnSince(),
-		    				Constants.DATE_FORMAT));
-		    	}
-		    	// Created on until filter
-		    	if(nonNull(validationJobFilter.getCreatedOnUntil())){
-		    		paramMap.put("createdOn:until", Utils.convertLocalDateToString(validationJobFilter.getCreatedOnUntil(),
-		    				Constants.DATE_FORMAT));
-		    	}
-		    	// Status filter
-		    	String statusesStr = convertValidationStatusEnumIteratorToString(validationJobFilter.getStatuses(),
-		    			Constants.STRING_SEPERATOR_COMMA);
-		    	if(!StringUtils.isBlank(statusesStr)){
-		    		paramMap.put("status", statusesStr);
-		    	}
-		    	// Exclude status filter
-		    	String excludeStatusesStr = convertValidationStatusEnumIteratorToString(validationJobFilter.getExcludeStatuses(),
-		    			Constants.STRING_SEPERATOR_COMMA);
-		    	if(!StringUtils.isBlank(excludeStatusesStr)){
-		    		paramMap.put("status:exclude", excludeStatusesStr);
-		    	}
-		    	// Owner filter
-		    	if(!StringUtils.isBlank(validationJobFilter.getOwner())){
-		    		paramMap.put("owner", validationJobFilter.getOwner());
-		    	}
-		    	// Sort
-		    	if(nonNull(validationJobFilter.getSort())){
-		    		paramMap.put("sort", validationJobFilter.getSort().getValidationJobsSort());
-		    	}
-    		}
-    	}
+    	// Add cursor as param for handling pagination. If cursor is passed, no need to pass other params as per the documentation.
+    	if(!StringUtils.isBlank(cursor)){
+			paramMap.put(Constants.API_PARAM_CURSOR, cursor);
+		} else {
+	    	if(nonNull(validationJobFilter)){
+	    		if(validateJobsFilterInputs(validationJobFilter)){ // If data is valid
+			    	// Created on filter
+			    	if(nonNull(validationJobFilter.getCreatedOn())){
+			    		paramMap.put("createdOn", Utils.convertLocalDateToString(validationJobFilter.getCreatedOn(),
+			    				Constants.DATE_FORMAT));
+			    	}
+			    	// Created on since filter
+			    	if(nonNull(validationJobFilter.getCreatedOnSince())){
+			    		paramMap.put("createdOn:since", Utils.convertLocalDateToString(validationJobFilter.getCreatedOnSince(),
+			    				Constants.DATE_FORMAT));
+			    	}
+			    	// Created on until filter
+			    	if(nonNull(validationJobFilter.getCreatedOnUntil())){
+			    		paramMap.put("createdOn:until", Utils.convertLocalDateToString(validationJobFilter.getCreatedOnUntil(),
+			    				Constants.DATE_FORMAT));
+			    	}
+			    	// Status filter
+			    	String statusesStr = convertValidationStatusEnumIteratorToString(validationJobFilter.getStatuses(),
+			    			Constants.STRING_SEPERATOR_COMMA);
+			    	if(!StringUtils.isBlank(statusesStr)){
+			    		paramMap.put("status", statusesStr);
+			    	}
+			    	// Exclude status filter
+			    	String excludeStatusesStr = convertValidationStatusEnumIteratorToString(validationJobFilter.getExcludeStatuses(),
+			    			Constants.STRING_SEPERATOR_COMMA);
+			    	if(!StringUtils.isBlank(excludeStatusesStr)){
+			    		paramMap.put("status:exclude", excludeStatusesStr);
+			    	}
+			    	// Owner filter
+			    	if(!StringUtils.isBlank(validationJobFilter.getOwner())){
+			    		paramMap.put("owner", validationJobFilter.getOwner());
+			    	}
+			    	// Sort
+			    	if(nonNull(validationJobFilter.getSort())){
+			    		paramMap.put("sort", validationJobFilter.getSort().getValidationJobsSort());
+			    	}
+	    		}
+	    	}
+		}
     	return paramMap;
     }
 

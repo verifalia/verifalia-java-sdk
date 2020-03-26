@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.time.LocalDate;
 import java.util.Arrays;
+import java.util.List;
 
 import com.verifalia.api.VerifaliaRestClient;
 import com.verifalia.api.WaitForCompletionOptions;
@@ -24,7 +25,6 @@ import com.verifalia.api.emailvalidations.models.ValidationStatus;
 import com.verifalia.api.emailvalidations.models.output.Validation;
 import com.verifalia.api.emailvalidations.models.output.ValidationEntries;
 import com.verifalia.api.emailvalidations.models.output.ValidationEntry;
-import com.verifalia.api.emailvalidations.models.output.ValidationJobs;
 import com.verifalia.api.emailvalidations.models.output.ValidationOverview;
 import com.verifalia.api.exceptions.VerifaliaException;
 
@@ -34,18 +34,18 @@ public class Samples {
 		if(args.length >= 2) {
 			Samples sample = new Samples();
 			// Email validations
-			sample.queryVerifaliaEmailValidationsServiceSample1(args[0], args[1]);
-			sample.queryVerifaliaEmailValidationsServiceSample2(args[0], args[1]);
-			sample.queryVerifaliaEmailValidationsServiceSample3(args[0], args[1]);
-			sample.queryVerifaliaEmailValidationsOverviewSample(args[0], args[1]);
-			sample.queryVerifaliaEmailValidationsEntriesSample(args[0], args[1]);
-			sample.queryVerifaliaEmailValidationsEntriesWithFiltersSample(args[0], args[1]);
+//			sample.queryVerifaliaEmailValidationsServiceSample1(args[0], args[1]);
+//			sample.queryVerifaliaEmailValidationsServiceSample2(args[0], args[1]);
+//			sample.queryVerifaliaEmailValidationsServiceSample3(args[0], args[1]);
+//			sample.queryVerifaliaEmailValidationsOverviewSample(args[0], args[1]);
+//			sample.queryVerifaliaEmailValidationsEntriesSample(args[0], args[1]);
+//			sample.queryVerifaliaEmailValidationsEntriesWithFiltersSample(args[0], args[1]);
 			sample.queryVerifaliaEmailValidationsJobsSample(args[0], args[1]);
 			sample.queryVerifaliaEmailValidationsJobsWithFiltersSample(args[0], args[1]);
 			// Credits
-			sample.getVerifaliaCreditsBalanceSample(args[0], args[1]);
-			sample.getVerifaliaCreditsDailyUsageSample(args[0], args[1]);
-			sample.getVerifaliaCreditsDailyUsageWithFiltersSample(args[0], args[1]);
+//			sample.getVerifaliaCreditsBalanceSample(args[0], args[1]);
+//			sample.getVerifaliaCreditsDailyUsageSample(args[0], args[1]);
+//			sample.getVerifaliaCreditsDailyUsageWithFiltersSample(args[0], args[1]);
 			System.exit(0);
 		}
 	}
@@ -492,14 +492,19 @@ public class Samples {
 		try {
 			if(nonNull(restClient)){
 				// Submit email verification request with method that return status immediately
-				ValidationJobs jobs = restClient.getEmailValidations().listJobs();
-				for (ValidationOverview validationOverview: jobs.getData()){
-					System.out.printf("ID: %s => Status: %s => No of Entries: %s => Completed On: %s\n",
-							validationOverview.getId(),
-							validationOverview.getStatus(),
-							validationOverview.getNoOfEntries(),
-							validationOverview.getCompletedOn()
-					);
+				List<ValidationOverview> validationJobsData = restClient.getEmailValidations().listJobs();
+				if(nonNull(validationJobsData) && validationJobsData.size() > 0){
+					System.out.println("Total validation jobs: " + validationJobsData.size());
+					for (ValidationOverview validationOverview: validationJobsData){
+						System.out.printf("ID: %s => Status: %s => No of Entries: %s => Completed On: %s\n",
+								validationOverview.getId(),
+								validationOverview.getStatus(),
+								validationOverview.getNoOfEntries(),
+								validationOverview.getCompletedOn()
+						);
+					}
+				} else {
+					System.out.println("No validation job data exists");
 				}
 			}
 		} catch(VerifaliaException e){
@@ -533,14 +538,18 @@ public class Samples {
 			if(nonNull(restClient)){
 				// Submit request for listing job with filter createdOn
 				System.out.println("------------------------------------------------------");
-				ValidationJobs jobsResult1 = restClient.getEmailValidations().listJobs(LocalDate.parse("2020-03-11"));
-				System.out.println("Jobs results with filter createdOn: " + jobsResult1.getData().size());
-				for (ValidationOverview validationOverview: jobsResult1.getData()){
-					System.out.printf("ID: %s => Status: %s => No of Entries: %s\n",
-							validationOverview.getId(),
-							validationOverview.getStatus(),
-							validationOverview.getNoOfEntries()
-					);
+				List<ValidationOverview> jobsResult1 = restClient.getEmailValidations().listJobs(LocalDate.parse("2020-03-25"));
+				if(nonNull(jobsResult1) && jobsResult1.size() > 0){
+					System.out.println("Jobs results with filter createdOn: " + jobsResult1.size());
+					for (ValidationOverview validationOverview: jobsResult1){
+						System.out.printf("ID: %s => Status: %s => No of Entries: %s\n",
+								validationOverview.getId(),
+								validationOverview.getStatus(),
+								validationOverview.getNoOfEntries()
+						);
+					}
+				} else {
+					System.out.println("Jobs results with filter createdOn: 0");
 				}
 			}
 		} catch(VerifaliaException e){
@@ -553,17 +562,22 @@ public class Samples {
 			if(nonNull(restClient)){
 				// Submit request for listing job with filter createdOn, status
 				System.out.println("------------------------------------------------------");
-				ValidationJobs jobsResult2 = restClient.getEmailValidations().listJobs(LocalDate.parse("2020-03-12"), new ValidationStatus[] {
-					ValidationStatus.Completed,
-					ValidationStatus.InProgress,
+				List<ValidationOverview> jobsResult2 = restClient.getEmailValidations().listJobs(LocalDate.parse("2020-03-25"),
+						new ValidationStatus[] {
+								ValidationStatus.Completed,
+								ValidationStatus.InProgress,
 				});
-				System.out.println("Jobs results with filter createdOn and status: " + jobsResult2.getData().size());
-				for (ValidationOverview validationOverview: jobsResult2.getData()){
-					System.out.printf("ID: %s => Status: %s => No of Entries: %s\n",
-							validationOverview.getId(),
-							validationOverview.getStatus(),
-							validationOverview.getNoOfEntries()
-					);
+				if(nonNull(jobsResult2) && jobsResult2.size() > 0){
+					System.out.println("Jobs results with filter createdOn and status: " + jobsResult2.size());
+					for (ValidationOverview validationOverview: jobsResult2){
+						System.out.printf("ID: %s => Status: %s => No of Entries: %s\n",
+								validationOverview.getId(),
+								validationOverview.getStatus(),
+								validationOverview.getNoOfEntries()
+						);
+					}
+				} else {
+					System.out.println("Jobs results with filter createdOn and status: 0");
 				}
 			}
 		} catch(VerifaliaException e){
@@ -576,15 +590,19 @@ public class Samples {
 			if(nonNull(restClient)){
 				// Submit request for listing job with filter filter createdOn and sort -createdOn
 				System.out.println("------------------------------------------------------");
-				ValidationJobs jobsResult3 = restClient.getEmailValidations().listJobs(LocalDate.parse("2020-03-17"),
+				List<ValidationOverview> jobsResult3 = restClient.getEmailValidations().listJobs(LocalDate.parse("2020-03-24"),
 						ValidationJobsSort.CreatedOnDesc);
-				System.out.println("Jobs results with filter createdOn and sort -createdOn: " + jobsResult3.getData().size());
-				for (ValidationOverview validationOverview: jobsResult3.getData()){
-					System.out.printf("ID: %s => Status: %s => No of Entries: %s\n",
-							validationOverview.getId(),
-							validationOverview.getStatus(),
-							validationOverview.getNoOfEntries()
-					);
+				if(nonNull(jobsResult3) && jobsResult3.size() > 0){
+					System.out.println("Jobs results with filter createdOn and sort -createdOn: " + jobsResult3.size());
+					for (ValidationOverview validationOverview: jobsResult3){
+						System.out.printf("ID: %s => Status: %s => No of Entries: %s\n",
+								validationOverview.getId(),
+								validationOverview.getStatus(),
+								validationOverview.getNoOfEntries()
+						);
+					}
+				} else {
+					System.out.println("Jobs results with filter createdOn and sort -createdOn: 0");
 				}
 			}
 		} catch(VerifaliaException e){
@@ -597,17 +615,22 @@ public class Samples {
 			if(nonNull(restClient)){
 				// Submit request for listing job with filter createdOn, status and sort createdOn
 				System.out.println("------------------------------------------------------");
-				ValidationJobs jobsResult4 = restClient.getEmailValidations().listJobs(LocalDate.parse("2020-03-11"), new ValidationStatus[] {
-						ValidationStatus.Completed,
-						ValidationStatus.InProgress
+				List<ValidationOverview> jobsResult4 = restClient.getEmailValidations().listJobs(LocalDate.parse("2020-03-25"),
+						new ValidationStatus[] {
+								ValidationStatus.Completed,
+								ValidationStatus.InProgress
 				}, ValidationJobsSort.CreatedOnAsc);
-				System.out.println("Jobs results with filter createdOn, status and sort createdOn: " + jobsResult4.getData().size());
-				for (ValidationOverview validationOverview: jobsResult4.getData()){
-					System.out.printf("ID: %s => Status: %s => No of Entries: %s\n",
-							validationOverview.getId(),
-							validationOverview.getStatus(),
-							validationOverview.getNoOfEntries()
-					);
+				if(nonNull(jobsResult4) && jobsResult4.size() > 0){
+					System.out.println("Jobs results with filter createdOn, status and sort createdOn: " + jobsResult4.size());
+					for (ValidationOverview validationOverview: jobsResult4){
+						System.out.printf("ID: %s => Status: %s => No of Entries: %s\n",
+								validationOverview.getId(),
+								validationOverview.getStatus(),
+								validationOverview.getNoOfEntries()
+						);
+					}
+				} else {
+					System.out.println("Jobs results with filter createdOn, status and sort createdOn: 0");
 				}
 			}
 		} catch(VerifaliaException e){
@@ -621,20 +644,24 @@ public class Samples {
 				// Submit request for listing job with object
 				System.out.println("------------------------------------------------------");
 				ValidationJobsFilter validationJobsFilter = new ValidationJobsFilter();
-				validationJobsFilter.setCreatedOnSince(LocalDate.parse("2020-03-11"));
-				validationJobsFilter.setCreatedOnUntil(LocalDate.parse("2020-03-12"));
+				validationJobsFilter.setCreatedOnSince(LocalDate.parse("2020-03-24"));
+				validationJobsFilter.setCreatedOnUntil(LocalDate.parse("2020-03-25"));
 				validationJobsFilter.setExcludeStatuses(Arrays.asList(new ValidationStatus[] {
 						ValidationStatus.Expired
 				}));
 				validationJobsFilter.setSort(ValidationJobsSort.CreatedOnDesc);
-				ValidationJobs jobsResult5 = restClient.getEmailValidations().listJobs(validationJobsFilter);
-				System.out.println("Jobs results with object: " + jobsResult5.getData().size());
-				for (ValidationOverview validationOverview: jobsResult5.getData()){
-					System.out.printf("ID: %s => Status: %s => No of Entries: %s\n",
-							validationOverview.getId(),
-							validationOverview.getStatus(),
-							validationOverview.getNoOfEntries()
-					);
+				List<ValidationOverview> jobsResult5 = restClient.getEmailValidations().listJobs(validationJobsFilter);
+				if(nonNull(jobsResult5) && jobsResult5.size() > 0){
+					System.out.println("Jobs results with object: " + jobsResult5.size());
+					for (ValidationOverview validationOverview: jobsResult5){
+						System.out.printf("ID: %s => Status: %s => No of Entries: %s\n",
+								validationOverview.getId(),
+								validationOverview.getStatus(),
+								validationOverview.getNoOfEntries()
+						);
+					}
+				} else {
+					System.out.println("Jobs results with object: 0");
 				}
 			}
 		} catch(VerifaliaException e){

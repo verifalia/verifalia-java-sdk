@@ -95,6 +95,11 @@ public class Constants {
 	 */
 	public static final String CREDITS_DAILY_USAGE_RESOURCE = CREDITS_RESOURCE + "/daily-usage";
 
+	/**
+	 * Verifalia API parameter for cursor to handle pagination
+	 */
+	public static final String API_PARAM_CURSOR = "cursor";
+
 	// Other constants
 	public static final char CR = '\r';
 	public static final char LF = '\n';
