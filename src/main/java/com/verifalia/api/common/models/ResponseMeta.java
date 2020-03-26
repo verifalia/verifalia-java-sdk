@@ -20,5 +20,5 @@ public class ResponseMeta {
     /**
      * Signals whether the response is truncated or not. If not present, the response is not truncated.
      */
-    private Boolean isTruncated = Boolean.FALSE;
+    private Boolean isTruncated;
 }

@@ -22,7 +22,6 @@ import com.verifalia.api.emailvalidations.models.ValidationJobsSort;
 import com.verifalia.api.emailvalidations.models.ValidationQuality;
 import com.verifalia.api.emailvalidations.models.ValidationStatus;
 import com.verifalia.api.emailvalidations.models.output.Validation;
-import com.verifalia.api.emailvalidations.models.output.ValidationEntries;
 import com.verifalia.api.emailvalidations.models.output.ValidationEntry;
 import com.verifalia.api.emailvalidations.models.output.ValidationOverview;
 import com.verifalia.api.exceptions.VerifaliaException;
@@ -33,16 +32,16 @@ public class Samples {
 		if(args.length >= 2) {
 			Samples sample = new Samples();
 			// Email validations
-//			sample.queryVerifaliaEmailValidationsServiceSample1(args[0], args[1]);
-//			sample.queryVerifaliaEmailValidationsServiceSample2(args[0], args[1]);
-//			sample.queryVerifaliaEmailValidationsServiceSample3(args[0], args[1]);
-//			sample.queryVerifaliaEmailValidationsOverviewSample(args[0], args[1]);
-//			sample.queryVerifaliaEmailValidationsEntriesSample(args[0], args[1]);
-//			sample.queryVerifaliaEmailValidationsEntriesWithFiltersSample(args[0], args[1]);
-//			sample.queryVerifaliaEmailValidationsJobsSample(args[0], args[1]);
-//			sample.queryVerifaliaEmailValidationsJobsWithFiltersSample(args[0], args[1]);
+			sample.queryVerifaliaEmailValidationsServiceSample1(args[0], args[1]);
+			sample.queryVerifaliaEmailValidationsServiceSample2(args[0], args[1]);
+			sample.queryVerifaliaEmailValidationsServiceSample3(args[0], args[1]);
+			sample.queryVerifaliaEmailValidationsOverviewSample(args[0], args[1]);
+			sample.queryVerifaliaEmailValidationsEntriesSample(args[0], args[1]);
+			sample.queryVerifaliaEmailValidationsEntriesWithFiltersSample(args[0], args[1]);
+			sample.queryVerifaliaEmailValidationsJobsSample(args[0], args[1]);
+			sample.queryVerifaliaEmailValidationsJobsWithFiltersSample(args[0], args[1]);
 			// Credits
-//			sample.getVerifaliaCreditsBalanceSample(args[0], args[1]);
+			sample.getVerifaliaCreditsBalanceSample(args[0], args[1]);
 			sample.getVerifaliaCreditsDailyUsageSample(args[0], args[1]);
 			sample.getVerifaliaCreditsDailyUsageWithFiltersSample(args[0], args[1]);
 			System.exit(0);
@@ -343,13 +342,12 @@ public class Samples {
 
 		try {
 			if(nonNull(restClient)){
+				String[] emailArr = new String[10500];
+				for(int i=1; i<=10500; i++){
+					emailArr[i-1] = "test_" + i + "_example@example" + i + ".com";
+				}
 				// Submit email verification request with method that return status immediately
-				ValidationOverview result = restClient.getEmailValidations().submit(new String[] {
-						"alice@example.com",
-						"bob@example.net",
-						"carol@example.org"
-					}
-				).getOverview();
+				ValidationOverview result = restClient.getEmailValidations().submit(emailArr).getOverview();
 
 				// Loop until request processing is completed or execution thread is interrupted
 				while (result.getStatus() != ValidationStatus.Completed) {
@@ -368,12 +366,16 @@ public class Samples {
 					System.err.println("Request still pending.");
 				else {
 					// Display results
-					ValidationEntries entries = restClient.getEmailValidations().queryEntries(result.getId());
-					for (ValidationEntry entryData: entries.getData()){
-						System.out.printf("Address: %s => Result: %s\n",
-								entryData.getInputData(),
-								entryData.getStatus()
-						);
+					List<ValidationEntry> entries = restClient.getEmailValidations().queryEntries(result.getId());
+					if(nonNull(entries) && entries.size() > 0){
+						for (ValidationEntry entryData: entries){
+							System.out.printf("Address: %s => Result: %s\n",
+									entryData.getInputData(),
+									entryData.getStatus()
+							);
+						}
+					} else {
+						System.out.println("No validation entry found for the request");
 					}
 				}
 			}
@@ -417,13 +419,13 @@ public class Samples {
 
 				// Submit request for getting entries with filter status
 				System.out.println("------------------------------------------------------");
-				ValidationEntries entries1 = restClient.getEmailValidations().queryEntries(result.getId(), new ValidationEntryStatus[] {
+				List<ValidationEntry> entries1 = restClient.getEmailValidations().queryEntries(result.getId(), new ValidationEntryStatus[] {
 					ValidationEntryStatus.Success,
 					ValidationEntryStatus.DomainHasNullMx
 				});
-				if(nonNull(entries1.getData())){
-					System.out.println("Entries results with filter status: " + entries1.getData().size());
-					for (ValidationEntry entryData: entries1.getData()){
+				if(nonNull(entries1) && entries1.size() > 0){
+					System.out.println("Entries results with filter status: " + entries1.size());
+					for (ValidationEntry entryData: entries1){
 						System.out.printf("Address: %s => Result: %s\n",
 								entryData.getInputData(),
 								entryData.getStatus()
@@ -448,10 +450,10 @@ public class Samples {
 					ValidationEntryStatus.Success,
 					ValidationEntryStatus.DomainHasNullMx
 				}));
-				ValidationEntries entries2 = restClient.getEmailValidations().queryEntries(result.getId(), validationEntriesFilter);
-				if(nonNull(entries2.getData())){
-					System.out.println("Entries results with filter object: " + entries2.getData().size());
-					for (ValidationEntry entryData: entries2.getData()){
+				List<ValidationEntry> entries2 = restClient.getEmailValidations().queryEntries(result.getId(), validationEntriesFilter);
+				if(nonNull(entries2) && entries2.size() > 0){
+					System.out.println("Entries results with filter object: " + entries2.size());
+					for (ValidationEntry entryData: entries2){
 						System.out.printf("Address: %s => Result: %s\n",
 								entryData.getInputData(),
 								entryData.getStatus()

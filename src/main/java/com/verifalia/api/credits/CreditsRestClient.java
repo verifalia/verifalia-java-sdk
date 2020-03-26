@@ -110,7 +110,7 @@ public class CreditsRestClient {
     	List<CreditDailyUsageData> creditDailyUsagesData = new ArrayList<CreditDailyUsageData>();
 
     	// Run through responses to handle pagination
-    	while(isTruncated){
+    	while(nonNull(isTruncated) && isTruncated){
 	    	// Build query string parameters map
 	    	Map<String, String> paramMap = getDailyUsageParamMap(creditDailyUsageFilter, cursor);
 

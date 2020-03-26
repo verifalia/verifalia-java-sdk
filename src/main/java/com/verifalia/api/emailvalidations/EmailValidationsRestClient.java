@@ -31,6 +31,7 @@ import com.verifalia.api.emailvalidations.models.input.ValidationEntryInput;
 import com.verifalia.api.emailvalidations.models.input.ValidationInput;
 import com.verifalia.api.emailvalidations.models.output.Validation;
 import com.verifalia.api.emailvalidations.models.output.ValidationEntries;
+import com.verifalia.api.emailvalidations.models.output.ValidationEntry;
 import com.verifalia.api.emailvalidations.models.output.ValidationJobs;
 import com.verifalia.api.emailvalidations.models.output.ValidationOverview;
 import com.verifalia.api.exceptions.AuthorizationException;
@@ -576,9 +577,9 @@ public class EmailValidationsRestClient {
      * Makes a GET request to the <b>"/email-validations/{id}/entries"</b> resource.
      * <p>To initiate a new email validation batch, please use {@link EmailValidationsRestClient#submit(java.lang.Iterable)}
      * @param id The identifier for an email validation batch to be retrieved.
-     * @return ValidationEntries An object representing the entries of the requested email validation batch.
+     * @return List<ValidationEntry> An object list representing the entries of the requested email validation batch.
      */
-    public ValidationEntries queryEntries(String id) throws IOException {
+    public List<ValidationEntry> queryEntries(String id) throws IOException {
     	ValidationEntriesFilter validationEntriesFilter = null;
     	return queryEntries(id, validationEntriesFilter);
     }
@@ -589,9 +590,9 @@ public class EmailValidationsRestClient {
      * <p>To initiate a new email validation batch, please use {@link EmailValidationsRestClient#submit(java.lang.Iterable)}
      * @param id The identifier for an email validation batch to be retrieved.
      * @param statuses A collection of statuses for which the entries needs to be retrieved.
-     * @return ValidationEntries An object representing the entries of the requested email validation batch.
+     * @return List<ValidationEntry> An object list representing the entries of the requested email validation batch.
      */
-    public ValidationEntries queryEntries(String id, ValidationEntryStatus[] statuses) throws IOException {
+    public List<ValidationEntry> queryEntries(String id, ValidationEntryStatus[] statuses) throws IOException {
     	ValidationEntriesFilter validationEntriesFilter = new ValidationEntriesFilter();
     	validationEntriesFilter.setStatuses(Arrays.asList(statuses));
     	return queryEntries(id, validationEntriesFilter);
@@ -603,9 +604,9 @@ public class EmailValidationsRestClient {
      * <p>To initiate a new email validation batch, please use {@link EmailValidationsRestClient#submit(java.lang.Iterable)}
      * @param id The identifier for an email validation batch to be retrieved.
      * @param statuses A collection of statuses for which the entries needs to be retrieved.
-     * @return ValidationEntries An object representing the entries of the requested email validation batch.
+     * @return List<ValidationEntry> An object list representing the entries of the requested email validation batch.
      */
-    public ValidationEntries queryEntries(String id, Iterable<ValidationEntryStatus> statuses) throws IOException {
+    public List<ValidationEntry> queryEntries(String id, Iterable<ValidationEntryStatus> statuses) throws IOException {
     	ValidationEntriesFilter validationEntriesFilter = new ValidationEntriesFilter();
     	validationEntriesFilter.setStatuses(statuses);
     	return queryEntries(id, validationEntriesFilter);
@@ -617,73 +618,95 @@ public class EmailValidationsRestClient {
      * <p>To initiate a new email validation batch, please use {@link EmailValidationsRestClient#submit(java.lang.Iterable)}
      * @param id The identifier for an email validation batch to be retrieved.
      * @param validationEntriesFilter An object with the various filters mentioned when retrieving entries.
-     * @return ValidationEntries An object representing the entries of the requested email validation batch.
+     * @return List<ValidationEntry> An object list representing the entries of the requested email validation batch.
      */
-    public ValidationEntries queryEntries(String id, ValidationEntriesFilter validationEntriesFilter)
+    public List<ValidationEntry> queryEntries(String id, ValidationEntriesFilter validationEntriesFilter)
     		throws IOException{
     	if(!StringUtils.isBlank(id)){
-	    	// Build query string parameters map
-	    	Map<String, String> paramMap = getValidationEntriesParamMap(validationEntriesFilter);
+    		// Assign with default values to handle pagination
+        	String cursor = StringUtils.EMPTY;
+        	Boolean isTruncated = Boolean.TRUE;
+        	List<ValidationEntry> validationEntriesData = new ArrayList<ValidationEntry>();
 
-	    	// Build request URI with the param map
-	    	URI requestUri = Utils.getHttpUri(null, null, null, paramMap);
+        	// Run through responses to handle pagination
+        	while(nonNull(isTruncated) && isTruncated){
+		    	// Build query string parameters map
+		    	Map<String, String> paramMap = getValidationEntriesParamMap(validationEntriesFilter, cursor);
 
-	    	// Build query entries resource string
-	    	StringBuilder queryEntriesResource = new StringBuilder(Constants.EMAIL_VALIDATIONS_RESOURCE);
-	    	queryEntriesResource.append("/");
-	    	queryEntriesResource.append(id);
-	    	queryEntriesResource.append("/");
-	    	queryEntriesResource.append(Constants.EMAIL_VALIDATIONS_ENTRIES_RESOURCE);
-	    	if(nonNull(requestUri) && !StringUtils.isBlank(requestUri.toString())){
-	    		queryEntriesResource.append(requestUri.toString());
-	    	}
+		    	// Build request URI with the param map
+		    	URI requestUri = Utils.getHttpUri(null, null, null, paramMap);
 
-	    	// Make request object for the rest call
-	    	RestRequest request = new RestRequest(HttpRequestMethod.GET, queryEntriesResource.toString());
+		    	// Build query entries resource string
+		    	StringBuilder queryEntriesResource = new StringBuilder(Constants.EMAIL_VALIDATIONS_RESOURCE);
+		    	queryEntriesResource.append("/");
+		    	queryEntriesResource.append(id);
+		    	queryEntriesResource.append("/");
+		    	queryEntriesResource.append(Constants.EMAIL_VALIDATIONS_ENTRIES_RESOURCE);
+		    	if(nonNull(requestUri) && !StringUtils.isBlank(requestUri.toString())){
+		    		queryEntriesResource.append(requestUri.toString());
+		    	}
+		    	System.out.println("Query entries URI: " + queryEntriesResource.toString());
 
-	        // Sends the request to the Verifalia servers
-	        RestResponse response = restClient.execute(request, ValidationEntries.class);
-	        ValidationEntries data = (ValidationEntries) response.getData();
+		    	// Make request object for the rest call
+		    	RestRequest request = new RestRequest(HttpRequestMethod.GET, queryEntriesResource.toString());
 
-	        // Handle response based on status code
-	        switch (response.getStatusCode()) {
-	            case HttpStatusCode.OK:
-	            case HttpStatusCode.ACCEPTED: {
-	                return data;
-	            }
+		        // Sends the request to the Verifalia servers
+		        RestResponse response = restClient.execute(request, ValidationEntries.class);
+		        int responseStatusCode = response.getStatusCode();
 
-	            case HttpStatusCode.GONE:
-	            case HttpStatusCode.NOT_FOUND: {
-	                return null;
-	            }
-
-	            default: {
-	            	throw new VerifaliaException(response);
-	            }
+		        // Handle response based on status code
+		        if(responseStatusCode == HttpStatusCode.OK || responseStatusCode == HttpStatusCode.ACCEPTED){
+		        	// Handle pagination with meta details
+			        ValidationEntries validationEntries = (ValidationEntries) response.getData();
+			        if(nonNull(validationEntries.getData())){
+			        	validationEntriesData.addAll(validationEntries.getData());
+			        } else {
+			        	System.out.println("No validation entries found");
+			        }
+			        ResponseMeta meta = validationEntries.getMeta();
+			        if(nonNull(meta)){
+			        	isTruncated = meta.getIsTruncated();
+			        	cursor = meta.getCursor();
+			        } else {
+			        	System.out.println("No meta details found");
+			        	isTruncated = Boolean.FALSE;
+			        }
+		        } else if(responseStatusCode == HttpStatusCode.GONE || responseStatusCode == HttpStatusCode.NOT_FOUND){
+		        	return null;
+		        } else {
+		        	throw new VerifaliaException(response);
+		        }
 	        }
+        	return validationEntriesData;
     	} else {
     		throw new IllegalArgumentException("Job ID cannot be blank");
     	}
     }
 
-    private Map<String, String> getValidationEntriesParamMap(ValidationEntriesFilter validationEntriesFilter){
+    private Map<String, String> getValidationEntriesParamMap(ValidationEntriesFilter validationEntriesFilter, String cursor){
     	Map<String, String> paramMap = new HashMap<String, String>();
-    	if(nonNull(validationEntriesFilter)){
-    		if(validateEntriesFilterInputs(validationEntriesFilter)){
-		    	// Status filter
-		    	String statusesStr = convertValidationEntryDataStatusEnumIteratorToString(validationEntriesFilter.getStatuses(),
-		    			Constants.STRING_SEPERATOR_COMMA);
-		    	if(!StringUtils.isBlank(statusesStr)){
-		    		paramMap.put("status", statusesStr);
-		    	}
-		    	// Exclude status filter
-		    	String excludeStatusesStr = convertValidationEntryDataStatusEnumIteratorToString(validationEntriesFilter.getExcludeStatuses(),
-		    			Constants.STRING_SEPERATOR_COMMA);
-		    	if(!StringUtils.isBlank(excludeStatusesStr)){
-		    		paramMap.put("status:exclude", excludeStatusesStr);
-		    	}
-    		}
-    	}
+
+    	// Add cursor as param for handling pagination. If cursor is passed, no need to pass other params as per the documentation.
+    	if(!StringUtils.isBlank(cursor)){
+			paramMap.put(Constants.API_PARAM_CURSOR, cursor);
+		} else {
+	    	if(nonNull(validationEntriesFilter)){
+	    		if(validateEntriesFilterInputs(validationEntriesFilter)){
+			    	// Status filter
+			    	String statusesStr = convertValidationEntryDataStatusEnumIteratorToString(validationEntriesFilter.getStatuses(),
+			    			Constants.STRING_SEPERATOR_COMMA);
+			    	if(!StringUtils.isBlank(statusesStr)){
+			    		paramMap.put("status", statusesStr);
+			    	}
+			    	// Exclude status filter
+			    	String excludeStatusesStr = convertValidationEntryDataStatusEnumIteratorToString(validationEntriesFilter.getExcludeStatuses(),
+			    			Constants.STRING_SEPERATOR_COMMA);
+			    	if(!StringUtils.isBlank(excludeStatusesStr)){
+			    		paramMap.put("status:exclude", excludeStatusesStr);
+			    	}
+	    		}
+	    	}
+		}
     	return paramMap;
     }
 
@@ -790,7 +813,7 @@ public class EmailValidationsRestClient {
     	List<ValidationOverview> validationJobsData = new ArrayList<ValidationOverview>();
 
     	// Run through responses to handle pagination
-    	while(isTruncated){
+    	while(nonNull(isTruncated) && isTruncated){
 	    	// Build query string param map
 	    	Map<String, String> paramMap = getListJobsParamMap(validationJobFilter, cursor);
 
@@ -917,8 +940,12 @@ public class EmailValidationsRestClient {
 	        // Sends the request to the Verifalia servers
 	        RestResponse response = restClient.execute(request, Validation.class);
 
-	        if(response.getStatusCode() != HttpStatusCode.OK)
+	        if(response.getStatusCode() == HttpStatusCode.OK
+	        		|| response.getStatusCode() == HttpStatusCode.GONE){
+	        	return;
+	        } else {
 	        	throw new VerifaliaException(response);
+	        }
     	} else {
     		throw new IllegalArgumentException("Job ID cannot be blank");
     	}
