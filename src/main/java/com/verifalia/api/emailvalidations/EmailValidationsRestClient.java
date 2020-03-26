@@ -802,7 +802,7 @@ public class EmailValidationsRestClient {
 	    	if(nonNull(requestUri) && !StringUtils.isBlank(requestUri.toString())){
 	    		listJobsResource.append(requestUri.toString());
 	    	}
-	    	System.out.println("URI: " + listJobsResource.toString());
+	    	System.out.println("List jobs URI: " + listJobsResource.toString());
 
 	    	// Make request object for the rest call
 	    	RestRequest request = new RestRequest(HttpRequestMethod.GET, listJobsResource.toString());
@@ -826,6 +826,7 @@ public class EmailValidationsRestClient {
 
     private Map<String, String> getListJobsParamMap(ValidationJobsFilter validationJobFilter, String cursor){
     	Map<String, String> paramMap = new HashMap<String, String>();
+
     	// Add cursor as param for handling pagination. If cursor is passed, no need to pass other params as per the documentation.
     	if(!StringUtils.isBlank(cursor)){
 			paramMap.put(Constants.API_PARAM_CURSOR, cursor);

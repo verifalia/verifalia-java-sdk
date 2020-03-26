@@ -12,7 +12,6 @@ import com.verifalia.api.VerifaliaRestClient;
 import com.verifalia.api.WaitForCompletionOptions;
 import com.verifalia.api.common.ServerPollingLoopEventListener;
 import com.verifalia.api.credits.models.CreditBalanceData;
-import com.verifalia.api.credits.models.CreditDailyUsage;
 import com.verifalia.api.credits.models.CreditDailyUsageData;
 import com.verifalia.api.credits.models.CreditDailyUsageFilter;
 import com.verifalia.api.emailvalidations.models.ValidationDeDuplication;
@@ -40,12 +39,12 @@ public class Samples {
 //			sample.queryVerifaliaEmailValidationsOverviewSample(args[0], args[1]);
 //			sample.queryVerifaliaEmailValidationsEntriesSample(args[0], args[1]);
 //			sample.queryVerifaliaEmailValidationsEntriesWithFiltersSample(args[0], args[1]);
-			sample.queryVerifaliaEmailValidationsJobsSample(args[0], args[1]);
-			sample.queryVerifaliaEmailValidationsJobsWithFiltersSample(args[0], args[1]);
+//			sample.queryVerifaliaEmailValidationsJobsSample(args[0], args[1]);
+//			sample.queryVerifaliaEmailValidationsJobsWithFiltersSample(args[0], args[1]);
 			// Credits
 //			sample.getVerifaliaCreditsBalanceSample(args[0], args[1]);
-//			sample.getVerifaliaCreditsDailyUsageSample(args[0], args[1]);
-//			sample.getVerifaliaCreditsDailyUsageWithFiltersSample(args[0], args[1]);
+			sample.getVerifaliaCreditsDailyUsageSample(args[0], args[1]);
+			sample.getVerifaliaCreditsDailyUsageWithFiltersSample(args[0], args[1]);
 			System.exit(0);
 		}
 	}
@@ -736,18 +735,17 @@ public class Samples {
 		try {
 			if(nonNull(restClient)){
 				// Submit email verification request with waiting parameters
-				CreditDailyUsage result = restClient.getCredits().getDailyUsage();
-
-				if (result == null) // Result is null if timeout expires
-					System.err.println("Request timeout expired");
-				else {
+				List<CreditDailyUsageData> result = restClient.getCredits().getDailyUsage();
+				if(nonNull(result) && result.size() > 0){
 					// Display results
-					for (CreditDailyUsageData creditDailyUsageData: result.getData()){
+					for (CreditDailyUsageData creditDailyUsageData: result){
 						System.out.printf("Date: %s =>, Credit Packs: %s => Free Credits: %s\n",
 								creditDailyUsageData.getDate(),
 								creditDailyUsageData.getCreditPacks(),
 								creditDailyUsageData.getFreeCredits());
 					}
+				} else {
+					System.out.println("No credit daily usage data was found");
 				}
 			}
 		} catch(VerifaliaException e){
@@ -781,17 +779,17 @@ public class Samples {
 			if(nonNull(restClient)){
 				// Submit daily usage request with filter date
 				System.out.println("------------------------------------------------------");
-				CreditDailyUsage result1 = restClient.getCredits().getDailyUsage(LocalDate.parse("2020-03-25"));
-				if (result1 == null) // Result is null if timeout expires
-					System.err.println("Request timeout expired");
-				else {
+				List<CreditDailyUsageData> result1 = restClient.getCredits().getDailyUsage(LocalDate.parse("2020-03-25"));
+				if(nonNull(result1) && result1.size() > 0){
 					// Display results
-					for (CreditDailyUsageData creditDailyUsageData: result1.getData()){
+					for (CreditDailyUsageData creditDailyUsageData: result1){
 						System.out.printf("Date: %s =>, Credit Packs: %s => Free Credits: %s\n",
 								creditDailyUsageData.getDate(),
 								creditDailyUsageData.getCreditPacks(),
 								creditDailyUsageData.getFreeCredits());
 					}
+				} else {
+					System.out.println("No result found for daily usage");
 				}
 			}
 		} catch(VerifaliaException e){
@@ -804,18 +802,18 @@ public class Samples {
 			if(nonNull(restClient)){
 				// Submit daily usage request with filter dateSince and filter dateUntil
 				System.out.println("------------------------------------------------------");
-				CreditDailyUsage result2 = restClient.getCredits().getDailyUsage(LocalDate.parse("2020-03-24"),
+				List<CreditDailyUsageData> result2 = restClient.getCredits().getDailyUsage(LocalDate.parse("2019-01-24"),
 						LocalDate.parse("2020-03-25"));
-				if (result2 == null) // Result is null if timeout expires
-					System.err.println("Request timeout expired");
-				else {
+				if(nonNull(result2) && result2.size() > 0){
 					// Display results
-					for (CreditDailyUsageData creditDailyUsageData: result2.getData()){
+					for (CreditDailyUsageData creditDailyUsageData: result2){
 						System.out.printf("Date: %s =>, Credit Packs: %s => Free Credits: %s\n",
 								creditDailyUsageData.getDate(),
 								creditDailyUsageData.getCreditPacks(),
 								creditDailyUsageData.getFreeCredits());
 					}
+				} else {
+					System.out.println("No result found for daily usage");
 				}
 			}
 		} catch(VerifaliaException e){
@@ -829,19 +827,18 @@ public class Samples {
 				// Submit daily usage request with filter object
 				System.out.println("------------------------------------------------------");
 				CreditDailyUsageFilter creditDailyUsageFilter1 = new CreditDailyUsageFilter(LocalDate.parse("2020-03-25"));
-				CreditDailyUsage result3 = restClient.getCredits().getDailyUsage(creditDailyUsageFilter1);
-				if (result3 == null) // Result is null if timeout expires
-					System.err.println("Request timeout expired");
-				else {
+				List<CreditDailyUsageData> result3 = restClient.getCredits().getDailyUsage(creditDailyUsageFilter1);
+				if(nonNull(result3) && result3.size() > 0){
 					// Display results
-					for (CreditDailyUsageData creditDailyUsageData: result3.getData()){
+					for (CreditDailyUsageData creditDailyUsageData: result3){
 						System.out.printf("Date: %s =>, Credit Packs: %s => Free Credits: %s\n",
 								creditDailyUsageData.getDate(),
 								creditDailyUsageData.getCreditPacks(),
 								creditDailyUsageData.getFreeCredits());
 					}
+				} else {
+					System.out.println("No result found for daily usage");
 				}
-
 			}
 		} catch(VerifaliaException e){
 			System.out.println("VerifaliaException:: " + e.getMessage());
@@ -853,19 +850,19 @@ public class Samples {
 			if(nonNull(restClient)){
 				// Submit daily usage request with filter object
 				System.out.println("------------------------------------------------------");
-				CreditDailyUsageFilter creditDailyUsageFilter2 = new CreditDailyUsageFilter(LocalDate.parse("2020-03-24"),
+				CreditDailyUsageFilter creditDailyUsageFilter2 = new CreditDailyUsageFilter(LocalDate.parse("2020-02-24"),
 						LocalDate.parse("2020-03-25"));
-				CreditDailyUsage result4 = restClient.getCredits().getDailyUsage(creditDailyUsageFilter2);
-				if (result4 == null) // Result is null if timeout expires
-					System.err.println("Request timeout expired");
-				else {
+				List<CreditDailyUsageData> result4 = restClient.getCredits().getDailyUsage(creditDailyUsageFilter2);
+				if(nonNull(result4) && result4.size() > 0){
 					// Display results
-					for (CreditDailyUsageData creditDailyUsageData: result4.getData()){
+					for (CreditDailyUsageData creditDailyUsageData: result4){
 						System.out.printf("Date: %s =>, Credit Packs: %s => Free Credits: %s\n",
 								creditDailyUsageData.getDate(),
 								creditDailyUsageData.getCreditPacks(),
 								creditDailyUsageData.getFreeCredits());
 					}
+				} else {
+					System.out.println("No result found for daily usage");
 				}
 			}
 		} catch(VerifaliaException e){
