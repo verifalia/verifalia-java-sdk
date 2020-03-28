@@ -41,6 +41,7 @@
 		<lombok.version>1.18.4</lombok.version>
 		<apache.commons.version>3.9</apache.commons.version>
 		<http.client.version>4.5.12</http.client.version>
+		<json.lib.version>2.4</json.lib.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 	</properties>
@@ -77,6 +78,13 @@
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpclient</artifactId>
 			<version>${http.client.version}</version>
+		</dependency>
+		<!-- JSON Library -->
+		<dependency>
+			<groupId>net.sf.json-lib</groupId>
+			<artifactId>json-lib</artifactId>
+			<version>${json.lib.version}</version>
+			<classifier>jdk15</classifier>
 		</dependency>
 	</dependencies>
 

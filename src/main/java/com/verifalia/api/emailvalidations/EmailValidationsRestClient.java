@@ -945,7 +945,7 @@ public class EmailValidationsRestClient {
 	    	RestRequest request = new RestRequest(HttpRequestMethod.DELETE, Constants.EMAIL_VALIDATIONS_RESOURCE + "/" + id);
 
 	        // Sends the request to the Verifalia servers
-	        RestResponse response = restClient.execute(request, Validation.class);
+	        RestResponse response = restClient.execute(request, Void.class);
 
 	        if(response.getStatusCode() == HttpStatusCode.OK
 	        		|| response.getStatusCode() == HttpStatusCode.GONE){

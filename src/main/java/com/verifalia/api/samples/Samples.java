@@ -25,6 +25,7 @@ import com.verifalia.api.emailvalidations.models.output.Validation;
 import com.verifalia.api.emailvalidations.models.output.ValidationEntry;
 import com.verifalia.api.emailvalidations.models.output.ValidationOverview;
 import com.verifalia.api.exceptions.VerifaliaException;
+import com.verifalia.api.rest.security.BearerAuthentication;
 
 public class Samples {
 
@@ -114,9 +115,11 @@ public class Samples {
 		VerifaliaRestClient restClient = null;
 		try {
 			// Create REST client object with your credentials
-			restClient = new VerifaliaRestClient(accountSid, authToken);
+			restClient = new VerifaliaRestClient(new BearerAuthentication(accountSid, authToken));
 		} catch(URISyntaxException e){
 			System.out.println("URISyntaxException:: " + e.getMessage());
+		} catch(IOException e){
+			System.out.println("IOException:: " + e.getMessage());
 		}
 
 		/**
@@ -274,10 +277,13 @@ public class Samples {
 		VerifaliaRestClient restClient = null;
 		try {
 			// Create REST client object with your credentials
-			restClient = new VerifaliaRestClient(accountSid, authToken);
+			restClient = new VerifaliaRestClient(new BearerAuthentication(accountSid, authToken));
 		} catch(URISyntaxException e){
 			System.out.println("URISyntaxException:: " + e.getMessage());
+		} catch(IOException e){
+			System.out.println("IOException:: " + e.getMessage());
 		}
+
 		try {
 			if(nonNull(restClient)){
 				// Submit email verification request with method that return status immediately
@@ -486,9 +492,11 @@ public class Samples {
 		VerifaliaRestClient restClient = null;
 		try {
 			// Create REST client object with your credentials
-			restClient = new VerifaliaRestClient(accountSid, authToken);
+			restClient = new VerifaliaRestClient(new BearerAuthentication(accountSid, authToken));
 		} catch(URISyntaxException e){
 			System.out.println("URISyntaxException:: " + e.getMessage());
+		} catch(IOException e){
+			System.out.println("IOException:: " + e.getMessage());
 		}
 
 		try {
@@ -531,9 +539,11 @@ public class Samples {
 		VerifaliaRestClient restClient = null;
 		try {
 			// Create REST client object with your credentials
-			restClient = new VerifaliaRestClient(accountSid, authToken);
+			restClient = new VerifaliaRestClient(new BearerAuthentication(accountSid, authToken));
 		} catch(URISyntaxException e){
 			System.out.println("URISyntaxException:: " + e.getMessage());
+		} catch(IOException e){
+			System.out.println("IOException:: " + e.getMessage());
 		}
 
 		try {
@@ -688,9 +698,11 @@ public class Samples {
 		VerifaliaRestClient restClient = null;
 		try {
 			// Create REST client object with your credentials
-			restClient = new VerifaliaRestClient(accountSid, authToken);
+			restClient = new VerifaliaRestClient(new BearerAuthentication(accountSid, authToken));
 		} catch(URISyntaxException e){
 			System.out.println("URISyntaxException:: " + e.getMessage());
+		} catch(IOException e){
+			System.out.println("IOException:: " + e.getMessage());
 		}
 
 		try {
@@ -730,9 +742,11 @@ public class Samples {
 		VerifaliaRestClient restClient = null;
 		try {
 			// Create REST client object with your credentials
-			restClient = new VerifaliaRestClient(accountSid, authToken);
+			restClient = new VerifaliaRestClient(new BearerAuthentication(accountSid, authToken));
 		} catch(URISyntaxException e){
 			System.out.println("URISyntaxException:: " + e.getMessage());
+		} catch(IOException e){
+			System.out.println("IOException:: " + e.getMessage());
 		}
 
 		try {
@@ -773,9 +787,11 @@ public class Samples {
 		VerifaliaRestClient restClient = null;
 		try {
 			// Create REST client object with your credentials
-			restClient = new VerifaliaRestClient(accountSid, authToken);
+			restClient = new VerifaliaRestClient(new BearerAuthentication(accountSid, authToken));
 		} catch(URISyntaxException e){
 			System.out.println("URISyntaxException:: " + e.getMessage());
+		} catch(IOException e){
+			System.out.println("IOException:: " + e.getMessage());
 		}
 
 		try {

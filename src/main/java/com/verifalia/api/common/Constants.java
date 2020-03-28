@@ -96,6 +96,11 @@ public class Constants {
 	public static final String CREDITS_DAILY_USAGE_RESOURCE = CREDITS_RESOURCE + "/daily-usage";
 
 	/**
+	 * Verifalia API endpoint to fetch authentication token
+	 */
+	public static final String AUTH_TOKEN_RESOURCE = "/auth/tokens";
+
+	/**
 	 * Verifalia API parameter for cursor to handle pagination
 	 */
 	public static final String API_PARAM_CURSOR = "cursor";

@@ -21,6 +21,8 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 
 import com.verifalia.api.common.Constants;
+import com.verifalia.api.rest.security.BasicAuthentication;
+import com.verifalia.api.rest.security.BearerAuthentication;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -65,7 +67,23 @@ public class RestClient {
 		this.baseURI = new URI(baseURL);
 		this.apiVersion = apiVersion;
 		this.userAgent = userAgent;
-		this.authString = getAuthString(accountSid, authToken);
+		this.authString = new BasicAuthentication(accountSid, authToken).getAuthString();
+	}
+
+	/**
+	 * Creates new object using given host name, API version, bearer authentication details and user agent.
+	 * @param baseURL Base URL of the server
+	 * @param apiVersion API version name
+	 * @param bearerAuth Bearer authentication object for implementing bearer authentication
+	 * @param userAgent User agent
+	 * @throws URISyntaxException
+	 */
+	public RestClient(String baseURL, String apiVersion, BearerAuthentication bearerAuth, String userAgent) throws URISyntaxException {
+		// TODO - Apply input validation
+		this.baseURI = new URI(baseURL);
+		this.apiVersion = apiVersion;
+		this.userAgent = userAgent;
+		this.authString = bearerAuth.getAuthString();
 	}
 
 	/**
@@ -78,7 +96,19 @@ public class RestClient {
 		this.baseURI = new URI(Constants.DEFAULT_BASE_URL);
 		this.apiVersion = Constants.DEFAULT_API_VERSION;
 		this.userAgent = Constants.USER_AGENT;
-		this.authString = getAuthString(accountSid, authToken);
+		this.authString = new BasicAuthentication(accountSid, authToken).getAuthString();
+	}
+
+	/**
+	 * Creates new object using given bearer authentication details.
+	 * @param bearerAuth Bearer authentication object for implementing bearer authentication
+	 * @throws URISyntaxException
+	 */
+	public RestClient(BearerAuthentication bearerAuth) throws URISyntaxException {
+		this.baseURI = new URI(Constants.DEFAULT_BASE_URL);
+		this.apiVersion = Constants.DEFAULT_API_VERSION;
+		this.userAgent = Constants.USER_AGENT;
+		this.authString = bearerAuth.getAuthString();
 	}
 
 	/**
@@ -92,7 +122,20 @@ public class RestClient {
 		this.baseURI = new URI(Constants.DEFAULT_BASE_URL);
 		this.apiVersion = apiVersion;
 		this.userAgent = Constants.USER_AGENT;
-		this.authString = getAuthString(accountSid, authToken);
+		this.authString = new BasicAuthentication(accountSid, authToken).getAuthString();
+	}
+
+	/**
+	 * Creates new object using given API version and bearer authentication details.
+	 * @param apiVersion API version name
+	 * @param bearerAuth Bearer authentication object for implementing bearer authentication
+	 * @throws URISyntaxException
+	 */
+	public RestClient(String apiVersion, BearerAuthentication bearerAuth) throws URISyntaxException {
+		this.baseURI = new URI(Constants.DEFAULT_BASE_URL);
+		this.apiVersion = apiVersion;
+		this.userAgent = Constants.USER_AGENT;
+		this.authString = bearerAuth.getAuthString();
 	}
 
 	/**
@@ -128,8 +171,6 @@ public class RestClient {
 
 	private CloseableHttpResponse sendRequest(RestRequest request)
 			throws UnsupportedEncodingException, MalformedURLException, IOException, ProtocolException {
-		CloseableHttpResponse response = null;
-
 		StringBuilder sb = new StringBuilder();
 		sb.append(baseURI.toString()).append('/').append(apiVersion).append('/').append(request.getResource());
 		URI uri = null;
@@ -141,6 +182,7 @@ public class RestClient {
 
 		HttpRequestMethod method = request.getMethod();
 		CloseableHttpClient client = HttpClients.createDefault();
+		CloseableHttpResponse response = null;
 
 		switch(method){
 			case POST: {
@@ -148,7 +190,7 @@ public class RestClient {
 				HttpPost httpPost = new HttpPost(uri);
 			    httpPost.setEntity(entity);
 			    httpPost.setHeader(HttpHeaders.USER_AGENT, userAgent);
-			    httpPost.setHeader(HttpHeaders.AUTHORIZATION, authString);
+			    httpPost.setHeader(HttpHeaders.AUTHORIZATION, this.authString);
 			    httpPost.setHeader(HttpHeaders.CONTENT_TYPE, Constants.REQUEST_CONTENT_TYPE);
 			    httpPost.setHeader(HttpHeaders.ACCEPT, Constants.RESPONSE_ACCEPT_TYPE);
 			    response = client.execute(httpPost);
@@ -158,7 +200,7 @@ public class RestClient {
 			case GET: {
 				HttpGet httpGet = new HttpGet(uri);
 				httpGet.setHeader(HttpHeaders.USER_AGENT, userAgent);
-				httpGet.setHeader(HttpHeaders.AUTHORIZATION, authString);
+				httpGet.setHeader(HttpHeaders.AUTHORIZATION, this.authString);
 				httpGet.setHeader(HttpHeaders.CONTENT_TYPE, Constants.REQUEST_CONTENT_TYPE);
 				httpGet.setHeader(HttpHeaders.ACCEPT, Constants.RESPONSE_ACCEPT_TYPE);
 			    response = client.execute(httpGet);
@@ -168,17 +210,5 @@ public class RestClient {
 			default: break;
 		}
 		return response;
-	}
-
-	private String getAuthString(String accountSid, String authToken){
-		String authString = StringUtils.EMPTY;
-		try {
-			byte[] authBytes = (accountSid + ':' + authToken).getBytes("UTF-8");
-			// Compatible with JDK 1.7
-			authString = "Basic " + javax.xml.bind.DatatypeConverter.printBase64Binary(authBytes);
-		} catch(UnsupportedEncodingException ex) {
-			/* just ignore it, UTF-8 is supported encoding */
-		}
-		return authString;
 	}
 }
