@@ -45,6 +45,34 @@ Specify the Verifalia REST API Java SDK as a dependency of your Java project:
   	</dependency>
 ```
 
+## Installation ##
+
+First things first: authentication to the Verifalia API is performed by way of either the credentials of your root Verifalia account or of one of its users (previously known as sub-accounts): if you don't have a Verifalia account, just [[register for a free one]](https://verifalia.com/sign-up "[register for a free one]"). For security reasons, it is always advisable to [[create and use a dedicated user]](https://verifalia.com/client-area#/users/new "[create and use a dedicated user]") for accessing the API, as doing so will allow to assign only the specific needed permissions to it.
+
+Learn more about authenticating to the Verifalia API at [https://verifalia.com/developers#authentication]
+
+Once you have your Verifalia credentials at hand, use them while creating a new instance of the `VerifaliaRestClient` type, which will be the starting point to every other operation against the Verifalia API: the supplied credentials will be automatically provided to the API using the HTTP Basic Auth method.
+
+```java
+import com.verifalia.api.VerifaliaRestClient;
+
+// Create REST client object with your credentials
+VerifaliaRestClient restClient = new VerifaliaRestClient("YOUR-ACCOUNT-SID", "YOUR-AUTH-TOKEN");
+```
+
+In addition to the HTTP Basic Auth method, this SDK also supports other different ways to authenticate to the Verifalia API, as explained in the subsequent paragraphs.
+
+#### Authenticating via bearer token
+
+Bearer authentication offers higher security over HTTP Basic Auth, as the latter requires sending the actual credentials on each API call, while the former only requires it on a first, dedicated authentication request. On the other side, the first authentication request needed by Bearer authentication takes a non-negligible time: if you need to perform only a single request, using HTTP Basic Auth provides the same degree of security and is the faster option too.
+
+```java
+import com.verifalia.api.VerifaliaRestClient;
+import com.verifalia.api.rest.security.BearerAuthentication;
+
+// Create REST client object with your credentials
+VerifaliaRestClient restClient = new VerifaliaRestClient(new BearerAuthentication("YOUR-ACCOUNT-SID", "YOUR-AUTH-TOKEN"));
+```
 
 ## Validating email addresses ##
 
@@ -53,11 +81,16 @@ The example below shows how to validate a couple of email addresses using the Ve
 ```java
 import com.verifalia.api.VerifaliaRestClient;
 import com.verifalia.api.WaitForCompletionOptions;
-import com.verifalia.api.emailvalidation.models.Validation;
-import com.verifalia.api.emailvalidation.models.ValidationEntry;
+import com.verifalia.api.emailvalidations.models.output.Validation;
+import com.verifalia.api.emailvalidations.models.output.ValidationEntry;
 
-// Create REST client object with your credentials
-VerifaliaRestClient restClient = new VerifaliaRestClient("YOUR-ACCOUNT-SID", "YOUR-AUTH-TOKEN");
+VerifaliaRestClient restClient = null;
+try {
+	// Create REST client object with your credentials
+	restClient = new VerifaliaRestClient(accountSid, authToken);
+} catch(URISyntaxException e){
+	System.out.println("URISyntaxException:: " + e.getMessage());
+}
 
 // Submit email verification request with waiting parameters
 Validation result = restClient.getEmailValidations().submit(new String[] { 
@@ -89,13 +122,20 @@ Instead of relying on the automatic polling behavior, you may choose to poll Ver
 ```java
 import com.verifalia.api.VerifaliaRestClient;
 import com.verifalia.api.WaitForCompletionOptions;
-import com.verifalia.api.emailvalidation.models.Validation;
-import com.verifalia.api.emailvalidation.models.ValidationEntry;
-import com.verifalia.api.emailvalidation.models.ValidationStatus;
+import com.verifalia.api.emailvalidations.models.ValidationStatus;
+import com.verifalia.api.emailvalidations.models.output.Validation;
+import com.verifalia.api.emailvalidations.models.output.ValidationEntry;
 import com.verifalia.api.exceptions.VerifaliaException;
 
-// Create REST client object with your credentials
-VerifaliaRestClient restClient = new VerifaliaRestClient("YOUR-ACCOUNT-SID", "YOUR-AUTH-TOKEN");
+VerifaliaRestClient restClient = null;
+try {
+	// Create REST client object with your credentials
+	restClient = new VerifaliaRestClient(new BearerAuthentication(accountSid, 	authToken));
+} catch(URISyntaxException e){
+	System.out.println("URISyntaxException:: " + e.getMessage());
+} catch(IOException e){
+	System.out.println("IOException:: " + e.getMessage());
+}
 
 // Submit email verification request with method that return status immediately
 Validation result = restClient.getEmailValidations().submit(new String[] { 
@@ -106,27 +146,26 @@ Validation result = restClient.getEmailValidations().submit(new String[] {
 );
 
 // Loop until request processing is completed or execution thread is interrupted
-while (result.getStatus() != ValidationStatus.Completed)
-{
-	result = restClient.getEmailValidations().query(result.getUniqueID(), WaitForCompletionOptions.DontWait);
-	try {
-		Thread.sleep(5000);
-	} catch (InterruptedException e) {
-		e.printStackTrace();
-		if(Thread.currentThread().isInterrupted())
-			break;
+while (result.getOverview().getStatus() != ValidationStatus.Completed) {
+	result = restClient.getEmailValidations().query(result.getOverview().getId(), WaitForCompletionOptions.DontWait);
+try {
+	Thread.sleep(5000);
+} catch (InterruptedException e) {
+	e.printStackTrace();
+	if(Thread.currentThread().isInterrupted())
+		break;
 	}
 }
 
 // If request completed, display result
-if (result.getStatus() != ValidationStatus.Completed)
+if (result.getOverview().getStatus() != ValidationStatus.Completed)
 	System.err.println("Request still pending.");
 else {
-	for (ValidationEntry entry: result.getEntries())
-	{
+	// Display results
+	for (ValidationEntry entryData: result.getEntries().getData()){
 		System.out.printf("Address: %s => Result: %s\n",
-			entry.getInputData(),
-			entry.getStatus()
+			entryData.getInputData(),
+			entryData.getStatus()
 		);
 	}
 }
@@ -141,9 +180,9 @@ Here is an example showing how to use it:
 import com.verifalia.api.VerifaliaRestClient;
 import com.verifalia.api.WaitForCompletionOptions;
 import com.verifalia.api.common.ServerPollingLoopEventListener;
-import com.verifalia.api.emailvalidation.models.Validation;
-import com.verifalia.api.emailvalidation.models.ValidationEntry;
-import com.verifalia.api.emailvalidation.models.ValidationStatus;
+import com.verifalia.api.emailvalidations.models.ValidationStatus;
+import com.verifalia.api.emailvalidations.models.output.Validation;
+import com.verifalia.api.emailvalidations.models.output.ValidationEntry;
 
 // Create REST client object with your credentials
 VerifaliaRestClient restClient = new VerifaliaRestClient("YOUR-ACCOUNT-SID", "YOUR-AUTH-TOKEN");
@@ -154,8 +193,7 @@ VerifaliaRestClient restClient = new VerifaliaRestClient("YOUR-ACCOUNT-SID", "YO
 class ServerPollingLoopEventListenerImpl implements ServerPollingLoopEventListener {
 	@Override
 	public void onPollingLoopEvent(ServerPollingLoopEvent event, Validation currentResult) {
-		switch(event)
-		{
+		switch(event) {
 			case ServerPollingLoopStarted: {
 				System.out.println("Info: Polling loop started.");
 				break;
@@ -200,9 +238,9 @@ Validation result = restClient.getEmailValidations().submit(new String[] {
 
 // If request not completed, wait and display progress.
 // when there are polling events happening
-if(result.getStatus() != ValidationStatus.Completed)
+if(result.getOverview().getStatus() != ValidationStatus.Completed)
 	result = restClient.getEmailValidations().query(
-		result.getUniqueID(), 
+		result.getOverview().getId(),
 		new WaitForCompletionOptions(10*60), // in seconds
 		new ServerPollingLoopEventListenerImpl()
 	);
@@ -211,11 +249,10 @@ if (result == null) // Result is null if timeout expires
 	System.err.println("Request timeout expired");
 else {
 	// Display results
-	for (ValidationEntry entry: result.getEntries())
-	{
+	for (ValidationEntry entryData: result.getEntries().getData()){
 		System.out.printf("Address: %s => Result: %s\n",
-			entry.getInputData(),
-			entry.getStatus()
+			entryData.getInputData(),
+			entryData.getStatus()
 		);
 	}
 }
@@ -244,16 +281,16 @@ Here is how to iterate over your jobs, from the most recent to the oldest one fo
 
 VerifaliaRestClient restClient = new VerifaliaRestClient(accountSid, authToken);
 
-ValidationJobs jobs = restClient.getEmailValidations().listJobs("2020-03-17", "-createdOn");
+List<ValidationOverview> jobsResult = restClient.getEmailValidations().listJobs(LocalDate.parse("2020-03-24"),
+	ValidationJobsSort.CreatedOnDesc);
 
-for (ValidationOverview validationOverview: jobs.getData()){
+for (ValidationOverview validationOverview: jobsResult){
 	System.out.printf("ID: %s => Status: %s => No of Entries: %s\n",
 		validationOverview.getId(),
 		validationOverview.getStatus(),
 		validationOverview.getNoOfEntries()
 	);
 }
-
 ```
 
 ## Managing credits ##
@@ -267,7 +304,7 @@ One of the most common tasks you may need to perform on your account is retrievi
 ```java
 VerifaliaRestClient restClient = new VerifaliaRestClient(accountSid, authToken);
 
-CreditBalanceData result = restClient.getCredits().balance();
+CreditBalanceData result = restClient.getCredits().getBalance();
 
 System.out.printf("Credit Packs: %s => Free Credits: %s => Free Credits Reset In: %s\n",
 	result.getCreditPacks(),
@@ -285,17 +322,21 @@ Here is how to retrieve the daily credits consumption for the specific date peri
 
 VerifaliaRestClient restClient = new VerifaliaRestClient(accountSid, authToken);
 
-//CreditDailyUsage usageResult = restClient.getCredits().dailyUsage("2020-03-12", "2020-03-16");
+//CreditDailyUsage usageResult = restClient.getCredits().getDailyUsage(LocalDate.parse("2020-03-12"), LocalDate.parse("2020-03-16"));
 
-CreditDailyUsageFilter creditDailyUsageFilter = new CreditDailyUsageFilter("2020-03-12", "2020-03-16");
-CreditDailyUsage usageResult = restClient.getCredits().dailyUsage(creditDailyUsageFilter);
+CreditDailyUsageFilter creditDailyUsageFilter = new CreditDailyUsageFilter(LocalDate.parse("2020-03-12"),  LocalDate.parse("2020-03-16"));
+CreditDailyUsage usageResult = restClient.getCredits().getDailyUsage(creditDailyUsageFilter);
 
-// Display results
-for (CreditBalanceData creditBalanceData: usageResult.getData()){
-	System.out.printf("Date: %s =>, Credit Packs: %s => Free Credits: %s\n",
-		creditBalanceData.getDate(),
-		creditBalanceData.getCreditPacks(),
-		creditBalanceData.getFreeCredits());
+if(nonNull(usageResult) && usageResult.size() > 0){
+	// Display results
+	for (CreditDailyUsageData creditDailyUsageData: usageResult){
+		System.out.printf("Date: %s =>, Credit Packs: %s => Free Credits: %s\n",
+			creditDailyUsageData.getDate(),
+			creditDailyUsageData.getCreditPacks(),
+			creditDailyUsageData.getFreeCredits());
+	}
+} else {
+	System.out.println("No result found for daily usage");
 }
 ```
 

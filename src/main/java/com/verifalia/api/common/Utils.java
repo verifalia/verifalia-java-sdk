@@ -12,9 +12,14 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.utils.URIBuilder;
+import org.codehaus.jackson.JsonFactory;
 import org.codehaus.jackson.JsonGenerationException;
+import org.codehaus.jackson.JsonParseException;
+import org.codehaus.jackson.JsonParser;
+import org.codehaus.jackson.map.DeserializationConfig;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 
 /**
  * Utility methods/functions used throughout the SDK
@@ -119,12 +124,40 @@ public class Utils {
      * Converts an object to JSON string
      * @param obj Object which needs to be converted to JSON format.
      * @return String JSON string for the input object
+     * @throws IOException
+     * @throws JsonGenerationException
+     * @throws JsonMappingException
      */
-    public static String convertObjectToJsonString(Object obj) throws JsonGenerationException, JsonMappingException, IOException {
+    public static String convertObjectToJsonString(Object obj) throws JsonGenerationException,
+    	JsonMappingException, IOException {
     	if(nonNull(obj)){
     		ObjectMapper mapper = new ObjectMapper();
+    		mapper.setSerializationInclusion(Inclusion.NON_NULL);
 			return mapper.writeValueAsString(obj);
     	}
     	return StringUtils.EMPTY;
+    }
+
+    /**
+     * Converts JSON string to an object
+     * @param jsonStr Object which needs to be converted to JSON format.
+     * @param responseDataClass Class for which the input JSON object needs to be converted.
+     * @return Object Object representation of the input JSON string.
+     * @throws IOException
+     * @throws JsonMappingException
+     * @throws JsonParseException
+     */
+    public static Object convertJsonStringToObj(String jsonStr, Class<?> responseDataClass) throws JsonParseException,
+    	JsonMappingException, IOException {
+    	Object data = null;
+    	if(responseDataClass != null) {
+			JsonFactory factory = new JsonFactory();
+			factory.enable(JsonParser.Feature.ALLOW_COMMENTS);
+			factory.enable(JsonParser.Feature.ALLOW_SINGLE_QUOTES);
+			ObjectMapper mapper = new ObjectMapper(factory);
+			mapper.configure(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+			data = mapper.readValue(jsonStr, responseDataClass);
+		}
+    	return data;
     }
 }

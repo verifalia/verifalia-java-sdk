@@ -3,11 +3,10 @@ package com.verifalia.api.rest;
 import java.io.IOException;
 
 import org.apache.commons.lang3.StringUtils;
-import org.codehaus.jackson.JsonFactory;
 import org.codehaus.jackson.JsonParseException;
-import org.codehaus.jackson.JsonParser;
 import org.codehaus.jackson.map.JsonMappingException;
-import org.codehaus.jackson.map.ObjectMapper;
+
+import com.verifalia.api.common.Utils;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -45,13 +44,7 @@ public class RestResponse {
 			throws JsonParseException, JsonMappingException, IOException {
 		this.statusCode = statusCode;
 		if(HttpStatusCode.isSuccess(statusCode)) {
-			if(responseDataClass != null) {
-				JsonFactory factory = new JsonFactory();
-				factory.enable(JsonParser.Feature.ALLOW_COMMENTS);
-				factory.enable(JsonParser.Feature.ALLOW_SINGLE_QUOTES);
-				ObjectMapper mapper = new ObjectMapper(factory);
-				data = mapper.readValue(result, responseDataClass);
-			}
+			data = Utils.convertJsonStringToObj(result, responseDataClass);
 		} else {
 			this.errorMessage = result;
 		}

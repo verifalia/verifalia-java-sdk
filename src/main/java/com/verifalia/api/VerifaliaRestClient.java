@@ -6,6 +6,7 @@ import com.verifalia.api.common.Constants;
 import com.verifalia.api.credits.CreditsRestClient;
 import com.verifalia.api.emailvalidations.EmailValidationsRestClient;
 import com.verifalia.api.rest.RestClient;
+import com.verifalia.api.rest.security.BearerAuthentication;
 
 /**
  * This is main Verifalia SDK REST client "facade" class to be used directly by the SDK end-users.
@@ -51,6 +52,19 @@ public class VerifaliaRestClient {
 	}
 
 	/**
+	 * Creates new object using given host name and API version.
+         * <p>Your account SID and Authentication token values can be retrieved in your client area,
+         * upon clicking on your subscription details, on Verifalia web site at: <a href="https://verifalia.com/client-area/subscriptions">https://verifalia.com/client-area/subscriptions</a>
+	 * @param baseURL Base URL of the Verifalia server
+	 * @param apiVersion API version name
+	 * @param bearerAuth Bearer authentication object which needs accountSid and authentication token
+	 * @throws URISyntaxException
+	 */
+	public VerifaliaRestClient(String baseURL, String apiVersion, BearerAuthentication bearerAuth) throws URISyntaxException {
+		restClient = new RestClient(baseURL, apiVersion, bearerAuth, Constants.USER_AGENT);
+	}
+
+	/**
 	 * Creates new object using {@link Constants#DEFAULT_BASE_URL} and given API version.
          * <p>Your account SID and authentication token values can be retrieved in your client area,
          * upon clicking on your subscription details, on Verifalia web site at: <a href="https://verifalia.com/client-area/subscriptions">https://verifalia.com/client-area/subscriptions</a>
@@ -64,6 +78,18 @@ public class VerifaliaRestClient {
 	}
 
 	/**
+	 * Creates new object using {@link Constants#DEFAULT_BASE_URL} and given API version.
+         * <p>Your account SID and authentication token values can be retrieved in your client area,
+         * upon clicking on your subscription details, on Verifalia web site at: <a href="https://verifalia.com/client-area/subscriptions">https://verifalia.com/client-area/subscriptions</a>
+	 * @param apiVersion API version name
+	 * @param bearerAuth Bearer authentication object which needs accountSid and authentication token
+	 * @throws URISyntaxException
+	 */
+	public VerifaliaRestClient(String apiVersion, BearerAuthentication bearerAuth) throws URISyntaxException {
+		restClient = new RestClient(apiVersion, bearerAuth);
+	}
+
+	/**
 	 * Creates new object using {@link Constants#DEFAULT_BASE_URL} and {@link Constants#DEFAULT_API_VERSION}.
          * <p>Your account SID and authentication token values can be retrieved in your client area,
          * upon clicking on your subscription details, on Verifalia web site at: <a href="https://verifalia.com/client-area/subscriptions">https://verifalia.com/client-area/subscriptions</a>
@@ -73,6 +99,17 @@ public class VerifaliaRestClient {
 	 */
 	public VerifaliaRestClient(String accountSid, String authToken) throws URISyntaxException {
 		restClient = new RestClient(accountSid, authToken);
+	}
+
+	/**
+	 * Creates new object using {@link Constants#DEFAULT_BASE_URL} and {@link Constants#DEFAULT_API_VERSION}.
+         * <p>Your account SID and authentication token values can be retrieved in your client area,
+         * upon clicking on your subscription details, on Verifalia web site at: <a href="https://verifalia.com/client-area/subscriptions">https://verifalia.com/client-area/subscriptions</a>
+	 * @param bearerAuth Bearer authentication object which needs accountSid and authentication token
+	 * @throws URISyntaxException
+	 */
+	public VerifaliaRestClient(BearerAuthentication bearerAuth) throws URISyntaxException {
+		restClient = new RestClient(bearerAuth);
 	}
 
 	/**
