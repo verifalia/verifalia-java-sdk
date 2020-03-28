@@ -689,9 +689,16 @@ public class EmailValidationsRestClient {
     	// Add cursor as param for handling pagination. If cursor is passed, no need to pass other params as per the documentation.
     	if(!StringUtils.isBlank(cursor)){
 			paramMap.put(Constants.API_PARAM_CURSOR, cursor);
+			if(nonNull(validationEntriesFilter) && nonNull(validationEntriesFilter.getLimit())){
+				paramMap.put("limit", validationEntriesFilter.getLimit().toString());
+			}
 		} else {
 	    	if(nonNull(validationEntriesFilter)){
 	    		if(validateEntriesFilterInputs(validationEntriesFilter)){
+	    			// Limit filter
+	    			if(nonNull(validationEntriesFilter.getLimit())){
+	    				paramMap.put("limit", validationEntriesFilter.getLimit().toString());
+	    			}
 			    	// Status filter
 			    	String statusesStr = convertValidationEntryDataStatusEnumIteratorToString(validationEntriesFilter.getStatuses(),
 			    			Constants.STRING_SEPERATOR_COMMA);

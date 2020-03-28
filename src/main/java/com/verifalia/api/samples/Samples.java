@@ -342,12 +342,12 @@ public class Samples {
 
 		try {
 			if(nonNull(restClient)){
-				String[] emailArr = new String[10500];
-				for(int i=1; i<=10500; i++){
-					emailArr[i-1] = "test_" + i + "_example@example" + i + ".com";
-				}
 				// Submit email verification request with method that return status immediately
-				ValidationOverview result = restClient.getEmailValidations().submit(emailArr).getOverview();
+				ValidationOverview result = restClient.getEmailValidations().submit(new String[] {
+						"alice@example.com",
+						"bob@example.net",
+						"carol@example.org"
+					}).getOverview();
 
 				// Loop until request processing is completed or execution thread is interrupted
 				while (result.getStatus() != ValidationStatus.Completed) {
@@ -450,6 +450,7 @@ public class Samples {
 					ValidationEntryStatus.Success,
 					ValidationEntryStatus.DomainHasNullMx
 				}));
+				validationEntriesFilter.setLimit(1000);
 				List<ValidationEntry> entries2 = restClient.getEmailValidations().queryEntries(result.getId(), validationEntriesFilter);
 				if(nonNull(entries2) && entries2.size() > 0){
 					System.out.println("Entries results with filter object: " + entries2.size());
