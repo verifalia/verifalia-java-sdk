@@ -15,6 +15,7 @@ import org.apache.http.HttpHeaders;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
@@ -23,6 +24,7 @@ import org.apache.http.util.EntityUtils;
 import com.verifalia.api.common.Constants;
 import com.verifalia.api.rest.security.BasicAuthentication;
 import com.verifalia.api.rest.security.BearerAuthentication;
+import com.verifalia.api.rest.security.TLSAuthentication;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -53,6 +55,11 @@ public class RestClient {
 	 * Authentication string
 	 */
 	private String authString;
+
+	/**
+	 * SSL Connection socket factory
+	 */
+	private SSLConnectionSocketFactory sslConnectionSocketFactory;
 
 	/**
 	 * Creates new object using given host name, API version, authentication details and user agent.
@@ -112,6 +119,18 @@ public class RestClient {
 	}
 
 	/**
+	 * Creates new object using given TLS authentication details.
+	 * @param tlsAuthentication TLS authentication object for implementing two way SSL authentication
+	 * @throws Exception
+	 */
+	public RestClient(TLSAuthentication tlsAuthentication) throws Exception {
+		this.baseURI = new URI(Constants.DEFAULT_TLS_BASE_URL);
+		this.apiVersion = Constants.DEFAULT_API_VERSION;
+		this.userAgent = Constants.USER_AGENT;
+		this.sslConnectionSocketFactory = tlsAuthentication.getSslConnectionSocketFactory();
+	}
+
+	/**
 	 * Creates new object using given API version and authentication details.
 	 * @param apiVersion API version name
 	 * @param accountSid Account SID
@@ -136,6 +155,19 @@ public class RestClient {
 		this.apiVersion = apiVersion;
 		this.userAgent = Constants.USER_AGENT;
 		this.authString = bearerAuth.getAuthString();
+	}
+
+	/**
+	 * Creates new object using given TLS authentication details.
+	 * @param apiVersion API version name
+	 * @param tlsAuthentication TLS authentication object for implementing two way SSL authentication
+	 * @throws Exception
+	 */
+	public RestClient(String apiVersion, TLSAuthentication tlsAuthentication) throws Exception {
+		this.baseURI = new URI(Constants.DEFAULT_TLS_BASE_URL);
+		this.apiVersion = apiVersion;
+		this.userAgent = Constants.USER_AGENT;
+		this.sslConnectionSocketFactory = tlsAuthentication.getSslConnectionSocketFactory();
 	}
 
 	/**
@@ -172,7 +204,7 @@ public class RestClient {
 	private CloseableHttpResponse sendRequest(RestRequest request)
 			throws UnsupportedEncodingException, MalformedURLException, IOException, ProtocolException {
 		StringBuilder sb = new StringBuilder();
-		sb.append(baseURI.toString()).append('/').append(apiVersion).append('/').append(request.getResource());
+		sb.append(this.baseURI.toString()).append('/').append(apiVersion).append('/').append(request.getResource());
 		URI uri = null;
 		try {
 			uri = new URI(sb.toString());
@@ -181,7 +213,15 @@ public class RestClient {
 		}
 
 		HttpRequestMethod method = request.getMethod();
-		CloseableHttpClient client = HttpClients.createDefault();
+		CloseableHttpClient client = null;
+
+		if(!StringUtils.isEmpty(this.authString)){ // If authentication is basic or bearer
+			client = HttpClients.createDefault();
+		} else if(nonNull(this.sslConnectionSocketFactory)){ // If authentication is TLS
+			client = HttpClients.custom().setSSLSocketFactory(this.sslConnectionSocketFactory).build();
+		} else {
+			throw new IOException("Invalid authentication de");
+		}
 		CloseableHttpResponse response = null;
 
 		switch(method){
@@ -189,8 +229,10 @@ public class RestClient {
 				StringEntity entity = new StringEntity(request.getData());
 				HttpPost httpPost = new HttpPost(uri);
 			    httpPost.setEntity(entity);
-			    httpPost.setHeader(HttpHeaders.USER_AGENT, userAgent);
-			    httpPost.setHeader(HttpHeaders.AUTHORIZATION, this.authString);
+			    httpPost.setHeader(HttpHeaders.USER_AGENT, this.userAgent);
+			    if(!StringUtils.isEmpty(this.authString)){ // If authentication is basic or bearer
+			    	httpPost.setHeader(HttpHeaders.AUTHORIZATION, this.authString);
+			    }
 			    httpPost.setHeader(HttpHeaders.CONTENT_TYPE, Constants.REQUEST_CONTENT_TYPE);
 			    httpPost.setHeader(HttpHeaders.ACCEPT, Constants.RESPONSE_ACCEPT_TYPE);
 			    response = client.execute(httpPost);
@@ -200,7 +242,9 @@ public class RestClient {
 			case GET: {
 				HttpGet httpGet = new HttpGet(uri);
 				httpGet.setHeader(HttpHeaders.USER_AGENT, userAgent);
-				httpGet.setHeader(HttpHeaders.AUTHORIZATION, this.authString);
+				if(!StringUtils.isEmpty(this.authString)){ // If authentication is basic or bearer
+					httpGet.setHeader(HttpHeaders.AUTHORIZATION, this.authString);
+				}
 				httpGet.setHeader(HttpHeaders.CONTENT_TYPE, Constants.REQUEST_CONTENT_TYPE);
 				httpGet.setHeader(HttpHeaders.ACCEPT, Constants.RESPONSE_ACCEPT_TYPE);
 			    response = client.execute(httpGet);

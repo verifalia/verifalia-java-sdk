@@ -19,7 +19,12 @@ public class Constants {
 	/**
 	 * Verifalia API base URL host
 	 */
-	public static final String DEFAULT_BASE_URL_HOST = "api.verifalia.com/";
+	public static final String DEFAULT_BASE_URL_HOST = "api.verifalia.com";
+
+	/**
+	 * Verifalia API TLS base URL host
+	 */
+	public static final String DEFAULT_TLS_BASE_URL_HOST = "api-cca.verifalia.com";
 
 	/**
 	 * Verifalia API version
@@ -30,6 +35,11 @@ public class Constants {
 	 * Verifalia API base URL
 	 */
 	public static final String DEFAULT_BASE_URL = DEFAULT_BASE_URL_SCHEME + "//" + DEFAULT_BASE_URL_HOST;
+
+	/**
+	 * Verifalia API TLS base URL
+	 */
+	public static final String DEFAULT_TLS_BASE_URL = DEFAULT_BASE_URL_SCHEME + "//" + DEFAULT_TLS_BASE_URL_HOST;
 
 	/**
 	 * Verifalia API user agent
@@ -112,4 +122,7 @@ public class Constants {
 	public static final String DATE_FORMAT = "yyyy-MM-dd";
 	public static final Integer VALIDATION_INPUT_PRIORITY_MIN_VALUE = 0;
 	public static final Integer VALIDATION_INPUT_PRIORITY_MAX_VALUE = 255;
+	public static final String TLS_AUTHENTICATION_JSK = "jks";
+	public static final String TLS_AUTHENTICATION_VERSION_1_1 = "TLSv1.1";
+	public static final String TLS_AUTHENTICATION_VERSION_1_2 = "TLSv1.2";
 }

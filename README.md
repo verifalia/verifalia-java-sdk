@@ -74,6 +74,23 @@ import com.verifalia.api.rest.security.BearerAuthentication;
 VerifaliaRestClient restClient = new VerifaliaRestClient(new BearerAuthentication("YOUR-ACCOUNT-SID", "YOUR-AUTH-TOKEN"));
 ```
 
+#### Authenticating via mutual TLS
+
+This authentication method uses a keystore to authenticate against the Verifalia API. This method, also called mutual TLS authentication (mTLS) or two-way authentication, offers the highest degree of security, as only a cryptographically-derived key (and not the actual credentials) is sent over the wire on each request.
+
+One needs to generate identity keystore file and trust store keystore file from the pem file obtained from Verifalia. One can refer to the [link](https://www.snaplogic.com/glossary/two-way-ssl-java-example "link") to understand how to generate required key store files from the pem file.
+
+Once the required files are generate use the below code to create the rest client.
+
+```java
+import com.verifalia.api.VerifaliaRestClient;
+import com.verifalia.api.rest.security.TLSAuthentication;
+import java.io.File;
+
+RestClient restClient = new VerifaliaRestClient(new TLSAuthentication(certAlias, certPassword, new File(identifyJksFilePath), new File(trustStoreJksFilePath)));
+```
+where certAlias is the alias used when creating certificate, certPassword is the password used when creating certificate, identityJksFilePath and trustStoreJksFilePath are the path of the identify and trust store JKS file respectively generated from the instructions as per the link.
+
 ## Validating email addresses ##
 
 The example below shows how to validate a couple of email addresses using the Verifalia REST API Java SDK:

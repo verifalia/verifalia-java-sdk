@@ -7,6 +7,7 @@ import com.verifalia.api.credits.CreditsRestClient;
 import com.verifalia.api.emailvalidations.EmailValidationsRestClient;
 import com.verifalia.api.rest.RestClient;
 import com.verifalia.api.rest.security.BearerAuthentication;
+import com.verifalia.api.rest.security.TLSAuthentication;
 
 /**
  * This is main Verifalia SDK REST client "facade" class to be used directly by the SDK end-users.
@@ -90,6 +91,18 @@ public class VerifaliaRestClient {
 	}
 
 	/**
+	 * Creates new object using {@link Constants#DEFAULT_BASE_URL} and given API version.
+         * <p>Your account SID and authentication token values can be retrieved in your client area,
+         * upon clicking on your subscription details, on Verifalia web site at: <a href="https://verifalia.com/client-area/subscriptions">https://verifalia.com/client-area/subscriptions</a>
+	 * @param apiVersion API version name
+	 * @param tlsAuthenticatation TLS authentication object which needs certificate related details
+	 * @throws Exception
+	 */
+	public VerifaliaRestClient(String apiVersion, TLSAuthentication tlsAuthenticatation) throws Exception {
+		restClient = new RestClient(apiVersion, tlsAuthenticatation);
+	}
+
+	/**
 	 * Creates new object using {@link Constants#DEFAULT_BASE_URL} and {@link Constants#DEFAULT_API_VERSION}.
          * <p>Your account SID and authentication token values can be retrieved in your client area,
          * upon clicking on your subscription details, on Verifalia web site at: <a href="https://verifalia.com/client-area/subscriptions">https://verifalia.com/client-area/subscriptions</a>
@@ -110,6 +123,17 @@ public class VerifaliaRestClient {
 	 */
 	public VerifaliaRestClient(BearerAuthentication bearerAuth) throws URISyntaxException {
 		restClient = new RestClient(bearerAuth);
+	}
+
+	/**
+	 * Creates new object using {@link Constants#DEFAULT_BASE_URL} and {@link Constants#DEFAULT_API_VERSION}.
+         * <p>Your account SID and authentication token values can be retrieved in your client area,
+         * upon clicking on your subscription details, on Verifalia web site at: <a href="https://verifalia.com/client-area/subscriptions">https://verifalia.com/client-area/subscriptions</a>
+	 * @param tlsAuthentication TLS authentication object which needs certificate related details
+	 * @throws Exception
+	 */
+	public VerifaliaRestClient(TLSAuthentication tlsAuthentication) throws Exception {
+		restClient = new RestClient(tlsAuthentication);
 	}
 
 	/**
