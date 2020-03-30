@@ -1,5 +1,7 @@
 package com.verifalia.api.emailvalidations.models.output;
 
+import static java.util.Objects.nonNull;
+
 import java.util.Date;
 
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
@@ -119,5 +121,15 @@ public class ValidationEntry {
      */
     public ValidationEntry(String inputData) {
     	this.inputData = inputData;
+    }
+
+    /**
+     * Overrides the default set method for status with custom logic to handle status as Unknown if no valid status is returned from server
+     * @param status Validation entry status mapped which needs to be checked
+     */
+    public void setStatus(ValidationEntryStatus status){
+    	if(!nonNull(status)){
+    		this.status = ValidationEntryStatus.Unknown;
+    	}
     }
 }

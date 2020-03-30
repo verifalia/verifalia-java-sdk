@@ -198,5 +198,10 @@ public enum ValidationEntryStatus {
     /**
      * A quoted pair within a quoted word is not closed properly.
      */
-    UnmatchedQuotedPair
+    UnmatchedQuotedPair,
+
+    /**
+     * If no valid status is returned, this will be the default status marked.
+     */
+    Unknown
 }
