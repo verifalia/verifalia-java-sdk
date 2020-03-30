@@ -130,6 +130,8 @@ public class ValidationEntry {
     public void setStatus(ValidationEntryStatus status){
     	if(!nonNull(status)){
     		this.status = ValidationEntryStatus.Unknown;
+    	} else {
+    		this.status = status;
     	}
     }
 }
