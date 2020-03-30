@@ -61,6 +61,11 @@ public class Constants {
 	 */
 	public static final String RESPONSE_ACCEPT_TYPE = "application/json";
 
+	/**
+	 * Verifalia response accept type encoded
+	 */
+	public static final String RESPONSE_ACCEPT_TYPE_ENCODING = "gzip";
+
 	//Constants related to Verifalia API tool
 
 	/**

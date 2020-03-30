@@ -10,8 +10,11 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.Header;
+import org.apache.http.HeaderElement;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHeaders;
+import org.apache.http.client.entity.GzipDecompressingEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
@@ -194,6 +197,19 @@ public class RestClient {
 			String result = StringUtils.EMPTY;
 			HttpEntity entity = response.getEntity();
 			if(nonNull(entity)){
+				Header contentHeader = entity.getContentEncoding();
+			    if (nonNull(contentHeader)) {
+			    	HeaderElement[] contentHeaderElements = contentHeader.getElements();
+			    	if(nonNull(contentHeaderElements) && contentHeaderElements.length > 0){
+			    		for (int i = 0; i < contentHeaderElements.length; i++) {
+			    			if (StringUtils.equalsIgnoreCase(contentHeaderElements[i].getName(),
+					        		Constants.RESPONSE_ACCEPT_TYPE_ENCODING)) {
+			    				System.out.println("Given response is compressed as gzip");
+			    				entity = new GzipDecompressingEntity(entity);
+			    			}
+			    		}
+			    	}
+			    }
 				result = EntityUtils.toString(entity);
 			}
 			return new RestResponse(responseCode, result, responseObjectClass);
@@ -216,11 +232,19 @@ public class RestClient {
 		CloseableHttpClient client = null;
 
 		if(!StringUtils.isEmpty(this.authString)){ // If authentication is basic or bearer
-			client = HttpClients.createDefault();
+			if(request.getIsCompressed()){
+				client = HttpClients.custom().disableContentCompression().build();
+			} else {
+				client = HttpClients.createDefault();
+			}
 		} else if(nonNull(this.sslConnectionSocketFactory)){ // If authentication is TLS
-			client = HttpClients.custom().setSSLSocketFactory(this.sslConnectionSocketFactory).build();
+			if(request.getIsCompressed()){
+				client = HttpClients.custom().setSSLSocketFactory(this.sslConnectionSocketFactory).disableContentCompression().build();
+			} else {
+				client = HttpClients.custom().setSSLSocketFactory(this.sslConnectionSocketFactory).build();
+			}
 		} else {
-			throw new IOException("Invalid authentication de");
+			throw new IOException("Invalid authentication details shared");
 		}
 		CloseableHttpResponse response = null;
 
@@ -234,7 +258,11 @@ public class RestClient {
 			    	httpPost.setHeader(HttpHeaders.AUTHORIZATION, this.authString);
 			    }
 			    httpPost.setHeader(HttpHeaders.CONTENT_TYPE, Constants.REQUEST_CONTENT_TYPE);
-			    httpPost.setHeader(HttpHeaders.ACCEPT, Constants.RESPONSE_ACCEPT_TYPE);
+			    if(request.getIsCompressed()){
+			    	httpPost.setHeader(HttpHeaders.ACCEPT_ENCODING, Constants.RESPONSE_ACCEPT_TYPE_ENCODING);
+			    } else {
+			    	httpPost.setHeader(HttpHeaders.ACCEPT, Constants.RESPONSE_ACCEPT_TYPE);
+			    }
 			    response = client.execute(httpPost);
 				break;
 			}
@@ -246,7 +274,11 @@ public class RestClient {
 					httpGet.setHeader(HttpHeaders.AUTHORIZATION, this.authString);
 				}
 				httpGet.setHeader(HttpHeaders.CONTENT_TYPE, Constants.REQUEST_CONTENT_TYPE);
-				httpGet.setHeader(HttpHeaders.ACCEPT, Constants.RESPONSE_ACCEPT_TYPE);
+				if(request.getIsCompressed()){
+					httpGet.setHeader(HttpHeaders.ACCEPT_ENCODING, Constants.RESPONSE_ACCEPT_TYPE_ENCODING);
+			    } else {
+			    	httpGet.setHeader(HttpHeaders.ACCEPT, Constants.RESPONSE_ACCEPT_TYPE);
+			    }
 			    response = client.execute(httpGet);
 				break;
 			}

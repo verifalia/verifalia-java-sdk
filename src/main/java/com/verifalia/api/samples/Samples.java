@@ -170,7 +170,7 @@ public class Samples {
 						"alice@example.com",
 						"bob@example.net",
 						"carol@example.org"
-					}, ValidationQuality.High, WaitForCompletionOptions.DontWait
+					}, ValidationQuality.High, WaitForCompletionOptions.DontWait, true
 				);
 				// If request not completed, wait and display progress.
 				// when there are polling events happening
@@ -178,7 +178,8 @@ public class Samples {
 					result = restClient.getEmailValidations().query(
 						result.getOverview().getId(),
 						new WaitForCompletionOptions(10*60), // in seconds
-						new ServerPollingLoopEventListenerImpl()
+						new ServerPollingLoopEventListenerImpl(),
+						true
 					);
 
 				if (result == null) // Result is null if timeout expires
@@ -372,7 +373,7 @@ public class Samples {
 					System.err.println("Request still pending.");
 				else {
 					// Display results
-					List<ValidationEntry> entries = restClient.getEmailValidations().queryEntries(result.getId());
+					List<ValidationEntry> entries = restClient.getEmailValidations().queryEntries(result.getId(), true);
 					if(nonNull(entries) && entries.size() > 0){
 						for (ValidationEntry entryData: entries){
 							System.out.printf("Address: %s => Result: %s\n",
@@ -428,7 +429,7 @@ public class Samples {
 				List<ValidationEntry> entries1 = restClient.getEmailValidations().queryEntries(result.getId(), new ValidationEntryStatus[] {
 					ValidationEntryStatus.Success,
 					ValidationEntryStatus.DomainHasNullMx
-				});
+				}, true);
 				if(nonNull(entries1) && entries1.size() > 0){
 					System.out.println("Entries results with filter status: " + entries1.size());
 					for (ValidationEntry entryData: entries1){
@@ -502,7 +503,7 @@ public class Samples {
 		try {
 			if(nonNull(restClient)){
 				// Submit email verification request with method that return status immediately
-				List<ValidationOverview> validationJobsData = restClient.getEmailValidations().listJobs();
+				List<ValidationOverview> validationJobsData = restClient.getEmailValidations().listJobs(true);
 				if(nonNull(validationJobsData) && validationJobsData.size() > 0){
 					System.out.println("Total validation jobs: " + validationJobsData.size());
 					for (ValidationOverview validationOverview: validationJobsData){
@@ -707,17 +708,16 @@ public class Samples {
 
 		try {
 			if(nonNull(restClient)){
-				// Submit email verification request with waiting parameters
+				// Submit credit balance data request
 				CreditBalanceData result = restClient.getCredits().getBalance();
-
-				if (result == null) // Result is null if timeout expires
-					System.err.println("Request timeout expired");
-				else {
+				if(nonNull(result)){
 					// Display result
 					System.out.printf("Credit Packs: %s => Free Credits: %s => Free Credits Reset In: %s\n",
 							result.getCreditPacks(),
 							result.getFreeCredits(),
 							result.getFreeCreditsResetIn());
+				} else {
+					System.out.println("No result found");
 				}
 			}
 		} catch(VerifaliaException e){
@@ -751,8 +751,8 @@ public class Samples {
 
 		try {
 			if(nonNull(restClient)){
-				// Submit email verification request with waiting parameters
-				List<CreditDailyUsageData> result = restClient.getCredits().getDailyUsage();
+				// Submit credit daily usage data request
+				List<CreditDailyUsageData> result = restClient.getCredits().getDailyUsage(true);
 				if(nonNull(result) && result.size() > 0){
 					// Display results
 					for (CreditDailyUsageData creditDailyUsageData: result){
@@ -822,7 +822,7 @@ public class Samples {
 				// Submit daily usage request with filter dateSince and filter dateUntil
 				System.out.println("------------------------------------------------------");
 				List<CreditDailyUsageData> result2 = restClient.getCredits().getDailyUsage(LocalDate.parse("2019-01-24"),
-						LocalDate.parse("2020-03-25"));
+						LocalDate.parse("2020-03-25"), true);
 				if(nonNull(result2) && result2.size() > 0){
 					// Display results
 					for (CreditDailyUsageData creditDailyUsageData: result2){

@@ -68,13 +68,33 @@ public class EmailValidationsRestClient {
      * along with the batch's {@link ValidationOverview#id}.
      *
      * @param emailAddresses A collection of email addresses to validate
+     * @param isCompressed Identifies if the response to be returned is compressed or not.
+     * @return An object representing the email validation batch.
+     * @throws VerifaliaException
+     * @throws IOException
+     */
+    public Validation submit(String[] emailAddresses, boolean isCompressed) throws IOException, VerifaliaException {
+    	ValidationInput validationInput = getValidationInput(Arrays.asList(emailAddresses));
+        return submit(validationInput, WaitForCompletionOptions.DontWait, isCompressed);
+    }
+
+    /**
+     * Initiates a new email validation batch. Makes a POST request to the "/email-validations" resource.
+     * <p>Upon initialization, batches usually are in the {@link ValidationStatus#InProgress InProgress} status.
+     * Validations are completed only when their {@link ValidationOverview#status} property
+     * is {@link ValidationStatus#Completed Completed}. Use the {@link EmailValidationsRestClient#submit(String[], WaitForCompletionOptions)}
+     * to wait for the completion of the batch without having to manually poll the API.
+     * In order to retrieve the most up-to-date snapshot of a validation batch, call the {@link EmailValidationsRestClient#query(String) query}
+     * along with the batch's {@link ValidationOverview#id}.
+     *
+     * @param emailAddresses A collection of email addresses to validate
      * @return An object representing the email validation batch.
      * @throws VerifaliaException
      * @throws IOException
      */
     public Validation submit(String[] emailAddresses) throws IOException, VerifaliaException {
     	ValidationInput validationInput = getValidationInput(Arrays.asList(emailAddresses));
-        return submit(validationInput, WaitForCompletionOptions.DontWait);
+        return submit(validationInput, WaitForCompletionOptions.DontWait, false);
     }
 
     /**
@@ -93,7 +113,28 @@ public class EmailValidationsRestClient {
      */
     public Validation submit(Iterable<String> emailAddresses) throws IOException, VerifaliaException {
     	ValidationInput validationInput = getValidationInput(emailAddresses);
-        return submit(validationInput, WaitForCompletionOptions.DontWait);
+        return submit(validationInput, WaitForCompletionOptions.DontWait, false);
+    }
+
+    /**
+     * Initiates a new email validation batch. Makes a POST request to the "/email-validations" resource.
+     * <p>Upon initialization, batches usually are in the {@link ValidationStatus#InProgress InProgress} status.
+     * Validations are completed only when their {@link ValidationOverview#status} property
+     * is {@link ValidationStatus#Completed Completed}. Use the {@link EmailValidationsRestClient#submit(com.verifalia.api.emailvalidations.models.input.ValidationInput, WaitForCompletionOptions)}
+     * to wait for the completion of the batch without having to manually poll the API.
+     * In order to retrieve the most up-to-date snapshot of a validation batch, call the {@link EmailValidationsRestClient#query(String) query}
+     * along with the batch's {@link ValidationOverview#id}.
+     *
+     * @param emailAddresses A collection of email addresses to validate
+     * @param isCompressed Identifies if the response to be returned is compressed or not.
+     * @return An object representing the email validation batch
+     * @throws VerifaliaException
+     * @throws IOException
+     */
+    public Validation submit(Iterable<String> emailAddresses, boolean isCompressed)
+    		throws IOException, VerifaliaException {
+    	ValidationInput validationInput = getValidationInput(emailAddresses);
+        return submit(validationInput, WaitForCompletionOptions.DontWait, isCompressed);
     }
 
     /**
@@ -111,9 +152,32 @@ public class EmailValidationsRestClient {
      * @throws IOException
      * @throws VerifaliaException
      */
-    public Validation submit(String[] emailAddresses, WaitForCompletionOptions waitForCompletionOptions) throws IOException, VerifaliaException {
+    public Validation submit(String[] emailAddresses, WaitForCompletionOptions waitForCompletionOptions)
+    		throws IOException, VerifaliaException {
     	ValidationInput validationInput = getValidationInput(Arrays.asList(emailAddresses));
-    	return submit(validationInput, waitForCompletionOptions);
+    	return submit(validationInput, waitForCompletionOptions, false);
+    }
+
+    /**
+     * Initiates a new email validation batch. Makes a POST request to the "/email-validations" resource.
+     * <p>Upon initialization, batches usually are in the {@link ValidationStatus#InProgress InProgress} status.
+     * Validations are completed only when their {@link ValidationOverview#status} property.
+     * is {@link ValidationStatus#Completed Completed}; the <b>waitForCompletionOptions</b> parameter
+     * allows to wait for the completion of the batch, without having to manually poll the API.
+     * In order to retrieve the most up-to-date snapshot of a validation batch, call the {@link EmailValidationsRestClient#query(String)}
+     * along with the batch's {@link ValidationOverview#id}.
+     *
+     * @param emailAddresses A collection of email addresses to validate
+     * @param waitForCompletionOptions The options about waiting for the validation completion
+     * @param isCompressed Identifies if the response to be returned is compressed or not
+     * @return An object representing the email validation batch.
+     * @throws IOException
+     * @throws VerifaliaException
+     */
+    public Validation submit(String[] emailAddresses, WaitForCompletionOptions waitForCompletionOptions,
+    		boolean isCompressed) throws IOException, VerifaliaException {
+    	ValidationInput validationInput = getValidationInput(Arrays.asList(emailAddresses));
+    	return submit(validationInput, waitForCompletionOptions, isCompressed);
     }
 
     /**
@@ -135,7 +199,30 @@ public class EmailValidationsRestClient {
     public Validation submit(String[] emailAddresses, ValidationQuality quality, WaitForCompletionOptions waitForCompletionOptions)
     		throws IOException, VerifaliaException {
     	ValidationInput validationInput = getValidationInput(Arrays.asList(emailAddresses), quality);
-    	return submit(validationInput, waitForCompletionOptions);
+    	return submit(validationInput, waitForCompletionOptions, false);
+    }
+
+    /**
+     * Initiates a new email validation batch. Makes a POST request to the "/email-validations" resource.
+     * <p>Upon initialization, batches usually are in the {@link ValidationStatus#InProgress InProgress} status.
+     * Validations are completed only when their {@link ValidationOverview#status} property.
+     * is {@link ValidationStatus#Completed Completed}; the <b>waitForCompletionOptions</b> parameter
+     * allows to wait for the completion of the batch, without having to manually poll the API.
+     * In order to retrieve the most up-to-date snapshot of a validation batch, call the {@link EmailValidationsRestClient#query(String)}
+     * along with the batch's {@link ValidationOverview#id}.
+     *
+     * @param emailAddresses A collection of email addresses to validate
+     * @param quality Validation quality based on which request needs to be proceessed
+     * @param waitForCompletionOptions The options about waiting for the validation completion
+     * @param isCompressed Boolean which identifies if the response should be compressed when making request
+     * @return An object representing the email validation batch.
+     * @throws IOException
+     * @throws VerifaliaException
+     */
+    public Validation submit(String[] emailAddresses, ValidationQuality quality, WaitForCompletionOptions waitForCompletionOptions,
+    		boolean isCompressed) throws IOException, VerifaliaException {
+    	ValidationInput validationInput = getValidationInput(Arrays.asList(emailAddresses), quality);
+    	return submit(validationInput, waitForCompletionOptions, isCompressed);
     }
 
     /**
@@ -154,10 +241,33 @@ public class EmailValidationsRestClient {
      * @throws IOException
      * @throws VerifaliaException
      */
-    public Validation submit(String[] emailAddresses, ValidationDeDuplication deDuplication, WaitForCompletionOptions waitForCompletionOptions)
-    		throws IOException, VerifaliaException {
+    public Validation submit(String[] emailAddresses, ValidationDeDuplication deDuplication,
+    		WaitForCompletionOptions waitForCompletionOptions) throws IOException, VerifaliaException {
     	ValidationInput validationInput = getValidationInput(Arrays.asList(emailAddresses), deDuplication);
-    	return submit(validationInput, waitForCompletionOptions);
+    	return submit(validationInput, waitForCompletionOptions, false);
+    }
+
+    /**
+     * Initiates a new email validation batch. Makes a POST request to the "/email-validations" resource.
+     * <p>Upon initialization, batches usually are in the {@link ValidationStatus#InProgress InProgress} status.
+     * Validations are completed only when their {@link ValidationOverview#status} property.
+     * is {@link ValidationStatus#Completed Completed}; the <b>waitForCompletionOptions</b> parameter
+     * allows to wait for the completion of the batch, without having to manually poll the API.
+     * In order to retrieve the most up-to-date snapshot of a validation batch, call the {@link EmailValidationsRestClient#query(String)}
+     * along with the batch's {@link ValidationOverview#id}.
+     *
+     * @param emailAddresses A collection of email addresses to validate
+     * @param deDuplication Validation deduplication based on which request needs to be proceessed
+     * @param waitForCompletionOptions The options about waiting for the validation completion
+     * @param isCompressed Boolean which identifies if the response should be compressed or not when making request
+     * @return An object representing the email validation batch.
+     * @throws IOException
+     * @throws VerifaliaException
+     */
+    public Validation submit(String[] emailAddresses, ValidationDeDuplication deDuplication,
+    		WaitForCompletionOptions waitForCompletionOptions, boolean isCompressed) throws IOException, VerifaliaException {
+    	ValidationInput validationInput = getValidationInput(Arrays.asList(emailAddresses), deDuplication);
+    	return submit(validationInput, waitForCompletionOptions, isCompressed);
     }
 
     /**
@@ -180,7 +290,31 @@ public class EmailValidationsRestClient {
     public Validation submit(String[] emailAddresses, ValidationQuality quality, ValidationDeDuplication deDuplication,
     		WaitForCompletionOptions waitForCompletionOptions) throws IOException, VerifaliaException {
     	ValidationInput validationInput = getValidationInput(Arrays.asList(emailAddresses), quality, deDuplication);
-    	return submit(validationInput, waitForCompletionOptions);
+    	return submit(validationInput, waitForCompletionOptions, false);
+    }
+
+    /**
+     * Initiates a new email validation batch. Makes a POST request to the "/email-validations" resource.
+     * <p>Upon initialization, batches usually are in the {@link ValidationStatus#InProgress InProgress} status.
+     * Validations are completed only when their {@link ValidationOverview#status} property.
+     * is {@link ValidationStatus#Completed Completed}; the <b>waitForCompletionOptions</b> parameter
+     * allows to wait for the completion of the batch, without having to manually poll the API.
+     * In order to retrieve the most up-to-date snapshot of a validation batch, call the {@link EmailValidationsRestClient#query(String)}
+     * along with the batch's {@link ValidationOverview#id}.
+     *
+     * @param emailAddresses A collection of email addresses to validate
+     * @param quality Validation quality based on which request needs to be processed
+     * @param deDuplication Validation de-duplication based on which request needs to be processed
+     * @param waitForCompletionOptions The options about waiting for the validation completion
+     * @param isCompressed Boolean which identifies if the response should be compressed or not when kaing request
+     * @return An object representing the email validation batch.
+     * @throws IOException
+     * @throws VerifaliaException
+     */
+    public Validation submit(String[] emailAddresses, ValidationQuality quality, ValidationDeDuplication deDuplication,
+    		WaitForCompletionOptions waitForCompletionOptions, boolean isCompressed) throws IOException, VerifaliaException {
+    	ValidationInput validationInput = getValidationInput(Arrays.asList(emailAddresses), quality, deDuplication);
+    	return submit(validationInput, waitForCompletionOptions, isCompressed);
     }
 
     /**
@@ -203,7 +337,31 @@ public class EmailValidationsRestClient {
     public Validation submit(String[] emailAddresses, ValidationQuality quality, ValidationDeDuplication deDuplication,
     		Integer priority, WaitForCompletionOptions waitForCompletionOptions) throws IOException, VerifaliaException {
     	ValidationInput validationInput = getValidationInput(Arrays.asList(emailAddresses), quality, deDuplication, priority);
-    	return submit(validationInput, waitForCompletionOptions);
+    	return submit(validationInput, waitForCompletionOptions, false);
+    }
+
+    /**
+     * Initiates a new email validation batch. Makes a POST request to the "/email-validations" resource.
+     * <p>Upon initialization, batches usually are in the {@link ValidationStatus#InProgress InProgress} status.
+     * Validations are completed only when their {@link ValidationOverview#status} property.
+     * is {@link ValidationStatus#Completed Completed}; the <b>waitForCompletionOptions</b> parameter
+     * allows to wait for the completion of the batch, without having to manually poll the API.
+     * In order to retrieve the most up-to-date snapshot of a validation batch, call the {@link EmailValidationsRestClient#query(String)}
+     * along with the batch's {@link ValidationOverview#id}.
+     *
+     * @param emailAddresses A collection of email addresses to validate
+     * @param quality Validation quality based on which request needs to be processed
+     * @param deDuplication Validation de-duplication based on which request needs to be processed
+     * @param waitForCompletionOptions The options about waiting for the validation completion
+     * @param isCompressed Boolean which identifies if the response should be compressed or not when making request
+     * @return An object representing the email validation batch.
+     * @throws IOException
+     * @throws VerifaliaException
+     */
+    public Validation submit(String[] emailAddresses, ValidationQuality quality, ValidationDeDuplication deDuplication,
+    		Integer priority, WaitForCompletionOptions waitForCompletionOptions, boolean isCompressed) throws IOException, VerifaliaException {
+    	ValidationInput validationInput = getValidationInput(Arrays.asList(emailAddresses), quality, deDuplication, priority);
+    	return submit(validationInput, waitForCompletionOptions, isCompressed);
     }
 
     /**
@@ -223,12 +381,34 @@ public class EmailValidationsRestClient {
      */
     public Validation submit(ValidationInput validationInput,
     		WaitForCompletionOptions waitForCompletionOptions) throws IOException, VerifaliaException {
+    	return submit(validationInput, waitForCompletionOptions, false);
+    }
+
+    /**
+     * Initiates a new email validation batch. Makes a POST request to the "/email-validations" resource.
+     * <p>Upon initialization, batches usually are in the {@link ValidationStatus#InProgress InProgress} status.
+     * Validations are completed only when their {@link ValidationOverview#status} property.
+     * is {@link ValidationStatus#Completed Completed}; the {@code waitForCompletionOptions} parameter
+     * allows to wait for the completion of the batch, without having to manually poll the API.
+     * In order to retrieve the most up-to-date snapshot of a validation batch, call the {@link EmailValidationsRestClient#query(String)}
+     * along with the batch's {@link ValidationOverview#id}.
+     *
+     * @param validationInput An object representing the input for email validation requests
+     * @param waitForCompletionOptions The options about waiting for the validation completion
+     * @param isCompressed Boolean which identifies if the response should be compressed or not when making request
+     * @return Validation An object representing the email validation batch.
+     * @throws IOException
+     * @throws VerifaliaException
+     */
+    public Validation submit(ValidationInput validationInput,
+    		WaitForCompletionOptions waitForCompletionOptions, boolean isCompressed) throws IOException, VerifaliaException {
         if (waitForCompletionOptions == null)
             throw new IllegalArgumentException("waitForCompletionOptions");
         if(validateEmailValidationInputs(validationInput)){ // If validation input object is valid
  	        // Build the REST request
 	        String requestData = Utils.convertObjectToJsonString(validationInput);
-	        RestRequest request = new RestRequest(HttpRequestMethod.POST, Constants.EMAIL_VALIDATIONS_RESOURCE, requestData);
+	        RestRequest request = new RestRequest(HttpRequestMethod.POST, Constants.EMAIL_VALIDATIONS_RESOURCE,
+	        		requestData, Boolean.valueOf(isCompressed));
 
 	        // Send the request to the Verifalia servers
 	        RestResponse response = restClient.execute(request, Validation.class);
@@ -249,7 +429,7 @@ public class EmailValidationsRestClient {
 	                    return data;
 	                } else {
 		                // Poll the service until completion
-		                return query(data.getOverview().getId(), waitForCompletionOptions);
+		                return query(data.getOverview().getId(), waitForCompletionOptions, isCompressed);
 	                }
 	            }
 
@@ -335,8 +515,22 @@ public class EmailValidationsRestClient {
      * @throws IOException
      */
     public Validation query(String id) throws IOException {
-        return query(id, WaitForCompletionOptions.DontWait);
+        return query(id, WaitForCompletionOptions.DontWait, false);
     }
+
+    /**
+     * Returns an object representing an email validation batch, identified by the specified unique identifier.
+     * Makes a GET request to the <b>"/email-validations/{id}"</b> resource.
+     * <p>To initiate a new email validation batch, please use {@link EmailValidationsRestClient#submit(java.lang.Iterable)}
+     * @param id The identifier for an email validation batch to be retrieved.
+     * @param isCompressed Boolean which identifies if the response should be compressed when making request.
+     * @return Validation An object representing the current status of the requested email validation batch.
+     * @throws IOException
+     */
+    public Validation query(String id, boolean isCompressed) throws IOException {
+        return query(id, WaitForCompletionOptions.DontWait, isCompressed);
+    }
+
 
     /**
      * Returns an object representing an email validation batch, waiting for its completion and issuing multiple retries if needed.
@@ -348,7 +542,21 @@ public class EmailValidationsRestClient {
      * @throws IOException
      */
     public Validation query(final String id, final WaitForCompletionOptions waitOptions) throws IOException {
-    	return query(id, waitOptions, null);
+    	return query(id, waitOptions, null, false);
+    }
+
+    /**
+     * Returns an object representing an email validation batch, waiting for its completion and issuing multiple retries if needed.
+     * Makes a GET request to the <b>"/email-validations/{uniqueId}"</b> resource.
+     * <p>To initiate a new email validation batch, please use {@link EmailValidationsRestClient#submit(java.lang.Iterable)}
+     * @param id The identifier for an email validation batch to be retrieved.
+     * @param waitOptions The options about waiting for the validation completion.
+     * @param isCompressed Boolean which identifies if the response should be compressed when making request.
+     * @return Validation An object representing the current status of the requested email validation batch.
+     * @throws IOException
+     */
+    public Validation query(final String id, final WaitForCompletionOptions waitOptions, boolean isCompressed) throws IOException {
+    	return query(id, waitOptions, null, isCompressed);
     }
 
     /**
@@ -363,6 +571,22 @@ public class EmailValidationsRestClient {
      */
     public Validation query(final String id, final WaitForCompletionOptions waitOptions,
     		final ServerPollingLoopEventListener pollingLoopEventListener) throws IOException {
+    	return query(id, waitOptions, pollingLoopEventListener, false);
+    }
+
+    /**
+     * Returns an object representing an email validation batch, waiting for its completion and issuing multiple retries if needed.
+     * Makes a GET request to the <b>"/email-validations/{uniqueId}"</b> resource.
+     * <p>To initiate a new email validation batch, please use {@link EmailValidationsRestClient#submit(java.lang.Iterable)}
+     * @param id The identifier for an email validation batch to be retrieved.
+     * @param waitOptions The options about waiting for the validation completion.
+     * @param pollingLoopEventListener Polling loop event listener, may be <b>null</b>.
+     * @param isCompressed Boolean which identifies whether the response should be compressed when making request.
+     * @return An object representing the current status of the requested email validation batch.
+     * @throws IOException
+     */
+    public Validation query(final String id, final WaitForCompletionOptions waitOptions,
+    		final ServerPollingLoopEventListener pollingLoopEventListener, final boolean isCompressed) throws IOException {
         // Handle the case when the client wishes to avoid waiting for completion
         if (waitOptions == WaitForCompletionOptions.DontWait)
             return queryOnce(id);
@@ -399,7 +623,7 @@ public class EmailValidationsRestClient {
 		            	if(pollingLoopEventListener != null)
 		            		pollingLoopEventListener.onPollingLoopEvent(ServerPollingLoopEvent.BeforePollServer, result);
 
-		                result = queryOnce(id);
+		                result = queryOnce(id, isCompressed);
 
 		                if(pollingLoopEventListener != null)
 		            		pollingLoopEventListener.onPollingLoopEvent(ServerPollingLoopEvent.AfterPollServer, result);
@@ -490,9 +714,22 @@ public class EmailValidationsRestClient {
      * @return An object representing the current status of the requested email validation batch.
      */
     public Validation queryOnce(String id) throws IOException {
+    	return queryOnce(id, false);
+    }
+
+    /**
+     * Returns an object representing an email validation batch, identified by the specified unique identifier.
+     * Makes a GET request to the <b>"/email-validations/{id}"</b> resource.
+     * <p>To initiate a new email validation batch, please use {@link EmailValidationsRestClient#submit(java.lang.Iterable)}
+     * @param id The identifier for an email validation batch to be retrieved.
+     * @param isCompressed Boolean which identifies if the response needs to be compressed or not.
+     * @return An object representing the current status of the requested email validation batch.
+     */
+    public Validation queryOnce(String id, boolean isCompressed) throws IOException {
     	if(!StringUtils.isBlank(id)){
     		// Build request
-	        RestRequest request = new RestRequest(HttpRequestMethod.GET, Constants.EMAIL_VALIDATIONS_RESOURCE + "/" + id);
+	        RestRequest request = new RestRequest(HttpRequestMethod.GET, Constants.EMAIL_VALIDATIONS_RESOURCE + "/" + id,
+	        		Boolean.valueOf(isCompressed));
 
 	        // Sends the request to the Verifalia servers
 	        RestResponse response = restClient.execute(request, Validation.class);
@@ -531,6 +768,18 @@ public class EmailValidationsRestClient {
      * @return ValidationOverview An object representing the overview of the requested email validation batch.
      */
     public ValidationOverview queryOverview(String id) throws IOException {
+    	return queryOverview(id, false);
+    }
+
+    /**
+     * Returns an object representing an email validation batch overview, identified by the specified unique identifier.
+     * Makes a GET request to the <b>"/email-validations/{id}/overview"</b> resource.
+     * <p>To initiate a new email validation batch, please use {@link EmailValidationsRestClient#submit(java.lang.Iterable)}
+     * @param id The identifier for an email validation batch to be retrieved.
+     * @param isCompressed Boolean which identifies if the response needs to be compressed or not when making request.
+     * @return ValidationOverview An object representing the overview of the requested email validation batch.
+     */
+    public ValidationOverview queryOverview(String id, boolean isCompressed) throws IOException {
     	if(!StringUtils.isBlank(id)){
     		// Build URL
     		StringBuilder requestUrlBuilder = new StringBuilder();
@@ -541,7 +790,7 @@ public class EmailValidationsRestClient {
     		requestUrlBuilder.append(Constants.EMAIL_VALIDATIONS_OVERVIEW_RESOURCE);
 
     		// Construct request object
-	        RestRequest request = new RestRequest(HttpRequestMethod.GET, requestUrlBuilder.toString());
+	        RestRequest request = new RestRequest(HttpRequestMethod.GET, requestUrlBuilder.toString(), Boolean.valueOf(isCompressed));
 
 	        // Sends the request to the Verifalia servers
 	        RestResponse response = restClient.execute(request, ValidationOverview.class);
@@ -581,7 +830,20 @@ public class EmailValidationsRestClient {
      */
     public List<ValidationEntry> queryEntries(String id) throws IOException {
     	ValidationEntriesFilter validationEntriesFilter = null;
-    	return queryEntries(id, validationEntriesFilter);
+    	return queryEntries(id, validationEntriesFilter, false);
+    }
+
+    /**
+     * Returns an object representing an email validation batch entries, identified by the specified unique identifier.
+     * Makes a GET request to the <b>"/email-validations/{id}/entries"</b> resource.
+     * <p>To initiate a new email validation batch, please use {@link EmailValidationsRestClient#submit(java.lang.Iterable)}
+     * @param id The identifier for an email validation batch to be retrieved.
+     * @param isCompressed Boolean which identifies if the response needs to be compressed or not.
+     * @return List<ValidationEntry> An object list representing the entries of the requested email validation batch.
+     */
+    public List<ValidationEntry> queryEntries(String id, boolean isCompressed) throws IOException {
+    	ValidationEntriesFilter validationEntriesFilter = null;
+    	return queryEntries(id, validationEntriesFilter, isCompressed);
     }
 
     /**
@@ -595,7 +857,22 @@ public class EmailValidationsRestClient {
     public List<ValidationEntry> queryEntries(String id, ValidationEntryStatus[] statuses) throws IOException {
     	ValidationEntriesFilter validationEntriesFilter = new ValidationEntriesFilter();
     	validationEntriesFilter.setStatuses(Arrays.asList(statuses));
-    	return queryEntries(id, validationEntriesFilter);
+    	return queryEntries(id, validationEntriesFilter, false);
+    }
+
+    /**
+     * Returns an object representing an email validation batch entries, identified by the specified unique identifier and with specified statuses.
+     * Makes a GET request to the <b>"/email-validations/{id}/entries"</b> resource.
+     * <p>To initiate a new email validation batch, please use {@link EmailValidationsRestClient#submit(java.lang.Iterable)}
+     * @param id The identifier for an email validation batch to be retrieved.
+     * @param statuses A collection of statuses for which the entries needs to be retrieved.
+     * @param isCompressed Boolean which identifies if the response needs to be compressed when making request.
+     * @return List<ValidationEntry> An object list representing the entries of the requested email validation batch.
+     */
+    public List<ValidationEntry> queryEntries(String id, ValidationEntryStatus[] statuses, boolean isCompressed) throws IOException {
+    	ValidationEntriesFilter validationEntriesFilter = new ValidationEntriesFilter();
+    	validationEntriesFilter.setStatuses(Arrays.asList(statuses));
+    	return queryEntries(id, validationEntriesFilter, isCompressed);
     }
 
     /**
@@ -609,7 +886,23 @@ public class EmailValidationsRestClient {
     public List<ValidationEntry> queryEntries(String id, Iterable<ValidationEntryStatus> statuses) throws IOException {
     	ValidationEntriesFilter validationEntriesFilter = new ValidationEntriesFilter();
     	validationEntriesFilter.setStatuses(statuses);
-    	return queryEntries(id, validationEntriesFilter);
+    	return queryEntries(id, validationEntriesFilter, false);
+    }
+
+    /**
+     * Returns an object representing an email validation batch entries, identified by the specified unique identifier and with specified statuses.
+     * Makes a GET request to the <b>"/email-validations/{id}/entries"</b> resource.
+     * <p>To initiate a new email validation batch, please use {@link EmailValidationsRestClient#submit(java.lang.Iterable)}
+     * @param id The identifier for an email validation batch to be retrieved.
+     * @param statuses A collection of statuses for which the entries needs to be retrieved.
+     * @param isCompressed Boolean which identifies if the response needs to be compressed when making request.
+     * @return List<ValidationEntry> An object list representing the entries of the requested email validation batch.
+     */
+    public List<ValidationEntry> queryEntries(String id, Iterable<ValidationEntryStatus> statuses,
+    		boolean isCompressed) throws IOException {
+    	ValidationEntriesFilter validationEntriesFilter = new ValidationEntriesFilter();
+    	validationEntriesFilter.setStatuses(statuses);
+    	return queryEntries(id, validationEntriesFilter, isCompressed);
     }
 
     /**
@@ -621,7 +914,21 @@ public class EmailValidationsRestClient {
      * @return List<ValidationEntry> An object list representing the entries of the requested email validation batch.
      */
     public List<ValidationEntry> queryEntries(String id, ValidationEntriesFilter validationEntriesFilter)
-    		throws IOException{
+    		throws IOException {
+    	return queryEntries(id, validationEntriesFilter, false);
+    }
+
+    /**
+     * Returns an object representing an email validation batch entries, identified by the specified unique identifier and with specified statuses.
+     * Makes a GET request to the <b>"/email-validations/{id}/entries"</b> resource.
+     * <p>To initiate a new email validation batch, please use {@link EmailValidationsRestClient#submit(java.lang.Iterable)}
+     * @param id The identifier for an email validation batch to be retrieved.
+     * @param validationEntriesFilter An object with the various filters mentioned when retrieving entries.
+     * @param isCompressed Boolean which identifies if the response needs to be compressed or not when making request.
+     * @return List<ValidationEntry> An object list representing the entries of the requested email validation batch.
+     */
+    public List<ValidationEntry> queryEntries(String id, ValidationEntriesFilter validationEntriesFilter,
+    		boolean isCompressed) throws IOException {
     	if(!StringUtils.isBlank(id)){
     		// Assign with default values to handle pagination
         	String cursor = StringUtils.EMPTY;
@@ -648,7 +955,7 @@ public class EmailValidationsRestClient {
 		    	System.out.println("Query entries URI: " + queryEntriesResource.toString());
 
 		    	// Make request object for the rest call
-		    	RestRequest request = new RestRequest(HttpRequestMethod.GET, queryEntriesResource.toString());
+		    	RestRequest request = new RestRequest(HttpRequestMethod.GET, queryEntriesResource.toString(), Boolean.valueOf(isCompressed));
 
 		        // Sends the request to the Verifalia servers
 		        RestResponse response = restClient.execute(request, ValidationEntries.class);
@@ -746,6 +1053,18 @@ public class EmailValidationsRestClient {
     }
 
     /**
+     * Returns an object representing the various email validations jobs initiated.
+     * Makes a GET request to the <b>"/email-validations"</b> resource.
+     * <p>To initiate a new email validation batch, please use {@link EmailValidationsRestClient#submit(java.lang.Iterable)}
+     * @param isCompressed Boolean which identifies if the response needs to be compressed when making request.
+     * @return List<ValidationOverview> An object list representing the information related to each validation job.
+     */
+    public List<ValidationOverview> listJobs(boolean isCompressed) throws IOException {
+    	ValidationJobsFilter validationJobsFilter = null;
+    	return listJobs(validationJobsFilter, isCompressed);
+    }
+
+    /**
      * Returns an object representing the various email validations jobs initiated for the input date.
      * Makes a GET request to the <b>"/email-validations"</b> resource.
      * <p>To initiate a new email validation batch, please use {@link EmailValidationsRestClient#submit(java.lang.Iterable)}
@@ -756,6 +1075,20 @@ public class EmailValidationsRestClient {
     	ValidationJobsFilter validationJobsFilter = new ValidationJobsFilter();
     	validationJobsFilter.setCreatedOn(filterCreatedOn);
     	return listJobs(validationJobsFilter);
+    }
+
+    /**
+     * Returns an object representing the various email validations jobs initiated for the input date.
+     * Makes a GET request to the <b>"/email-validations"</b> resource.
+     * <p>To initiate a new email validation batch, please use {@link EmailValidationsRestClient#submit(java.lang.Iterable)}
+     * @param filterCreatedOn Local date for which usage job details needs to be fetched. If null or blank value is passed, it will not consider the param when making request.
+     * @param isCompressed Boolean which identifies if the response needs to be compressed when making request.
+     * @return List<ValidationOverview> An object list representing the information related to each validation job.
+     */
+    public List<ValidationOverview> listJobs(LocalDate filterCreatedOn, boolean isCompressed) throws IOException {
+    	ValidationJobsFilter validationJobsFilter = new ValidationJobsFilter();
+    	validationJobsFilter.setCreatedOn(filterCreatedOn);
+    	return listJobs(validationJobsFilter, isCompressed);
     }
 
     /**
@@ -774,6 +1107,23 @@ public class EmailValidationsRestClient {
     }
 
     /**
+     * Returns an object representing the various email validations jobs initiated for the input date and with given statuses.
+     * Makes a GET request to the <b>"/email-validations"</b> resource.
+     * <p>To initiate a new email validation batch, please use {@link EmailValidationsRestClient#submit(java.lang.Iterable)}
+     * @param filterCreatedOn Local date for which usage job details needs to be fetched. If null or blank value is passed, it will not consider the param when making request.
+     * @param statuses  A collection of statuses for which the jobs needs to be retrieved.
+     * @param isCompressed Boolean which identifies if the response needs to be compressed when making request.
+     * @return List<ValidationOverview> An object list representing the information related to each validation job.
+     */
+    public List<ValidationOverview> listJobs(LocalDate filterCreatedOn, ValidationStatus[] statuses, boolean isCompressed)
+    		throws IOException {
+    	ValidationJobsFilter validationJobsFilter = new ValidationJobsFilter();
+    	validationJobsFilter.setCreatedOn(filterCreatedOn);
+    	validationJobsFilter.setStatuses(Arrays.asList(statuses));
+    	return listJobs(validationJobsFilter, isCompressed);
+    }
+
+    /**
      * Returns an object representing the various email validations jobs initiated for the input date and with given sort direction
      * Makes a GET request to the <b>"/email-validations"</b> resource.
      * <p>To initiate a new email validation batch, please use {@link EmailValidationsRestClient#submit(java.lang.Iterable)}
@@ -786,6 +1136,22 @@ public class EmailValidationsRestClient {
     	validationJobsFilter.setCreatedOn(filterCreatedOn);
     	validationJobsFilter.setSort(sort);
     	return listJobs(validationJobsFilter);
+    }
+
+    /**
+     * Returns an object representing the various email validations jobs initiated for the input date and with given sort direction
+     * Makes a GET request to the <b>"/email-validations"</b> resource.
+     * <p>To initiate a new email validation batch, please use {@link EmailValidationsRestClient#submit(java.lang.Iterable)}
+     * @param filterCreatedOn Local date for which usage job details needs to be fetched. If null or blank value is passed, it will not consider the param when making request.
+     * @param sort String based on which sort needs to be applied when fetching results.
+     * @param isCompressed Boolean which identifies if the response needs to be compressed when making request.
+     * @return List<ValidationOverview> An object list representing the information related to each validation job.
+     */
+    public List<ValidationOverview> listJobs(LocalDate filterCreatedOn, ValidationJobsSort sort, boolean isCompressed) throws IOException {
+    	ValidationJobsFilter validationJobsFilter = new ValidationJobsFilter();
+    	validationJobsFilter.setCreatedOn(filterCreatedOn);
+    	validationJobsFilter.setSort(sort);
+    	return listJobs(validationJobsFilter, isCompressed);
     }
 
     /**
@@ -807,6 +1173,25 @@ public class EmailValidationsRestClient {
     }
 
     /**
+     * Returns an object representing the various email validations jobs initiated for the input date, given statuses and with given sort direction
+     * Makes a GET request to the <b>"/email-validations"</b> resource.
+     * <p>To initiate a new email validation batch, please use {@link EmailValidationsRestClient#submit(java.lang.Iterable)}
+     * @param filterCreatedOn Date in format YYYY-MM-DD for which usage job details needs to be fetched. If null or blank value is passed, it will not consider the param when making request.
+     * @param statuses  A collection of statuses for which the jobs needs to be retrieved.
+     * @param sort String based on which sort needs to be applied when fetching results.
+     * @param isCompressed Boolean which identifies if the response needs to be compressed when making request.
+     * @return List<ValidationOverview> An object list representing the information related to each validation job.
+     */
+    public List<ValidationOverview> listJobs(LocalDate filterCreatedOn, ValidationStatus[] statuses,
+    		ValidationJobsSort sort, boolean isCompressed) throws IOException {
+    	ValidationJobsFilter validationJobsFilter = new ValidationJobsFilter();
+    	validationJobsFilter.setCreatedOn(filterCreatedOn);
+    	validationJobsFilter.setStatuses(Arrays.asList(statuses));
+    	validationJobsFilter.setSort(sort);
+    	return listJobs(validationJobsFilter, isCompressed);
+    }
+
+    /**
      * Returns an object representing the various email validations jobs initiated based on filter and sort options passed.
      * Makes a GET request to the <b>"/email-validations"</b> resource.
      * <p>To initiate a new email validation batch, please use {@link EmailValidationsRestClient#submit(java.lang.Iterable)}
@@ -814,6 +1199,18 @@ public class EmailValidationsRestClient {
      * @return List<ValidationOverview> An object list representing the information related to each validation job.
      */
     public List<ValidationOverview> listJobs(ValidationJobsFilter validationJobFilter) throws IOException {
+    	return listJobs(validationJobFilter, false);
+    }
+
+    /**
+     * Returns an object representing the various email validations jobs initiated based on filter and sort options passed.
+     * Makes a GET request to the <b>"/email-validations"</b> resource.
+     * <p>To initiate a new email validation batch, please use {@link EmailValidationsRestClient#submit(java.lang.Iterable)}
+     * @param validationJobFilter Object with options for filters and sort options supported.
+     * @param isCompressed Boolean which identifies if the response needs to be compressed when making request.
+     * @return List<ValidationOverview> An object list representing the information related to each validation job.
+     */
+    public List<ValidationOverview> listJobs(ValidationJobsFilter validationJobFilter, boolean isCompressed) throws IOException {
     	// Assign with default values to handle pagination
     	String cursor = StringUtils.EMPTY;
     	Boolean isTruncated = Boolean.TRUE;
@@ -835,7 +1232,8 @@ public class EmailValidationsRestClient {
 	    	System.out.println("List jobs URI: " + listJobsResource.toString());
 
 	    	// Make request object for the rest call
-	    	RestRequest request = new RestRequest(HttpRequestMethod.GET, listJobsResource.toString());
+	    	RestRequest request = new RestRequest(HttpRequestMethod.GET, listJobsResource.toString(),
+	    			Boolean.valueOf(isCompressed));
 
 	        // Sends the request to the Verifalia servers
 	        RestResponse response = restClient.execute(request, ValidationJobs.class);
