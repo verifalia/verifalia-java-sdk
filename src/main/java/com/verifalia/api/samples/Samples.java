@@ -19,10 +19,12 @@ import com.verifalia.api.emailvalidations.models.Validation;
 import com.verifalia.api.emailvalidations.models.ValidationEntriesFilter;
 import com.verifalia.api.emailvalidations.models.ValidationEntry;
 import com.verifalia.api.emailvalidations.models.ValidationEntryStatus;
-import com.verifalia.api.emailvalidations.models.ValidationsFilter;
-import com.verifalia.api.emailvalidations.models.ValidationsSort;
 import com.verifalia.api.emailvalidations.models.ValidationOverview;
 import com.verifalia.api.emailvalidations.models.ValidationStatus;
+import com.verifalia.api.emailvalidations.models.ValidationsFilter;
+import com.verifalia.api.emailvalidations.models.ValidationsSort;
+import com.verifalia.api.exceptions.AuthorizationException;
+import com.verifalia.api.exceptions.InsufficientCreditException;
 import com.verifalia.api.exceptions.VerifaliaException;
 import com.verifalia.api.rest.security.BearerAuthentication;
 
@@ -91,6 +93,10 @@ public class Samples {
 					}
 				}
 			}
+		} catch(AuthorizationException e){
+			System.out.println("AuthorizationException:: " + e.getMessage());
+		} catch(InsufficientCreditException e){
+			System.out.println("InsufficientCreditException:: " + e.getMessage());
 		} catch(VerifaliaException e){
 			System.out.println("VerifaliaException:: " + e.getMessage());
 		} catch(IOException e){
@@ -192,6 +198,10 @@ public class Samples {
 					}
 				}
 			}
+		} catch(AuthorizationException e){
+			System.out.println("AuthorizationException:: " + e.getMessage());
+		} catch(InsufficientCreditException e){
+			System.out.println("InsufficientCreditException:: " + e.getMessage());
 		} catch(VerifaliaException e){
 			System.out.println("VerifaliaException:: " + e.getMessage());
 		} catch(IOException e){
@@ -254,6 +264,10 @@ public class Samples {
 					}
 				}
 			}
+		} catch(AuthorizationException e){
+			System.out.println("AuthorizationException:: " + e.getMessage());
+		} catch(InsufficientCreditException e){
+			System.out.println("InsufficientCreditException:: " + e.getMessage());
 		} catch(VerifaliaException e){
 			System.out.println("VerifaliaException:: " + e.getMessage());
 		} catch(IOException e){
@@ -317,6 +331,10 @@ public class Samples {
 					);
 				}
 			}
+		} catch(AuthorizationException e){
+			System.out.println("AuthorizationException:: " + e.getMessage());
+		} catch(InsufficientCreditException e){
+			System.out.println("InsufficientCreditException:: " + e.getMessage());
 		} catch(VerifaliaException e){
 			System.out.println("VerifaliaException:: " + e.getMessage());
 		} catch(IOException e){
@@ -384,6 +402,10 @@ public class Samples {
 					}
 				}
 			}
+		} catch(AuthorizationException e){
+			System.out.println("AuthorizationException:: " + e.getMessage());
+		} catch(InsufficientCreditException e){
+			System.out.println("InsufficientCreditException:: " + e.getMessage());
 		} catch(VerifaliaException e){
 			System.out.println("VerifaliaException:: " + e.getMessage());
 		} catch(IOException e){
@@ -440,6 +462,10 @@ public class Samples {
 					System.out.println("Entries results with filter status is in progress");
 				}
 			}
+		} catch(AuthorizationException e){
+			System.out.println("AuthorizationException:: " + e.getMessage());
+		} catch(InsufficientCreditException e){
+			System.out.println("InsufficientCreditException:: " + e.getMessage());
 		} catch(VerifaliaException e){
 			System.out.println("VerifaliaException:: " + e.getMessage());
 		} catch(IOException e){
@@ -469,6 +495,10 @@ public class Samples {
 					System.out.println("Entries results with filter status is in progress");
 				}
 			}
+		} catch(AuthorizationException e){
+			System.out.println("AuthorizationException:: " + e.getMessage());
+		} catch(InsufficientCreditException e){
+			System.out.println("InsufficientCreditException:: " + e.getMessage());
 		} catch(VerifaliaException e){
 			System.out.println("VerifaliaException:: " + e.getMessage());
 		} catch(IOException e){
@@ -516,6 +546,10 @@ public class Samples {
 					System.out.println("No validation job data exists");
 				}
 			}
+		} catch(AuthorizationException e){
+			System.out.println("AuthorizationException:: " + e.getMessage());
+		} catch(InsufficientCreditException e){
+			System.out.println("InsufficientCreditException:: " + e.getMessage());
 		} catch(VerifaliaException e){
 			System.out.println("VerifaliaException:: " + e.getMessage());
 		} catch(IOException e){
@@ -563,6 +597,10 @@ public class Samples {
 					System.out.println("Jobs results with filter createdOn: 0");
 				}
 			}
+		} catch(AuthorizationException e){
+			System.out.println("AuthorizationException:: " + e.getMessage());
+		} catch(InsufficientCreditException e){
+			System.out.println("InsufficientCreditException:: " + e.getMessage());
 		} catch(VerifaliaException e){
 			System.out.println("VerifaliaException:: " + e.getMessage());
 		} catch(IOException e){
@@ -591,6 +629,10 @@ public class Samples {
 					System.out.println("Jobs results with filter createdOn and status: 0");
 				}
 			}
+		} catch(AuthorizationException e){
+			System.out.println("AuthorizationException:: " + e.getMessage());
+		} catch(InsufficientCreditException e){
+			System.out.println("InsufficientCreditException:: " + e.getMessage());
 		} catch(VerifaliaException e){
 			System.out.println("VerifaliaException:: " + e.getMessage());
 		} catch(IOException e){
@@ -616,6 +658,10 @@ public class Samples {
 					System.out.println("Jobs results with filter createdOn and sort -createdOn: 0");
 				}
 			}
+		} catch(AuthorizationException e){
+			System.out.println("AuthorizationException:: " + e.getMessage());
+		} catch(InsufficientCreditException e){
+			System.out.println("InsufficientCreditException:: " + e.getMessage());
 		} catch(VerifaliaException e){
 			System.out.println("VerifaliaException:: " + e.getMessage());
 		} catch(IOException e){
@@ -644,6 +690,10 @@ public class Samples {
 					System.out.println("Jobs results with filter createdOn, status and sort createdOn: 0");
 				}
 			}
+		} catch(AuthorizationException e){
+			System.out.println("AuthorizationException:: " + e.getMessage());
+		} catch(InsufficientCreditException e){
+			System.out.println("InsufficientCreditException:: " + e.getMessage());
 		} catch(VerifaliaException e){
 			System.out.println("VerifaliaException:: " + e.getMessage());
 		} catch(IOException e){
@@ -675,6 +725,10 @@ public class Samples {
 					System.out.println("Jobs results with object: 0");
 				}
 			}
+		} catch(AuthorizationException e){
+			System.out.println("AuthorizationException:: " + e.getMessage());
+		} catch(InsufficientCreditException e){
+			System.out.println("InsufficientCreditException:: " + e.getMessage());
 		} catch(VerifaliaException e){
 			System.out.println("VerifaliaException:: " + e.getMessage());
 		} catch(IOException e){
@@ -718,6 +772,10 @@ public class Samples {
 					System.out.println("No result found");
 				}
 			}
+		} catch(AuthorizationException e){
+			System.out.println("AuthorizationException:: " + e.getMessage());
+		} catch(InsufficientCreditException e){
+			System.out.println("InsufficientCreditException:: " + e.getMessage());
 		} catch(VerifaliaException e){
 			System.out.println("VerifaliaException:: " + e.getMessage());
 		} catch(IOException e){
@@ -763,6 +821,10 @@ public class Samples {
 					System.out.println("No credit daily usage data was found");
 				}
 			}
+		} catch(AuthorizationException e){
+			System.out.println("AuthorizationException:: " + e.getMessage());
+		} catch(InsufficientCreditException e){
+			System.out.println("InsufficientCreditException:: " + e.getMessage());
 		} catch(VerifaliaException e){
 			System.out.println("VerifaliaException:: " + e.getMessage());
 		} catch(IOException e){
@@ -809,6 +871,10 @@ public class Samples {
 					System.out.println("No result found for daily usage");
 				}
 			}
+		} catch(AuthorizationException e){
+			System.out.println("AuthorizationException:: " + e.getMessage());
+		} catch(InsufficientCreditException e){
+			System.out.println("InsufficientCreditException:: " + e.getMessage());
 		} catch(VerifaliaException e){
 			System.out.println("VerifaliaException:: " + e.getMessage());
 		} catch(IOException e){
@@ -833,6 +899,10 @@ public class Samples {
 					System.out.println("No result found for daily usage");
 				}
 			}
+		} catch(AuthorizationException e){
+			System.out.println("AuthorizationException:: " + e.getMessage());
+		} catch(InsufficientCreditException e){
+			System.out.println("InsufficientCreditException:: " + e.getMessage());
 		} catch(VerifaliaException e){
 			System.out.println("VerifaliaException:: " + e.getMessage());
 		} catch(IOException e){
@@ -857,6 +927,10 @@ public class Samples {
 					System.out.println("No result found for daily usage");
 				}
 			}
+		} catch(AuthorizationException e){
+			System.out.println("AuthorizationException:: " + e.getMessage());
+		} catch(InsufficientCreditException e){
+			System.out.println("InsufficientCreditException:: " + e.getMessage());
 		} catch(VerifaliaException e){
 			System.out.println("VerifaliaException:: " + e.getMessage());
 		} catch(IOException e){
@@ -882,6 +956,10 @@ public class Samples {
 					System.out.println("No result found for daily usage");
 				}
 			}
+		} catch(AuthorizationException e){
+			System.out.println("AuthorizationException:: " + e.getMessage());
+		} catch(InsufficientCreditException e){
+			System.out.println("InsufficientCreditException:: " + e.getMessage());
 		} catch(VerifaliaException e){
 			System.out.println("VerifaliaException:: " + e.getMessage());
 		} catch(IOException e){

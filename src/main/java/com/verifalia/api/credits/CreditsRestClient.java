@@ -19,9 +19,7 @@ import com.verifalia.api.credits.models.CreditBalanceData;
 import com.verifalia.api.credits.models.CreditDailyUsage;
 import com.verifalia.api.credits.models.CreditDailyUsageData;
 import com.verifalia.api.credits.models.CreditDailyUsageFilter;
-import com.verifalia.api.exceptions.VerifaliaException;
 import com.verifalia.api.rest.HttpRequestMethod;
-import com.verifalia.api.rest.HttpStatusCode;
 import com.verifalia.api.rest.RestClient;
 import com.verifalia.api.rest.RestRequest;
 import com.verifalia.api.rest.RestResponse;
@@ -53,9 +51,6 @@ public class CreditsRestClient {
 
         // Sends the request to the Verifalia servers
         RestResponse response = restClient.execute(request, CreditBalanceData.class);
-
-        if(response.getStatusCode() != HttpStatusCode.OK)
-        	throw new VerifaliaException(response);
 
         return (CreditBalanceData)response.getData();
     }
@@ -128,9 +123,6 @@ public class CreditsRestClient {
 
 	        // Sends the request to the Verifalia servers
 	        RestResponse response = restClient.execute(request, CreditDailyUsage.class);
-
-	        if(response.getStatusCode() != HttpStatusCode.OK)
-	        	throw new VerifaliaException(response);
 
 	        // Handle pagination with meta details
 	        CreditDailyUsage creditDailyUsage = ((CreditDailyUsage)response.getData());

@@ -26,15 +26,13 @@ import com.verifalia.api.emailvalidations.models.ValidationEntries;
 import com.verifalia.api.emailvalidations.models.ValidationEntriesFilter;
 import com.verifalia.api.emailvalidations.models.ValidationEntry;
 import com.verifalia.api.emailvalidations.models.ValidationEntryStatus;
-import com.verifalia.api.emailvalidations.models.Validations;
-import com.verifalia.api.emailvalidations.models.ValidationsFilter;
-import com.verifalia.api.emailvalidations.models.ValidationsSort;
 import com.verifalia.api.emailvalidations.models.ValidationOverview;
 import com.verifalia.api.emailvalidations.models.ValidationRequest;
 import com.verifalia.api.emailvalidations.models.ValidationRequestEntry;
 import com.verifalia.api.emailvalidations.models.ValidationStatus;
-import com.verifalia.api.exceptions.AuthorizationException;
-import com.verifalia.api.exceptions.InsufficientCreditException;
+import com.verifalia.api.emailvalidations.models.Validations;
+import com.verifalia.api.emailvalidations.models.ValidationsFilter;
+import com.verifalia.api.emailvalidations.models.ValidationsSort;
 import com.verifalia.api.exceptions.VerifaliaException;
 import com.verifalia.api.rest.HttpRequestMethod;
 import com.verifalia.api.rest.HttpStatusCode;
@@ -378,7 +376,6 @@ public class EmailValidationsRestClient {
 	                data.getOverview().setStatus(ValidationStatus.Completed);
 	                return data;
 	            }
-
 	            case HttpStatusCode.ACCEPTED: {
 	                // The batch has been accepted but is not yet completed
 	                if (waitForCompletionOptions == WaitForCompletionOptions.DontWait) {
@@ -389,17 +386,10 @@ public class EmailValidationsRestClient {
 		                return query(data.getOverview().getId(), waitForCompletionOptions);
 	                }
 	            }
-
-	            case HttpStatusCode.UNAUTHORIZED: {
-	                // The batch has NOT been accepted because of an issue with the supplied credentials
-	                throw new AuthorizationException(response);
+	            case HttpStatusCode.GONE: {
+                	data.getOverview().setStatus(ValidationStatus.Deleted);
+                    return data;
 	            }
-
-	            case HttpStatusCode.PAYMENT_REQUIRED: {
-	                // The batch has NOT been accepted because of low account credit
-	                throw new InsufficientCreditException(response);
-	            }
-
 	            default: {
 	                // An unhandled exception happened at the Verifalia side
 	                throw new VerifaliaException(response);
@@ -641,19 +631,17 @@ public class EmailValidationsRestClient {
 	            	data.getOverview().setStatus(ValidationStatus.Completed);
 	            	return data;
 	            }
-
 	            case HttpStatusCode.ACCEPTED: {
 	                data.getOverview().setStatus(ValidationStatus.InProgress);
 	                return data;
 	            }
-
-	            case HttpStatusCode.GONE:
-	            case HttpStatusCode.NOT_FOUND: {
-	                return null;
+	            case HttpStatusCode.GONE: {
+	            	data.getOverview().setStatus(ValidationStatus.Deleted);
+	                return data;
 	            }
-
-	            default:
+	            default: {
 	            	throw new VerifaliaException(response);
+	            }
 	        }
     	} else {
     		throw new IllegalArgumentException("Job ID cannot be blank");
@@ -690,19 +678,17 @@ public class EmailValidationsRestClient {
 	            	data.setStatus(ValidationStatus.Completed);
 	                return data;
 	            }
-
 	            case HttpStatusCode.ACCEPTED: {
 	            	data.setStatus(ValidationStatus.InProgress);
 	                return data;
 	            }
-
-	            case HttpStatusCode.GONE:
-	            case HttpStatusCode.NOT_FOUND: {
-	                return null;
+	            case HttpStatusCode.GONE: {
+	            	data.setStatus(ValidationStatus.Deleted);
+	                return data;
 	            }
-
-	            default:
+	            default: {
 	            	throw new VerifaliaException(response);
+	            }
 	        }
     	} else {
     		throw new IllegalArgumentException("Job ID cannot be blank");
@@ -803,7 +789,7 @@ public class EmailValidationsRestClient {
 			        } else {
 			        	isTruncated = Boolean.FALSE;
 			        }
-		        } else if(responseStatusCode == HttpStatusCode.GONE || responseStatusCode == HttpStatusCode.NOT_FOUND){
+		        } else if(responseStatusCode == HttpStatusCode.GONE){
 		        	return null;
 		        } else {
 		        	throw new VerifaliaException(response);
@@ -971,10 +957,6 @@ public class EmailValidationsRestClient {
 	        // Sends the request to the Verifalia servers
 	        RestResponse response = restClient.execute(request, Validations.class);
 
-	        // Check for response. If not appropriate, throw error
-	        if(response.getStatusCode() != HttpStatusCode.OK)
-	        	throw new VerifaliaException(response);
-
 	        // Handle pagination with meta details
 	        Validations validationJobs = ((Validations)response.getData());
 	        validationJobsData.addAll(validationJobs.getData());
@@ -1073,17 +1055,11 @@ public class EmailValidationsRestClient {
      */
     public void delete(String id) throws IOException {
     	if(!StringUtils.isBlank(id)){
+    		// Make request
 	    	RestRequest request = new RestRequest(HttpRequestMethod.DELETE, Constants.EMAIL_VALIDATIONS_RESOURCE + "/" + id);
 
 	        // Sends the request to the Verifalia servers
-	        RestResponse response = restClient.execute(request, Void.class);
-
-	        if(response.getStatusCode() == HttpStatusCode.OK
-	        		|| response.getStatusCode() == HttpStatusCode.GONE){
-	        	return;
-	        } else {
-	        	throw new VerifaliaException(response);
-	        }
+	        restClient.execute(request, Void.class);
     	} else {
     		throw new IllegalArgumentException("Job ID cannot be blank");
     	}

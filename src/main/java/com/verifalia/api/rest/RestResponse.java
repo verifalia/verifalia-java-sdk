@@ -7,6 +7,9 @@ import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.JsonMappingException;
 
 import com.verifalia.api.common.Utils;
+import com.verifalia.api.exceptions.AuthorizationException;
+import com.verifalia.api.exceptions.InsufficientCreditException;
+import com.verifalia.api.exceptions.VerifaliaException;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -47,6 +50,16 @@ public class RestResponse {
 			data = Utils.convertJsonStringToObj(result, responseDataClass);
 		} else {
 			this.errorMessage = result;
+			// 410 status needs to be considered without throwing exception as if a job is deleted, the API returns this code
+			if(statusCode != HttpStatusCode.GONE){
+				if(statusCode == HttpStatusCode.UNAUTHORIZED){
+					throw new AuthorizationException(this);
+				} else if(statusCode == HttpStatusCode.PAYMENT_REQUIRED){
+					throw new InsufficientCreditException(this);
+				} else {
+					throw new VerifaliaException(this);
+				}
+			}
 		}
 	}
 }
