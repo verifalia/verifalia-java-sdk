@@ -3,7 +3,6 @@ package com.verifalia.api.emailvalidations.models.input;
 import java.util.List;
 
 import com.verifalia.api.emailvalidations.models.ValidationDeDuplication;
-import com.verifalia.api.emailvalidations.models.ValidationQuality;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -24,7 +23,7 @@ public class ValidationInput {
 	 /**
      * Identifies the results quality level requested for the job; can be one of Standard, High and Extreme (or other values for custom quality levels).
      */
-    private ValidationQuality quality;
+    private String quality;
 
     /**
      * Identifies the deduplication algorithm requested for the job; can be one of Off, Safe and Relaxed.

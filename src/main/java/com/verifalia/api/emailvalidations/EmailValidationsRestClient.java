@@ -25,7 +25,6 @@ import com.verifalia.api.emailvalidations.models.ValidationEntriesFilter;
 import com.verifalia.api.emailvalidations.models.ValidationEntryStatus;
 import com.verifalia.api.emailvalidations.models.ValidationJobsFilter;
 import com.verifalia.api.emailvalidations.models.ValidationJobsSort;
-import com.verifalia.api.emailvalidations.models.ValidationQuality;
 import com.verifalia.api.emailvalidations.models.ValidationStatus;
 import com.verifalia.api.emailvalidations.models.input.ValidationEntryInput;
 import com.verifalia.api.emailvalidations.models.input.ValidationInput;
@@ -133,7 +132,7 @@ public class EmailValidationsRestClient {
      * @throws IOException
      * @throws VerifaliaException
      */
-    public Validation submit(String[] emailAddresses, ValidationQuality quality, WaitForCompletionOptions waitForCompletionOptions)
+    public Validation submit(String[] emailAddresses, String quality, WaitForCompletionOptions waitForCompletionOptions)
     		throws IOException, VerifaliaException {
     	ValidationInput validationInput = getValidationInput(Arrays.asList(emailAddresses), quality);
     	return submit(validationInput, waitForCompletionOptions);
@@ -178,7 +177,7 @@ public class EmailValidationsRestClient {
      * @throws IOException
      * @throws VerifaliaException
      */
-    public Validation submit(String[] emailAddresses, ValidationQuality quality, ValidationDeDuplication deDuplication,
+    public Validation submit(String[] emailAddresses, String quality, ValidationDeDuplication deDuplication,
     		WaitForCompletionOptions waitForCompletionOptions) throws IOException, VerifaliaException {
     	ValidationInput validationInput = getValidationInput(Arrays.asList(emailAddresses), quality, deDuplication);
     	return submit(validationInput, waitForCompletionOptions);
@@ -201,7 +200,7 @@ public class EmailValidationsRestClient {
      * @throws IOException
      * @throws VerifaliaException
      */
-    public Validation submit(String[] emailAddresses, ValidationQuality quality, ValidationDeDuplication deDuplication,
+    public Validation submit(String[] emailAddresses, String quality, ValidationDeDuplication deDuplication,
     		Integer priority, WaitForCompletionOptions waitForCompletionOptions) throws IOException, VerifaliaException {
     	ValidationInput validationInput = getValidationInput(Arrays.asList(emailAddresses), quality, deDuplication, priority);
     	return submit(validationInput, waitForCompletionOptions);
@@ -276,7 +275,7 @@ public class EmailValidationsRestClient {
     	return getValidationInput(emailAddresses, null, null, null);
     }
 
-    private ValidationInput getValidationInput(Iterable<String> emailAddresses, ValidationQuality quality){
+    private ValidationInput getValidationInput(Iterable<String> emailAddresses, String quality){
     	return getValidationInput(emailAddresses, quality, null, null);
     }
 
@@ -284,12 +283,12 @@ public class EmailValidationsRestClient {
     	return getValidationInput(emailAddresses, null, deDuplication, null);
     }
 
-    private ValidationInput getValidationInput(Iterable<String> emailAddresses, ValidationQuality quality,
+    private ValidationInput getValidationInput(Iterable<String> emailAddresses, String quality,
     		ValidationDeDuplication deDuplication){
     	return getValidationInput(emailAddresses, quality, deDuplication, null);
     }
 
-    private ValidationInput getValidationInput(Iterable<String> emailAddresses, ValidationQuality quality,
+    private ValidationInput getValidationInput(Iterable<String> emailAddresses, String quality,
     		ValidationDeDuplication deDuplication, Integer priority){
     	// Populate validation input object
     	List<ValidationEntryInput> entries = new ArrayList<ValidationEntryInput>();

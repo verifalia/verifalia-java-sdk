@@ -19,7 +19,6 @@ import com.verifalia.api.emailvalidations.models.ValidationEntriesFilter;
 import com.verifalia.api.emailvalidations.models.ValidationEntryStatus;
 import com.verifalia.api.emailvalidations.models.ValidationJobsFilter;
 import com.verifalia.api.emailvalidations.models.ValidationJobsSort;
-import com.verifalia.api.emailvalidations.models.ValidationQuality;
 import com.verifalia.api.emailvalidations.models.ValidationStatus;
 import com.verifalia.api.emailvalidations.models.output.Validation;
 import com.verifalia.api.emailvalidations.models.output.ValidationEntry;
@@ -170,7 +169,7 @@ public class Samples {
 						"alice@example.com",
 						"bob@example.net",
 						"carol@example.org"
-					}, ValidationQuality.High, WaitForCompletionOptions.DontWait
+					}, "High", WaitForCompletionOptions.DontWait
 				);
 				// If request not completed, wait and display progress.
 				// when there are polling events happening
@@ -227,7 +226,7 @@ public class Samples {
 						"alice@example.com",
 						"bob@example.net",
 						"carol@example.org"
-					}, ValidationQuality.Standard, ValidationDeDuplication.Relaxed, 255, WaitForCompletionOptions.DontWait
+					}, "Standard", ValidationDeDuplication.Relaxed, 255, WaitForCompletionOptions.DontWait
 				);
 
 				// Loop until request processing is completed or execution thread is interrupted
