@@ -123,8 +123,6 @@ public class Samples {
 			restClient = new VerifaliaRestClient(new BearerAuthentication(accountSid, authToken));
 		} catch(URISyntaxException e){
 			System.out.println("URISyntaxException:: " + e.getMessage());
-		} catch(IOException e){
-			System.out.println("IOException:: " + e.getMessage());
 		}
 
 		/**
@@ -293,8 +291,6 @@ public class Samples {
 			restClient = new VerifaliaRestClient(new BearerAuthentication(accountSid, authToken));
 		} catch(URISyntaxException e){
 			System.out.println("URISyntaxException:: " + e.getMessage());
-		} catch(IOException e){
-			System.out.println("IOException:: " + e.getMessage());
 		}
 
 		try {
@@ -524,8 +520,6 @@ public class Samples {
 			restClient = new VerifaliaRestClient(new BearerAuthentication(accountSid, authToken));
 		} catch(URISyntaxException e){
 			System.out.println("URISyntaxException:: " + e.getMessage());
-		} catch(IOException e){
-			System.out.println("IOException:: " + e.getMessage());
 		}
 
 		try {
@@ -575,8 +569,6 @@ public class Samples {
 			restClient = new VerifaliaRestClient(new BearerAuthentication(accountSid, authToken));
 		} catch(URISyntaxException e){
 			System.out.println("URISyntaxException:: " + e.getMessage());
-		} catch(IOException e){
-			System.out.println("IOException:: " + e.getMessage());
 		}
 
 		try {
@@ -754,8 +746,6 @@ public class Samples {
 			restClient = new VerifaliaRestClient(new BearerAuthentication(accountSid, authToken));
 		} catch(URISyntaxException e){
 			System.out.println("URISyntaxException:: " + e.getMessage());
-		} catch(IOException e){
-			System.out.println("IOException:: " + e.getMessage());
 		}
 
 		try {
@@ -801,8 +791,6 @@ public class Samples {
 			restClient = new VerifaliaRestClient(new BearerAuthentication(accountSid, authToken));
 		} catch(URISyntaxException e){
 			System.out.println("URISyntaxException:: " + e.getMessage());
-		} catch(IOException e){
-			System.out.println("IOException:: " + e.getMessage());
 		}
 
 		try {
@@ -850,8 +838,6 @@ public class Samples {
 			restClient = new VerifaliaRestClient(new BearerAuthentication(accountSid, authToken));
 		} catch(URISyntaxException e){
 			System.out.println("URISyntaxException:: " + e.getMessage());
-		} catch(IOException e){
-			System.out.println("IOException:: " + e.getMessage());
 		}
 
 		try {

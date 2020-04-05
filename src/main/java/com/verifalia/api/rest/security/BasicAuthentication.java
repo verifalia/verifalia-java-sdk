@@ -10,6 +10,17 @@ import lombok.Setter;
 @Getter
 @Setter
 public class BasicAuthentication {
+
+	/**
+	 * Account ID
+	 */
+	private String accountSid;
+
+	/**
+	 * Account token
+	 */
+	private String authToken;
+
 	/**
 	 * Authentication string
 	 */
@@ -22,7 +33,20 @@ public class BasicAuthentication {
 	 * @throws IllegalArgumentException
 	 */
 	public BasicAuthentication(String accountSid, String authToken) {
-		this.authString = getAuthString(accountSid, authToken);
+		this.accountSid = accountSid;
+		this.authToken = authToken;
+		this.authString = StringUtils.EMPTY;
+	}
+
+	/**
+	 * Gets authentication string for basic authentication
+	 * @return String Basic authentication string
+	 */
+	public String getAuthString(){
+		if(StringUtils.isBlank(this.authString)){
+			this.authString = getAuthString(accountSid, authToken);
+		}
+		return this.authString;
 	}
 
 	private String getAuthString(String accountSid, String authToken) throws IllegalArgumentException {

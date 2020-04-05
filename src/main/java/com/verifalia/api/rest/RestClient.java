@@ -18,7 +18,6 @@ import org.apache.http.client.entity.GzipDecompressingEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
@@ -55,14 +54,24 @@ public class RestClient {
 	private String userAgent;
 
 	/**
-	 * Authentication string
+	 * Authentication type
 	 */
-	private String authString;
+	private String authType;
 
 	/**
-	 * SSL Connection socket factory
+	 * Basic Authentication
 	 */
-	private SSLConnectionSocketFactory sslConnectionSocketFactory;
+	private BasicAuthentication basicAuth;
+
+	/**
+	 * Bearer Authentication
+	 */
+	private BearerAuthentication bearerAuth;
+
+	/**
+	 * TLS Authentication
+	 */
+	private TLSAuthentication tlsAuth;
 
 	/**
 	 * Creates new object using given host name, API version, authentication details and user agent.
@@ -77,7 +86,8 @@ public class RestClient {
 		this.baseURI = new URI(baseURL);
 		this.apiVersion = apiVersion;
 		this.userAgent = userAgent;
-		this.authString = new BasicAuthentication(accountSid, authToken).getAuthString();
+		this.authType = Constants.AUTHENTICATION_BASIC;
+		this.basicAuth = new BasicAuthentication(accountSid, authToken);
 	}
 
 	/**
@@ -89,11 +99,11 @@ public class RestClient {
 	 * @throws URISyntaxException
 	 */
 	public RestClient(String baseURL, String apiVersion, BearerAuthentication bearerAuth, String userAgent) throws URISyntaxException {
-		// TODO - Apply input validation
 		this.baseURI = new URI(baseURL);
 		this.apiVersion = apiVersion;
 		this.userAgent = userAgent;
-		this.authString = bearerAuth.getAuthString();
+		this.authType = Constants.AUTHENTICATION_BEARER;
+		this.bearerAuth = bearerAuth;
 	}
 
 	/**
@@ -105,8 +115,8 @@ public class RestClient {
 	public RestClient(String accountSid, String authToken) throws URISyntaxException {
 		this.baseURI = new URI(Constants.DEFAULT_BASE_URL);
 		this.apiVersion = Constants.DEFAULT_API_VERSION;
-		this.userAgent = Constants.USER_AGENT;
-		this.authString = new BasicAuthentication(accountSid, authToken).getAuthString();
+		this.authType = Constants.AUTHENTICATION_BASIC;
+		this.basicAuth = new BasicAuthentication(accountSid, authToken);
 	}
 
 	/**
@@ -118,19 +128,21 @@ public class RestClient {
 		this.baseURI = new URI(Constants.DEFAULT_BASE_URL);
 		this.apiVersion = Constants.DEFAULT_API_VERSION;
 		this.userAgent = Constants.USER_AGENT;
-		this.authString = bearerAuth.getAuthString();
+		this.authType = Constants.AUTHENTICATION_BEARER;
+		this.bearerAuth = bearerAuth;
 	}
 
 	/**
 	 * Creates new object using given TLS authentication details.
 	 * @param tlsAuthentication TLS authentication object for implementing two way SSL authentication
-	 * @throws Exception
+	 * @throws URISyntaxException
 	 */
-	public RestClient(TLSAuthentication tlsAuthentication) throws Exception {
+	public RestClient(TLSAuthentication tlsAuthentication) throws URISyntaxException {
 		this.baseURI = new URI(Constants.DEFAULT_TLS_BASE_URL);
 		this.apiVersion = Constants.DEFAULT_API_VERSION;
 		this.userAgent = Constants.USER_AGENT;
-		this.sslConnectionSocketFactory = tlsAuthentication.getSslConnectionSocketFactory();
+		this.authType = Constants.AUTHENTICATION_TLS;
+		this.tlsAuth = tlsAuthentication;
 	}
 
 	/**
@@ -144,7 +156,8 @@ public class RestClient {
 		this.baseURI = new URI(Constants.DEFAULT_BASE_URL);
 		this.apiVersion = apiVersion;
 		this.userAgent = Constants.USER_AGENT;
-		this.authString = new BasicAuthentication(accountSid, authToken).getAuthString();
+		this.authType = Constants.AUTHENTICATION_BASIC;
+		this.basicAuth = new BasicAuthentication(accountSid, authToken);
 	}
 
 	/**
@@ -157,7 +170,8 @@ public class RestClient {
 		this.baseURI = new URI(Constants.DEFAULT_BASE_URL);
 		this.apiVersion = apiVersion;
 		this.userAgent = Constants.USER_AGENT;
-		this.authString = bearerAuth.getAuthString();
+		this.authType = Constants.AUTHENTICATION_BEARER;
+		this.bearerAuth = bearerAuth;
 	}
 
 	/**
@@ -170,7 +184,8 @@ public class RestClient {
 		this.baseURI = new URI(Constants.DEFAULT_TLS_BASE_URL);
 		this.apiVersion = apiVersion;
 		this.userAgent = Constants.USER_AGENT;
-		this.sslConnectionSocketFactory = tlsAuthentication.getSslConnectionSocketFactory();
+		this.authType = Constants.AUTHENTICATION_TLS;
+		this.tlsAuth = tlsAuthentication;
 	}
 
 	/**
@@ -230,10 +245,10 @@ public class RestClient {
 		HttpRequestMethod method = request.getMethod();
 		CloseableHttpClient client = null;
 
-		if(!StringUtils.isEmpty(this.authString)){ // If authentication is basic or bearer
+		if(isAuthBasicOrBearer()){ // If authentication is basic or bearer
 			client = HttpClients.createDefault();
-		} else if(nonNull(this.sslConnectionSocketFactory)){ // If authentication is TLS
-			client = HttpClients.custom().setSSLSocketFactory(this.sslConnectionSocketFactory).build();
+		} else if(StringUtils.equalsIgnoreCase(this.authType, Constants.AUTHENTICATION_TLS)){ // If authentication is TLS
+			client = HttpClients.custom().setSSLSocketFactory(this.tlsAuth.getSSlConnectionSocketFactory()).build();
 		} else {
 			throw new IOException("Invalid authentication details shared");
 		}
@@ -245,8 +260,8 @@ public class RestClient {
 				HttpPost httpPost = new HttpPost(uri);
 			    httpPost.setEntity(entity);
 			    httpPost.setHeader(HttpHeaders.USER_AGENT, this.userAgent);
-			    if(!StringUtils.isEmpty(this.authString)){ // If authentication is basic or bearer
-			    	httpPost.setHeader(HttpHeaders.AUTHORIZATION, this.authString);
+			    if(isAuthBasicOrBearer()){ // If authentication is basic or bearer
+			    	httpPost.setHeader(HttpHeaders.AUTHORIZATION, getAuthString());
 			    }
 			    httpPost.setHeader(HttpHeaders.CONTENT_TYPE, Constants.REQUEST_CONTENT_TYPE);
 		    	httpPost.setHeader(HttpHeaders.ACCEPT, Constants.RESPONSE_ACCEPT_TYPE);
@@ -257,9 +272,9 @@ public class RestClient {
 			case GET: {
 				HttpGet httpGet = new HttpGet(uri);
 				httpGet.setHeader(HttpHeaders.USER_AGENT, userAgent);
-				if(!StringUtils.isEmpty(this.authString)){ // If authentication is basic or bearer
-					httpGet.setHeader(HttpHeaders.AUTHORIZATION, this.authString);
-				}
+				if(isAuthBasicOrBearer()){ // If authentication is basic or bearer
+					httpGet.setHeader(HttpHeaders.AUTHORIZATION, getAuthString());
+			    }
 				httpGet.setHeader(HttpHeaders.CONTENT_TYPE, Constants.REQUEST_CONTENT_TYPE);
 			    httpGet.setHeader(HttpHeaders.ACCEPT, Constants.RESPONSE_ACCEPT_TYPE);
 			    response = client.execute(httpGet);
@@ -269,5 +284,26 @@ public class RestClient {
 			default: break;
 		}
 		return response;
+	}
+
+	private boolean isAuthBasicOrBearer(){
+		if(StringUtils.equalsIgnoreCase(this.authType, Constants.AUTHENTICATION_BASIC) ||
+				StringUtils.equalsIgnoreCase(this.authType, Constants.AUTHENTICATION_BEARER)){
+			return true;
+		}
+		return false;
+	}
+
+	private String getAuthString() throws IOException{
+		if(isAuthBasicOrBearer()){
+			if(StringUtils.equalsIgnoreCase(this.authType, Constants.AUTHENTICATION_BASIC)){
+				return this.basicAuth.getAuthString();
+			} else if(StringUtils.equalsIgnoreCase(this.authType, Constants.AUTHENTICATION_BEARER)){
+				return this.bearerAuth.getAuthString();
+			} else {
+				return StringUtils.EMPTY;
+			}
+		}
+		return StringUtils.EMPTY;
 	}
 }

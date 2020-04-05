@@ -130,4 +130,7 @@ public class Constants {
 	public static final String TLS_AUTHENTICATION_JKS = "jks";
 	public static final String TLS_AUTHENTICATION_VERSION_1_1 = "TLSv1.1";
 	public static final String TLS_AUTHENTICATION_VERSION_1_2 = "TLSv1.2";
+	public static final String AUTHENTICATION_BASIC = "BASIC";
+	public static final String AUTHENTICATION_BEARER = "BEARER";
+	public static final String AUTHENTICATION_TLS = "TLS";
 }

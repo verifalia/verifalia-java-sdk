@@ -130,9 +130,9 @@ public class VerifaliaRestClient {
          * <p>Your account SID and authentication token values can be retrieved in your client area,
          * upon clicking on your subscription details, on Verifalia web site at: <a href="https://verifalia.com/client-area/subscriptions">https://verifalia.com/client-area/subscriptions</a>
 	 * @param tlsAuthentication TLS authentication object which needs certificate related details
-	 * @throws Exception
+	 * @throws URISyntaxException
 	 */
-	public VerifaliaRestClient(TLSAuthentication tlsAuthentication) throws Exception {
+	public VerifaliaRestClient(TLSAuthentication tlsAuthentication) throws URISyntaxException {
 		restClient = new RestClient(tlsAuthentication);
 	}
 

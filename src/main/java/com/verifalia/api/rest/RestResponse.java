@@ -39,6 +39,9 @@ public class RestResponse {
 
 	/**
 	 * Creates new object
+	 * @param statusCode Status code
+	 * @param result Result string
+	 * @param responseDataClass Class in which the response data needs to be mapped
 	 * @throws IOException
 	 * @throws JsonMappingException
 	 * @throws JsonParseException
@@ -61,5 +64,15 @@ public class RestResponse {
 				}
 			}
 		}
+	}
+
+	/**
+	 * Creates new object
+	 * @param statusCode Status code
+	 * @param errorMessage Error message
+	 */
+	public RestResponse(int statusCode, String errorMessage){
+		this.statusCode = statusCode;
+		this.errorMessage = errorMessage;
 	}
 }

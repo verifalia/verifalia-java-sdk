@@ -1,7 +1,10 @@
 package com.verifalia.api.rest.security;
 
+import static java.util.Objects.nonNull;
+
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.net.Socket;
 import java.security.KeyStore;
 import java.util.Map;
@@ -23,6 +26,26 @@ import lombok.Setter;
 public class TLSAuthentication {
 
 	/**
+	 * Certificate alias
+	 */
+	private String certAlias;
+
+	/**
+	 * Certificate password
+	 */
+	private String certPassword;
+
+	/**
+	 * Identity store JKS file
+	 */
+	private File identityStoreJksFile;
+
+	/**
+	 * Trust key store JKS file
+	 */
+	private File trustKeyStoreJksFile;
+
+	/**
 	 * SSL Connection socket factory
 	 */
 	private SSLConnectionSocketFactory sslConnectionSocketFactory;
@@ -35,10 +58,29 @@ public class TLSAuthentication {
 	 * @param trustKeyStoreJksFile Trust key-store JKS file
 	 * @throws Exception
 	 */
-	public TLSAuthentication(String certAlias, String certPassword, File identityStoreJksFile,
-			File trustKeyStoreJksFile) throws Exception {
-		this.sslConnectionSocketFactory = getSSlConnectionSocketFactory(certAlias, certPassword,
-				identityStoreJksFile, trustKeyStoreJksFile);
+	public TLSAuthentication(String certAlias, String certPassword, File identityStoreJksFile, File trustKeyStoreJksFile){
+		this.certAlias = certAlias;
+		this.certPassword = certPassword;
+		this.identityStoreJksFile = identityStoreJksFile;
+		this.trustKeyStoreJksFile = trustKeyStoreJksFile;
+	}
+
+	/**
+	 * Gets SSL connection socket factory object for TLS Authentication
+	 * @return SSLConnectionSocketFactory SSL connection socket factory
+	 * @throws Exception
+	 */
+	public SSLConnectionSocketFactory getSSlConnectionSocketFactory() throws IOException {
+		if(!nonNull(this.sslConnectionSocketFactory)){
+			try {
+				this.sslConnectionSocketFactory = getSSlConnectionSocketFactory(this.certAlias, this.certPassword,
+					this.identityStoreJksFile, this.trustKeyStoreJksFile);
+			} catch(Exception e){
+				e.printStackTrace();
+				throw new IOException(e.getMessage());
+			}
+		}
+		return this.sslConnectionSocketFactory;
 	}
 
 	private SSLConnectionSocketFactory getSSlConnectionSocketFactory(final String certAlias, final String certPassword,
