@@ -1,7 +1,5 @@
 package com.verifalia.api.credits.models;
 
-import java.util.Date;
-
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 
 import lombok.Getter;
@@ -20,7 +18,7 @@ public class CreditDailyUsageData {
 	 /**
      * The date for which credit balance data is given.
      */
-	private Date date;
+	private String date;
 
 	 /**
      * The number of credit packs (that is, the non-expiring credits).

@@ -127,7 +127,7 @@ public class Constants {
 	public static final String DATE_FORMAT = "yyyy-MM-dd";
 	public static final Integer VALIDATION_INPUT_PRIORITY_MIN_VALUE = 0;
 	public static final Integer VALIDATION_INPUT_PRIORITY_MAX_VALUE = 255;
-	public static final String TLS_AUTHENTICATION_JSK = "jks";
+	public static final String TLS_AUTHENTICATION_JKS = "jks";
 	public static final String TLS_AUTHENTICATION_VERSION_1_1 = "TLSv1.1";
 	public static final String TLS_AUTHENTICATION_VERSION_1_2 = "TLSv1.2";
 }

@@ -1,4 +1,4 @@
-package com.verifalia.api.emailvalidations.models.input;
+package com.verifalia.api.emailvalidations.models;
 
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 
@@ -17,7 +17,7 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class ValidationEntryInput {
+public class ValidationRequestEntry {
 
     /**
      * A string with the original input data submitted for validation.
@@ -29,7 +29,7 @@ public class ValidationEntryInput {
      */
     private String custom;
 
-    public ValidationEntryInput(String inputData){
+    public ValidationRequestEntry(String inputData){
     	this.inputData = inputData;
     }
 }

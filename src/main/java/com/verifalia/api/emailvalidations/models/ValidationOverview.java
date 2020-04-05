@@ -1,9 +1,6 @@
-package com.verifalia.api.emailvalidations.models.output;
+package com.verifalia.api.emailvalidations.models;
 
 import java.util.Date;
-
-import com.verifalia.api.emailvalidations.models.ValidationDeDuplication;
-import com.verifalia.api.emailvalidations.models.ValidationStatus;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -50,7 +47,7 @@ public class ValidationOverview {
     /**
      * Identifies the deduplication algorithm requested for the job; can be one of Off, Safe and Relaxed.
      */
-    private ValidationDeDuplication deduplication;
+    private DeduplicationMode deduplication;
 
     /**
      * The number of email addresses included in this job.

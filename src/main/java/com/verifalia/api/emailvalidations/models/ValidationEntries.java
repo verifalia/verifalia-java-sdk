@@ -1,4 +1,4 @@
-package com.verifalia.api.emailvalidations.models.output;
+package com.verifalia.api.emailvalidations.models;
 
 import java.util.List;
 

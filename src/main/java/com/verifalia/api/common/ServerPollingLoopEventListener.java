@@ -1,6 +1,6 @@
 package com.verifalia.api.common;
 
-import com.verifalia.api.emailvalidations.models.output.Validation;
+import com.verifalia.api.emailvalidations.models.Validation;
 
 /**
  * Listener object for the server polling loop

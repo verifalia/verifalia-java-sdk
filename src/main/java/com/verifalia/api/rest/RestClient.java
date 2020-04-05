@@ -204,7 +204,6 @@ public class RestClient {
 			    		for (int i = 0; i < contentHeaderElements.length; i++) {
 			    			if (StringUtils.equalsIgnoreCase(contentHeaderElements[i].getName(),
 					        		Constants.RESPONSE_ACCEPT_TYPE_ENCODING)) {
-			    				System.out.println("Gzip as response");
 			    				entity = new GzipDecompressingEntity(entity);
 			    			}
 			    		}

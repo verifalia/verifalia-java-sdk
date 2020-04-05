@@ -14,15 +14,15 @@ import com.verifalia.api.common.ServerPollingLoopEventListener;
 import com.verifalia.api.credits.models.CreditBalanceData;
 import com.verifalia.api.credits.models.CreditDailyUsageData;
 import com.verifalia.api.credits.models.CreditDailyUsageFilter;
-import com.verifalia.api.emailvalidations.models.ValidationDeDuplication;
+import com.verifalia.api.emailvalidations.models.DeduplicationMode;
+import com.verifalia.api.emailvalidations.models.Validation;
 import com.verifalia.api.emailvalidations.models.ValidationEntriesFilter;
+import com.verifalia.api.emailvalidations.models.ValidationEntry;
 import com.verifalia.api.emailvalidations.models.ValidationEntryStatus;
-import com.verifalia.api.emailvalidations.models.ValidationJobsFilter;
-import com.verifalia.api.emailvalidations.models.ValidationJobsSort;
+import com.verifalia.api.emailvalidations.models.ValidationsFilter;
+import com.verifalia.api.emailvalidations.models.ValidationsSort;
+import com.verifalia.api.emailvalidations.models.ValidationOverview;
 import com.verifalia.api.emailvalidations.models.ValidationStatus;
-import com.verifalia.api.emailvalidations.models.output.Validation;
-import com.verifalia.api.emailvalidations.models.output.ValidationEntry;
-import com.verifalia.api.emailvalidations.models.output.ValidationOverview;
 import com.verifalia.api.exceptions.VerifaliaException;
 import com.verifalia.api.rest.security.BearerAuthentication;
 
@@ -226,7 +226,7 @@ public class Samples {
 						"alice@example.com",
 						"bob@example.net",
 						"carol@example.org"
-					}, "Standard", ValidationDeDuplication.Relaxed, 255, WaitForCompletionOptions.DontWait
+					}, "Standard", DeduplicationMode.Relaxed, 255, WaitForCompletionOptions.DontWait
 				);
 
 				// Loop until request processing is completed or execution thread is interrupted
@@ -602,7 +602,7 @@ public class Samples {
 				// Submit request for listing job with filter filter createdOn and sort -createdOn
 				System.out.println("------------------------------------------------------");
 				List<ValidationOverview> jobsResult3 = restClient.getEmailValidations().listJobs(LocalDate.parse("2020-03-24"),
-						ValidationJobsSort.CreatedOnDesc);
+						ValidationsSort.CreatedOnDesc);
 				if(nonNull(jobsResult3) && jobsResult3.size() > 0){
 					System.out.println("Jobs results with filter createdOn and sort -createdOn: " + jobsResult3.size());
 					for (ValidationOverview validationOverview: jobsResult3){
@@ -630,7 +630,7 @@ public class Samples {
 						new ValidationStatus[] {
 								ValidationStatus.Completed,
 								ValidationStatus.InProgress
-				}, ValidationJobsSort.CreatedOnAsc);
+				}, ValidationsSort.CreatedOnAsc);
 				if(nonNull(jobsResult4) && jobsResult4.size() > 0){
 					System.out.println("Jobs results with filter createdOn, status and sort createdOn: " + jobsResult4.size());
 					for (ValidationOverview validationOverview: jobsResult4){
@@ -654,13 +654,13 @@ public class Samples {
 			if(nonNull(restClient)){
 				// Submit request for listing job with object
 				System.out.println("------------------------------------------------------");
-				ValidationJobsFilter validationJobsFilter = new ValidationJobsFilter();
+				ValidationsFilter validationJobsFilter = new ValidationsFilter();
 				validationJobsFilter.setCreatedOnSince(LocalDate.parse("2020-03-24"));
 				validationJobsFilter.setCreatedOnUntil(LocalDate.parse("2020-03-25"));
 				validationJobsFilter.setExcludeStatuses(Arrays.asList(new ValidationStatus[] {
 						ValidationStatus.Expired
 				}));
-				validationJobsFilter.setSort(ValidationJobsSort.CreatedOnDesc);
+				validationJobsFilter.setSort(ValidationsSort.CreatedOnDesc);
 				List<ValidationOverview> jobsResult5 = restClient.getEmailValidations().listJobs(validationJobsFilter);
 				if(nonNull(jobsResult5) && jobsResult5.size() > 0){
 					System.out.println("Jobs results with object: " + jobsResult5.size());

@@ -122,7 +122,6 @@ public class CreditsRestClient {
 	    	if(nonNull(requestUri) && !StringUtils.isBlank(requestUri.toString())){
 	    		dailyUsageResource.append(requestUri.toString());
 	    	}
-	    	System.out.println("Daily usage URI: " + dailyUsageResource.toString());
 
 	    	// Make request object for the rest call
 	    	RestRequest request = new RestRequest(HttpRequestMethod.GET, dailyUsageResource.toString());

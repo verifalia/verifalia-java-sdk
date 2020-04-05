@@ -1,4 +1,4 @@
-package com.verifalia.api.emailvalidations.models.output;
+package com.verifalia.api.emailvalidations.models;
 
 import java.util.List;
 
@@ -14,7 +14,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class ValidationJobs {
+public class Validations {
 
 	/**
      * Meta information for the jobs

@@ -44,12 +44,12 @@ public class TLSAuthentication {
 	private SSLConnectionSocketFactory getSSlConnectionSocketFactory(final String certAlias, final String certPassword,
 			File identityStoreJksFile, File trustKeyStoreJksFile) throws Exception {
 		// Load identity key store
-		KeyStore identityKeyStore = KeyStore.getInstance(Constants.TLS_AUTHENTICATION_JSK);
+		KeyStore identityKeyStore = KeyStore.getInstance(Constants.TLS_AUTHENTICATION_JKS);
 		FileInputStream identityKeyStoreFile = new FileInputStream(identityStoreJksFile);
 		identityKeyStore.load(identityKeyStoreFile, certPassword.toCharArray());
 
 		// Load trust key store
-		KeyStore trustKeyStore = KeyStore.getInstance(Constants.TLS_AUTHENTICATION_JSK);
+		KeyStore trustKeyStore = KeyStore.getInstance(Constants.TLS_AUTHENTICATION_JKS);
 		FileInputStream trustKeyStoreFile = new FileInputStream(trustKeyStoreJksFile);
 		trustKeyStore.load(trustKeyStoreFile, certPassword.toCharArray());
 

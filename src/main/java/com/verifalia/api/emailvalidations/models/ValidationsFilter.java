@@ -12,7 +12,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class ValidationJobsFilter {
+public class ValidationsFilter {
 
 	/**
 	 * A local date representing the required date, expressed according to ISO 8601 (yyyy-mm-dd).
@@ -47,5 +47,5 @@ public class ValidationJobsFilter {
 	/**
 	 * A object representing the required sorting to apply to the listing operation. Can be one of the following values: createdOn, -createdOn
 	 */
-	private ValidationJobsSort sort;
+	private ValidationsSort sort;
 }
