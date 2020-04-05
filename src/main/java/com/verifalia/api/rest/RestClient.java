@@ -204,7 +204,7 @@ public class RestClient {
 			    		for (int i = 0; i < contentHeaderElements.length; i++) {
 			    			if (StringUtils.equalsIgnoreCase(contentHeaderElements[i].getName(),
 					        		Constants.RESPONSE_ACCEPT_TYPE_ENCODING)) {
-			    				System.out.println("Given response is compressed as gzip");
+			    				System.out.println("Gzip as response");
 			    				entity = new GzipDecompressingEntity(entity);
 			    			}
 			    		}
@@ -232,17 +232,9 @@ public class RestClient {
 		CloseableHttpClient client = null;
 
 		if(!StringUtils.isEmpty(this.authString)){ // If authentication is basic or bearer
-			if(request.getIsCompressed()){
-				client = HttpClients.custom().disableContentCompression().build();
-			} else {
-				client = HttpClients.createDefault();
-			}
+			client = HttpClients.createDefault();
 		} else if(nonNull(this.sslConnectionSocketFactory)){ // If authentication is TLS
-			if(request.getIsCompressed()){
-				client = HttpClients.custom().setSSLSocketFactory(this.sslConnectionSocketFactory).disableContentCompression().build();
-			} else {
-				client = HttpClients.custom().setSSLSocketFactory(this.sslConnectionSocketFactory).build();
-			}
+			client = HttpClients.custom().setSSLSocketFactory(this.sslConnectionSocketFactory).build();
 		} else {
 			throw new IOException("Invalid authentication details shared");
 		}
@@ -258,11 +250,7 @@ public class RestClient {
 			    	httpPost.setHeader(HttpHeaders.AUTHORIZATION, this.authString);
 			    }
 			    httpPost.setHeader(HttpHeaders.CONTENT_TYPE, Constants.REQUEST_CONTENT_TYPE);
-			    if(request.getIsCompressed()){
-			    	httpPost.setHeader(HttpHeaders.ACCEPT_ENCODING, Constants.RESPONSE_ACCEPT_TYPE_ENCODING);
-			    } else {
-			    	httpPost.setHeader(HttpHeaders.ACCEPT, Constants.RESPONSE_ACCEPT_TYPE);
-			    }
+		    	httpPost.setHeader(HttpHeaders.ACCEPT, Constants.RESPONSE_ACCEPT_TYPE);
 			    response = client.execute(httpPost);
 				break;
 			}
@@ -274,11 +262,7 @@ public class RestClient {
 					httpGet.setHeader(HttpHeaders.AUTHORIZATION, this.authString);
 				}
 				httpGet.setHeader(HttpHeaders.CONTENT_TYPE, Constants.REQUEST_CONTENT_TYPE);
-				if(request.getIsCompressed()){
-					httpGet.setHeader(HttpHeaders.ACCEPT_ENCODING, Constants.RESPONSE_ACCEPT_TYPE_ENCODING);
-			    } else {
-			    	httpGet.setHeader(HttpHeaders.ACCEPT, Constants.RESPONSE_ACCEPT_TYPE);
-			    }
+			    httpGet.setHeader(HttpHeaders.ACCEPT, Constants.RESPONSE_ACCEPT_TYPE);
 			    response = client.execute(httpGet);
 				break;
 			}

@@ -61,27 +61,6 @@ public class CreditsRestClient {
     }
 
     /**
-     * Gets Verifalia API current credit balance information.
-     * Makes a GET request to the <b>"/credits/balance"</b> resource.
-     * @param isCompressed Identifies if the response to be returned is compressed or not.
-     * @return CreditBalanceData representing the credit balance data.
-     * @throws IOException
-     */
-    public CreditBalanceData getBalance(boolean isCompressed) throws IOException {
-    	// Make rest request
-    	RestRequest request = new RestRequest(HttpRequestMethod.GET, Constants.CREDITS_BALANCE_RESOURCE,
-    			Boolean.valueOf(isCompressed));
-
-        // Sends the request to the Verifalia servers
-        RestResponse response = restClient.execute(request, CreditBalanceData.class);
-
-        if(response.getStatusCode() != HttpStatusCode.OK)
-        	throw new VerifaliaException(response);
-
-        return (CreditBalanceData)response.getData();
-    }
-
-    /**
      * Gets Verifalia API daily usage credit balance information.
      * Makes a GET request to the <b>"/credits/daily-usage"</b> resource.
      * @return List<CreditDailyUsageData> List of objects where each object representing the credit daily usage details for a date.
@@ -89,19 +68,7 @@ public class CreditsRestClient {
      */
     public List<CreditDailyUsageData> getDailyUsage() throws IOException {
     	CreditDailyUsageFilter creditDailyUsageFilter = null;
-    	return getDailyUsage(creditDailyUsageFilter, false);
-    }
-
-    /**
-     * Gets Verifalia API daily usage credit balance information.
-     * Makes a GET request to the <b>"/credits/daily-usage"</b> resource.
-     * @param isCompressed Identifies if the response to be returned is compressed or not.
-     * @return List<CreditDailyUsageData> List of objects where each object representing the credit daily usage details for a date.
-     * @throws IOException
-     */
-    public List<CreditDailyUsageData> getDailyUsage(boolean isCompressed) throws IOException {
-    	CreditDailyUsageFilter creditDailyUsageFilter = null;
-    	return getDailyUsage(creditDailyUsageFilter, isCompressed);
+    	return getDailyUsage(creditDailyUsageFilter);
     }
 
     /**
@@ -113,20 +80,7 @@ public class CreditsRestClient {
      */
     public List<CreditDailyUsageData> getDailyUsage(LocalDate date) throws IOException {
     	CreditDailyUsageFilter creditDailyUsageFilter = new CreditDailyUsageFilter(date);
-    	return getDailyUsage(creditDailyUsageFilter, false);
-    }
-
-    /**
-     * Gets Verifalia API daily usage credit balance information for a given date
-     * Makes a GET request to the <b>"/credits/daily-usage?date={DATE_YYYY-MM-DD}"</b> resource.
-     * @param date Local date for which usage details needs to be fetched. If null or blank value is passed, it will not consider the param when making request.
-     * @param isCompressed Identifies if the response to be returned is compressed or not.
-     * @return List<CreditDailyUsageData> List of objects where each object representing the credit daily usage details for a date.
-     * @throws IOException
-     */
-    public List<CreditDailyUsageData> getDailyUsage(LocalDate date, boolean isCompressed) throws IOException {
-    	CreditDailyUsageFilter creditDailyUsageFilter = new CreditDailyUsageFilter(date);
-    	return getDailyUsage(creditDailyUsageFilter, isCompressed);
+    	return getDailyUsage(creditDailyUsageFilter);
     }
 
     /**
@@ -139,21 +93,7 @@ public class CreditsRestClient {
      */
     public List<CreditDailyUsageData> getDailyUsage(LocalDate dateSince, LocalDate dateUntil) throws IOException {
     	CreditDailyUsageFilter creditDailyUsageFilter = new CreditDailyUsageFilter(dateSince, dateUntil);
-    	return getDailyUsage(creditDailyUsageFilter, false);
-    }
-
-    /**
-     * Gets Verifalia API daily usage credit balance information for a given date range
-     * Makes a GET request to the <b>"/credits/daily-usage?date:since={DATE_YYYY-MM-DD}&date:until={DATE_YYYY-MM-DD}"</b> resource.
-     * @param dateSince Local date from which usage details needs to be fetched. If null or blank value is passed, it will not consider the param when making request.
-     * @param dateUntil Local date till which usage details needs to be fetched. If null or blank value is passed, it will not consider the param when making request.
-     * @param isCompressed Identifies if the response to be returned is compressed or not.
-     * @return List<CreditDailyUsageData> List of objects where each object representing the credit daily usage details for a date.
-     * @throws IOException
-     */
-    public List<CreditDailyUsageData> getDailyUsage(LocalDate dateSince, LocalDate dateUntil, boolean isCompressed) throws IOException {
-    	CreditDailyUsageFilter creditDailyUsageFilter = new CreditDailyUsageFilter(dateSince, dateUntil);
-    	return getDailyUsage(creditDailyUsageFilter, isCompressed);
+    	return getDailyUsage(creditDailyUsageFilter);
     }
 
     /**
@@ -164,18 +104,6 @@ public class CreditsRestClient {
      * @throws IOException
      */
     public List<CreditDailyUsageData> getDailyUsage(CreditDailyUsageFilter creditDailyUsageFilter) throws IOException {
-    	return getDailyUsage(creditDailyUsageFilter, false);
-    }
-    /**
-     * Gets Verifalia API daily usage credit balance information for given options defined in the filter object
-     * Makes a GET request to the <b>"/credits/daily-usage"</b> resource with the set of filters defined in the input object.
-     * @param creditDailyUsageFilter Object representing the daily usage filter options possible for the API.
-     * @param isCompressed Identifies if the response to be returned is compressed or not.
-     * @return List<CreditDailyUsageData> List of objects where each object representing the credit daily usage details for a date.
-     * @throws IOException
-     */
-    public List<CreditDailyUsageData> getDailyUsage(CreditDailyUsageFilter creditDailyUsageFilter,
-    		boolean isCompressed) throws IOException {
     	// Assign with default values to handle pagination
     	String cursor = StringUtils.EMPTY;
     	Boolean isTruncated = Boolean.TRUE;
@@ -197,8 +125,7 @@ public class CreditsRestClient {
 	    	System.out.println("Daily usage URI: " + dailyUsageResource.toString());
 
 	    	// Make request object for the rest call
-	    	RestRequest request = new RestRequest(HttpRequestMethod.GET, dailyUsageResource.toString(),
-	    			Boolean.valueOf(isCompressed));
+	    	RestRequest request = new RestRequest(HttpRequestMethod.GET, dailyUsageResource.toString());
 
 	        // Sends the request to the Verifalia servers
 	        RestResponse response = restClient.execute(request, CreditDailyUsage.class);
