@@ -85,7 +85,7 @@ public class Samples {
 					System.err.println("Request timeout expired");
 				else {
 					// Display results
-					for (ValidationEntry entryData: result.getEntries().getData()) {
+					for (ValidationEntry entryData: result.getEntries()) {
 						System.out.printf("Address: %s => Result: %s\n",
 								entryData.getInputData(),
 								entryData.getStatus()
@@ -188,7 +188,7 @@ public class Samples {
 					System.err.println("Request timeout expired");
 				else {
 					// Display results
-					for (ValidationEntry entryData: result.getEntries().getData()){
+					for (ValidationEntry entryData: result.getEntries()){
 						System.out.printf("Address: %s => Result: %s\n",
 								entryData.getInputData(),
 								entryData.getStatus()
@@ -254,7 +254,7 @@ public class Samples {
 					System.err.println("Request still pending.");
 				else {
 					// Display results
-					for (ValidationEntry entryData: result.getEntries().getData()){
+					for (ValidationEntry entryData: result.getEntries()){
 						System.out.printf("Address: %s => Result: %s\n",
 								entryData.getInputData(),
 								entryData.getStatus()

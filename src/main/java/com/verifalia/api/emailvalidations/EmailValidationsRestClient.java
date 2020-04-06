@@ -26,6 +26,7 @@ import com.verifalia.api.emailvalidations.models.ValidationEntries;
 import com.verifalia.api.emailvalidations.models.ValidationEntriesFilter;
 import com.verifalia.api.emailvalidations.models.ValidationEntry;
 import com.verifalia.api.emailvalidations.models.ValidationEntryStatus;
+import com.verifalia.api.emailvalidations.models.ValidationMapper;
 import com.verifalia.api.emailvalidations.models.ValidationOverview;
 import com.verifalia.api.emailvalidations.models.ValidationRequest;
 import com.verifalia.api.emailvalidations.models.ValidationRequestEntry;
@@ -366,29 +367,30 @@ public class EmailValidationsRestClient {
 	        RestRequest request = new RestRequest(HttpRequestMethod.POST, Constants.EMAIL_VALIDATIONS_RESOURCE, requestData);
 
 	        // Send the request to the Verifalia servers
-	        RestResponse response = restClient.execute(request, Validation.class);
-	        Validation data = (Validation)response.getData();
+	        RestResponse response = restClient.execute(request, ValidationMapper.class);
+	        ValidationMapper data = (ValidationMapper)response.getData();
+	        Validation validation = mapValidationMapperToValidation(data);
 
 	        // Handle response based on status code
 	        switch (response.getStatusCode()) {
 	            case HttpStatusCode.OK: {
 	                // The batch has been completed in real time
-	                data.getOverview().setStatus(ValidationStatus.Completed);
-	                return data;
+	            	validation.getOverview().setStatus(ValidationStatus.Completed);
+	                return validation;
 	            }
 	            case HttpStatusCode.ACCEPTED: {
 	                // The batch has been accepted but is not yet completed
 	                if (waitForCompletionOptions == WaitForCompletionOptions.DontWait) {
-	                	data.getOverview().setStatus(ValidationStatus.InProgress);
-	                    return data;
+	                	validation.getOverview().setStatus(ValidationStatus.InProgress);
+	                    return validation;
 	                } else {
 		                // Poll the service until completion
-		                return query(data.getOverview().getId(), waitForCompletionOptions);
+		                return query(validation.getOverview().getId(), waitForCompletionOptions);
 	                }
 	            }
 	            case HttpStatusCode.GONE: {
-                	data.getOverview().setStatus(ValidationStatus.Deleted);
-                    return data;
+	            	validation.getOverview().setStatus(ValidationStatus.Deleted);
+                    return validation;
 	            }
 	            default: {
 	                // An unhandled exception happened at the Verifalia side
@@ -622,22 +624,23 @@ public class EmailValidationsRestClient {
 	        RestRequest request = new RestRequest(HttpRequestMethod.GET, Constants.EMAIL_VALIDATIONS_RESOURCE + "/" + id);
 
 	        // Sends the request to the Verifalia servers
-	        RestResponse response = restClient.execute(request, Validation.class);
-	        Validation data = (Validation) response.getData();
+	        RestResponse response = restClient.execute(request, ValidationMapper.class);
+	        ValidationMapper data = (ValidationMapper) response.getData();
+	        Validation validation = mapValidationMapperToValidation(data);
 
 	        // Handle response based on status code
 	        switch (response.getStatusCode()) {
 	            case HttpStatusCode.OK: {
-	            	data.getOverview().setStatus(ValidationStatus.Completed);
-	            	return data;
+	            	validation.getOverview().setStatus(ValidationStatus.Completed);
+	            	return validation;
 	            }
 	            case HttpStatusCode.ACCEPTED: {
-	                data.getOverview().setStatus(ValidationStatus.InProgress);
-	                return data;
+	            	validation.getOverview().setStatus(ValidationStatus.InProgress);
+	                return validation;
 	            }
 	            case HttpStatusCode.GONE: {
-	            	data.getOverview().setStatus(ValidationStatus.Deleted);
-	                return data;
+	            	validation.getOverview().setStatus(ValidationStatus.Deleted);
+	                return validation;
 	            }
 	            default: {
 	            	throw new VerifaliaException(response);
@@ -1063,5 +1066,19 @@ public class EmailValidationsRestClient {
     	} else {
     		throw new IllegalArgumentException("Job ID cannot be blank");
     	}
+    }
+
+    private Validation mapValidationMapperToValidation(ValidationMapper validationMapper){
+    	Validation validation = null;
+    	if(nonNull(validationMapper)){
+    		validation = new Validation();
+    		if(nonNull(validationMapper.getOverview())){
+    			validation.setOverview(validationMapper.getOverview());
+    		}
+    		if(nonNull(validationMapper.getEntries())){
+    			validation.setEntries(validationMapper.getEntries().getData());
+    		}
+    	}
+    	return validation;
     }
 }

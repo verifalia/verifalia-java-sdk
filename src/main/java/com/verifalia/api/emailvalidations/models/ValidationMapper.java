@@ -1,7 +1,5 @@
 package com.verifalia.api.emailvalidations.models;
 
-import java.util.List;
-
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -12,7 +10,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class Validation {
+public class ValidationMapper {
 
 	/**
      * The overview of the email validation batch.
@@ -20,7 +18,7 @@ public class Validation {
 	private ValidationOverview overview;
 
 	/**
-     * List of all the validation entry data object submitted with the request
+     * Validation entries submiited for the job
      */
-	private List<ValidationEntry> entries;
+	private ValidationEntries entries;
 }
