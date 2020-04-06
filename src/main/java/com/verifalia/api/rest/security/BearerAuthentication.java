@@ -122,7 +122,7 @@ public class BearerAuthentication {
 	    	if(nonNull(resultJson) && nonNull(resultJson.get("help"))){
 	    		errorMsg = resultJson.getString("help");
 	    	} else {
-	    		errorMsg = "Unknown error found when authenticating";
+	    		errorMsg = Constants.UNKNOWN_ERROR_MSG;
 	    	}
 	    	if(statusCode == HttpStatusCode.UNAUTHORIZED){
 				throw new AuthorizationException(new RestResponse(statusCode, errorMsg));

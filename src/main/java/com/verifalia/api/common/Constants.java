@@ -133,4 +133,5 @@ public class Constants {
 	public static final String AUTHENTICATION_BASIC = "BASIC";
 	public static final String AUTHENTICATION_BEARER = "BEARER";
 	public static final String AUTHENTICATION_TLS = "TLS";
+	public static final String UNKNOWN_ERROR_MSG = "Unknown error found while processing your request";
 }

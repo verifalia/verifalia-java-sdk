@@ -98,8 +98,8 @@ The example below shows how to validate a couple of email addresses using the Ve
 ```java
 import com.verifalia.api.VerifaliaRestClient;
 import com.verifalia.api.WaitForCompletionOptions;
-import com.verifalia.api.emailvalidations.models.output.Validation;
-import com.verifalia.api.emailvalidations.models.output.ValidationEntry;
+import com.verifalia.api.emailvalidations.models.Validation;
+import com.verifalia.api.emailvalidations.models.ValidationEntry;
 
 VerifaliaRestClient restClient = null;
 try {
@@ -140,8 +140,8 @@ Instead of relying on the automatic polling behavior, you may choose to poll Ver
 import com.verifalia.api.VerifaliaRestClient;
 import com.verifalia.api.WaitForCompletionOptions;
 import com.verifalia.api.emailvalidations.models.ValidationStatus;
-import com.verifalia.api.emailvalidations.models.output.Validation;
-import com.verifalia.api.emailvalidations.models.output.ValidationEntry;
+import com.verifalia.api.emailvalidations.models.Validation;
+import com.verifalia.api.emailvalidations.models.ValidationEntry;
 import com.verifalia.api.exceptions.VerifaliaException;
 
 VerifaliaRestClient restClient = null;
@@ -150,9 +150,7 @@ try {
 	restClient = new VerifaliaRestClient(new BearerAuthentication(accountSid, 	authToken));
 } catch(URISyntaxException e){
 	System.out.println("URISyntaxException:: " + e.getMessage());
-} catch(IOException e){
-	System.out.println("IOException:: " + e.getMessage());
-}
+} 
 
 // Submit email verification request with method that return status immediately
 Validation result = restClient.getEmailValidations().submit(new String[] { 
@@ -179,7 +177,7 @@ if (result.getOverview().getStatus() != ValidationStatus.Completed)
 	System.err.println("Request still pending.");
 else {
 	// Display results
-	for (ValidationEntry entryData: result.getEntries().getData()){
+	for (ValidationEntry entryData: result.getEntries()){
 		System.out.printf("Address: %s => Result: %s\n",
 			entryData.getInputData(),
 			entryData.getStatus()
@@ -198,8 +196,8 @@ import com.verifalia.api.VerifaliaRestClient;
 import com.verifalia.api.WaitForCompletionOptions;
 import com.verifalia.api.common.ServerPollingLoopEventListener;
 import com.verifalia.api.emailvalidations.models.ValidationStatus;
-import com.verifalia.api.emailvalidations.models.output.Validation;
-import com.verifalia.api.emailvalidations.models.output.ValidationEntry;
+import com.verifalia.api.emailvalidations.models.Validation;
+import com.verifalia.api.emailvalidations.models.ValidationEntry;
 
 // Create REST client object with your credentials
 VerifaliaRestClient restClient = new VerifaliaRestClient("YOUR-ACCOUNT-SID", "YOUR-AUTH-TOKEN");
@@ -266,7 +264,7 @@ if (result == null) // Result is null if timeout expires
 	System.err.println("Request timeout expired");
 else {
 	// Display results
-	for (ValidationEntry entryData: result.getEntries().getData()){
+	for (ValidationEntry entryData: result.getEntries()){
 		System.out.printf("Address: %s => Result: %s\n",
 			entryData.getInputData(),
 			entryData.getStatus()

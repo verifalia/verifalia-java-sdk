@@ -6,6 +6,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.JsonMappingException;
 
+import com.verifalia.api.common.Constants;
 import com.verifalia.api.common.Utils;
 import com.verifalia.api.exceptions.AuthorizationException;
 import com.verifalia.api.exceptions.InsufficientCreditException;
@@ -50,9 +51,15 @@ public class RestResponse {
 			throws JsonParseException, JsonMappingException, IOException {
 		this.statusCode = statusCode;
 		if(HttpStatusCode.isSuccess(statusCode)) {
-			data = Utils.convertJsonStringToObj(result, responseDataClass);
+			if(!StringUtils.isBlank(result)){
+				data = Utils.convertJsonStringToObj(result, responseDataClass);
+			}
 		} else {
-			this.errorMessage = result;
+			if(!StringUtils.isBlank(result)){
+				this.errorMessage = result;
+			} else {
+				this.errorMessage = Constants.UNKNOWN_ERROR_MSG;
+			}
 			// 410 status needs to be considered without throwing exception as if a job is deleted, the API returns this code
 			if(statusCode != HttpStatusCode.GONE){
 				if(statusCode == HttpStatusCode.UNAUTHORIZED){
