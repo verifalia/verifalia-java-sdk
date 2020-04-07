@@ -1,5 +1,7 @@
 package com.verifalia.api.rest;
 
+import java.net.URI;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,9 +13,14 @@ import lombok.Setter;
 public class RestRequest {
 
 	/**
+	 * Base URI
+	 */
+	private URI baseURI;
+
+	/**
 	 * HTTP request method
 	 */
-	HttpRequestMethod method;
+	private HttpRequestMethod method;
 
 	/**
 	 * Request target resource

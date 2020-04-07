@@ -54,4 +54,12 @@ public final class HttpStatusCode {
     	return statusCode >= 200 && statusCode <= 299;
     }
 
+    /**
+     * Returns flag whether a given status code needs retry.
+     * @param statusCode Status code be to checked
+     */
+    public static final boolean isRetryNeeded(int statusCode) {
+    	return statusCode >= 500 && statusCode <= 599;
+    }
+
 }

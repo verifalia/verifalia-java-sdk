@@ -1,6 +1,7 @@
 package com.verifalia.api.common;
 
 import static java.util.Objects.nonNull;
+import java.util.Random;
 
 import java.io.IOException;
 import java.net.URI;
@@ -159,5 +160,14 @@ public class Utils {
 			data = mapper.readValue(jsonStr, responseDataClass);
 		}
     	return data;
+    }
+
+    /**
+     * Generates random number in the range from 0 to the input passed in the request
+     * @param rangeTo Identifies to range for generating random number
+     * @return int Random between in the range from 0 to the input passed in the request
+     */
+    public static int getRandomNumberInRange(int rangeTo){
+    	return new Random().nextInt(rangeTo);
     }
 }

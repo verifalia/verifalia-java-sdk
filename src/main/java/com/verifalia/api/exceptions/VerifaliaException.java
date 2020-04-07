@@ -2,6 +2,7 @@ package com.verifalia.api.exceptions;
 
 import java.io.IOException;
 
+import com.verifalia.api.rest.HttpStatusCode;
 import com.verifalia.api.rest.RestResponse;
 
 /**
@@ -36,5 +37,13 @@ public class VerifaliaException extends IOException {
 	public VerifaliaException(RestResponse response) {
 		super(Integer.toString(response.getStatusCode()) + ": "+  response.getErrorMessage());
 		this.response = response;
+	}
+
+	/**
+	 * Creates new object with given message and server response
+	 * @param response Response form a Verifalia server
+	 */
+	public VerifaliaException(String errorMessage) {
+		super(Integer.toString(HttpStatusCode.SERVICE_UNAVAILABLE) + ": "+  errorMessage);
 	}
 }

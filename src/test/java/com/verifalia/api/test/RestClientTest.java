@@ -1,9 +1,9 @@
 package com.verifalia.api.test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import java.io.IOException;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.UUID;
 
@@ -13,11 +13,11 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import com.verifalia.api.emailvalidations.models.Validation;
+import com.verifalia.api.rest.HttpRequestMethod;
 import com.verifalia.api.rest.HttpStatusCode;
 import com.verifalia.api.rest.RestClient;
 import com.verifalia.api.rest.RestRequest;
-import com.verifalia.api.emailvalidations.models.Validation;
-import com.verifalia.api.rest.HttpRequestMethod;
 import com.verifalia.api.rest.RestResponse;
 import com.verifalia.api.test.utils.MiniHTTPD;
 import com.verifalia.api.test.utils.TestData;
@@ -71,15 +71,6 @@ public class RestClientTest {
 		assertNotNull(response);
 		assertEquals(HttpStatusCode.OK, response.getStatusCode());
 		assertNotNull(response.getData());
-	}
-
-
-	@Test
-	public void testGetSetBaseURI() {
-		restClient.setBaseURI(URI.create("https://verifalia.com:8888"));
-		URI uri = restClient.getBaseURI();
-		assertEquals("verifalia.com", uri.getHost());
-		assertEquals(8888, uri.getPort());
 	}
 
 	@Test

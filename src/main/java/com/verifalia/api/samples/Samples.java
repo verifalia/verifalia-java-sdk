@@ -743,7 +743,7 @@ public class Samples {
 		VerifaliaRestClient restClient = null;
 		try {
 			// Create REST client object with your credentials
-			restClient = new VerifaliaRestClient(new BearerAuthentication(accountSid, authToken));
+			restClient = new VerifaliaRestClient(accountSid, authToken);
 		} catch(URISyntaxException e){
 			System.out.println("URISyntaxException:: " + e.getMessage());
 		}

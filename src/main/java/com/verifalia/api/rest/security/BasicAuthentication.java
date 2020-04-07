@@ -2,6 +2,7 @@ package com.verifalia.api.rest.security;
 
 import java.io.UnsupportedEncodingException;
 
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
 
 import lombok.Getter;
@@ -53,8 +54,7 @@ public class BasicAuthentication {
 		String authString = StringUtils.EMPTY;
 		try {
 			byte[] authBytes = (accountSid + ':' + authToken).getBytes("UTF-8");
-			// Compatible with JDK 1.7
-			authString = "Basic " + javax.xml.bind.DatatypeConverter.printBase64Binary(authBytes);
+			authString = "Basic " + new String(Base64.encodeBase64(authBytes));
 		} catch(UnsupportedEncodingException ex) {
 			throw new IllegalArgumentException("Invalid format parameters passed");
 		}

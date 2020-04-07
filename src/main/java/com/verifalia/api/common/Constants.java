@@ -1,5 +1,7 @@
 package com.verifalia.api.common;
 
+import java.util.ArrayList;
+
 /**
  * Constants that will be used throughout the SDK
  */
@@ -7,39 +9,34 @@ public class Constants {
 	// API related constants that will be used making call to Verifalia
 
 	/**
+	 * Verifalia API base URL host list
+	 */
+	@SuppressWarnings("serial")
+	public static final ArrayList<String> DEFAULT_BASE_URL_LIST = new ArrayList<String>() {{
+		add("https://api-1.verifalia.com");
+		add("https://api-2.verifalia.com");
+		add("https://api-3.verifalia.com");
+	}};
+
+	/**
+	 * Verifalia API base URL host list
+	 */
+	@SuppressWarnings("serial")
+	public static final ArrayList<String> DEFAULT_TLS_BASE_URL_LIST = new ArrayList<String>() {{
+		add("https://api-cca-1.verifalia.com");
+		add("https://api-cca-2.verifalia.com");
+		add("https://api-cca-3.verifalia.com");
+	}};
+
+	/**
 	 * Verifalia client version
 	 */
 	public static final String CLIENT_VERSION = "2.1";
 
 	/**
-	 * Verifalia API base URL scheme
-	 */
-	public static final String DEFAULT_BASE_URL_SCHEME = "https:";
-
-	/**
-	 * Verifalia API base URL host
-	 */
-	public static final String DEFAULT_BASE_URL_HOST = "api.verifalia.com";
-
-	/**
-	 * Verifalia API TLS base URL host
-	 */
-	public static final String DEFAULT_TLS_BASE_URL_HOST = "api-cca.verifalia.com";
-
-	/**
 	 * Verifalia API version
 	 */
 	public static final String DEFAULT_API_VERSION = "v2.1";
-
-	/**
-	 * Verifalia API base URL
-	 */
-	public static final String DEFAULT_BASE_URL = DEFAULT_BASE_URL_SCHEME + "//" + DEFAULT_BASE_URL_HOST;
-
-	/**
-	 * Verifalia API TLS base URL
-	 */
-	public static final String DEFAULT_TLS_BASE_URL = DEFAULT_BASE_URL_SCHEME + "//" + DEFAULT_TLS_BASE_URL_HOST;
 
 	/**
 	 * Verifalia API user agent
@@ -113,7 +110,7 @@ public class Constants {
 	/**
 	 * Verifalia API endpoint to fetch authentication token
 	 */
-	public static final String AUTH_TOKEN_RESOURCE = "/auth/tokens";
+	public static final String AUTH_TOKEN_RESOURCE = "auth/tokens";
 
 	/**
 	 * Verifalia API parameter for cursor to handle pagination
