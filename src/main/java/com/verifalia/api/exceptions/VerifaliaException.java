@@ -41,7 +41,7 @@ public class VerifaliaException extends IOException {
 
 	/**
 	 * Creates new object with given message and server response
-	 * @param response Response form a Verifalia server
+	 * @param errorMessage Error message for HTTP request failure
 	 */
 	public VerifaliaException(String errorMessage) {
 		super(Integer.toString(HttpStatusCode.SERVICE_UNAVAILABLE) + ": "+  errorMessage);

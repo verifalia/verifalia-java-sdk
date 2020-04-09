@@ -123,7 +123,7 @@ public class Utils {
 
     /**
      * Converts string to local date based on the input format.
-     * @param localDateStr Date string which needs to be converted to local date.
+     * @param dateStr Date string which needs to be converted to local date.
      * @param dateFormat Date format in which the local date object needs to be formatted.
      * @return LocalDate Converted date string to local date as per the input format.
      */
