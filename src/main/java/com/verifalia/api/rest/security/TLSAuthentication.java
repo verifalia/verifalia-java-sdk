@@ -76,8 +76,7 @@ public class TLSAuthentication {
 				this.sslConnectionSocketFactory = getSSlConnectionSocketFactory(this.certAlias, this.certPassword,
 					this.identityStoreJksFile, this.trustKeyStoreJksFile);
 			} catch(Exception e){
-				e.printStackTrace();
-				throw new IOException(e.getMessage());
+				throw new IOException(e);
 			}
 		}
 		return this.sslConnectionSocketFactory;
