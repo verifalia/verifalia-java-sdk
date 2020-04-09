@@ -12,12 +12,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.Header;
-import org.apache.http.HeaderElement;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHeaders;
 import org.apache.http.ParseException;
-import org.apache.http.client.entity.GzipDecompressingEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
@@ -296,6 +293,7 @@ public class RestClient {
 			    }
 			    httpPost.setHeader(HttpHeaders.CONTENT_TYPE, Constants.REQUEST_CONTENT_TYPE);
 		    	httpPost.setHeader(HttpHeaders.ACCEPT, Constants.RESPONSE_ACCEPT_TYPE);
+		    	httpPost.setHeader(HttpHeaders.ACCEPT_ENCODING, Constants.RESPONSE_ACCEPT_TYPE_ENCODING);
 			    response = client.execute(httpPost);
 				break;
 			}
@@ -308,6 +306,7 @@ public class RestClient {
 			    }
 				httpGet.setHeader(HttpHeaders.CONTENT_TYPE, Constants.REQUEST_CONTENT_TYPE);
 			    httpGet.setHeader(HttpHeaders.ACCEPT, Constants.RESPONSE_ACCEPT_TYPE);
+			    httpGet.setHeader(HttpHeaders.ACCEPT_ENCODING, Constants.RESPONSE_ACCEPT_TYPE_ENCODING);
 			    response = client.execute(httpGet);
 				break;
 			}
@@ -364,18 +363,6 @@ public class RestClient {
 		if(nonNull(response)){
 			HttpEntity entity = response.getEntity();
 			if(nonNull(entity)){
-				Header contentHeader = entity.getContentEncoding();
-			    if (nonNull(contentHeader)) {
-			    	HeaderElement[] contentHeaderElements = contentHeader.getElements();
-			    	if(nonNull(contentHeaderElements) && contentHeaderElements.length > 0){
-			    		for (int j = 0; j < contentHeaderElements.length; j++) {
-			    			if (StringUtils.equalsIgnoreCase(contentHeaderElements[j].getName(),
-					        		Constants.RESPONSE_ACCEPT_TYPE_ENCODING)) {
-			    				entity = new GzipDecompressingEntity(entity);
-			    			}
-			    		}
-			    	}
-			    }
 				result = EntityUtils.toString(entity);
 			}
 		}

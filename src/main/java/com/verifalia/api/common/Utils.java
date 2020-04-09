@@ -1,7 +1,6 @@
 package com.verifalia.api.common;
 
 import static java.util.Objects.nonNull;
-import java.util.Random;
 
 import java.io.IOException;
 import java.net.URI;
@@ -10,6 +9,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Random;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.utils.URIBuilder;
@@ -119,6 +119,19 @@ public class Utils {
     		return localDate.format(DateTimeFormatter.ofPattern(dateFormat));
     	}
     	return StringUtils.EMPTY;
+    }
+
+    /**
+     * Converts string to local date based on the input format.
+     * @param localDateStr Date string which needs to be converted to local date.
+     * @param dateFormat Date format in which the local date object needs to be formatted.
+     * @return LocalDate Converted date string to local date as per the input format.
+     */
+    public static LocalDate convertStringToLocalDate(String dateStr, String dateFormat){
+    	if(!StringUtils.isBlank(dateStr)){
+    		return LocalDate.parse(dateStr, DateTimeFormatter.ofPattern(Constants.DATE_FORMAT));
+    	}
+    	return null;
     }
 
     /**
