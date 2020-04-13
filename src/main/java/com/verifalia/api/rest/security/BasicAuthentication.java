@@ -1,63 +1,59 @@
 package com.verifalia.api.rest.security;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
+import com.verifalia.api.rest.RestClient;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.http.HttpHeaders;
+import org.apache.http.HttpStatus;
+import org.apache.http.client.methods.HttpRequestBase;
 
 @Getter
 @Setter
-public class BasicAuthentication {
+public class BasicAuthentication extends AuthenticationProvider {
 
 	/**
-	 * Account ID
+	 * Username used to authenticate to Verifalia
 	 */
-	private String accountSid;
+	private String username;
 
 	/**
-	 * Account token
+	 * Password used to authenticate to Verifalia
 	 */
-	private String authToken;
-
-	/**
-	 * Authentication string
-	 */
-	private String authString;
+	private String password;
 
 	/**
 	 * Constructs an object for basic authentication to authenticate API client
-	 * @param accountSid Account SID
-	 * @param authToken Authentication token
+	 * @param username The username used to authenticate to Verifalia
+	 * @param password The password used to authenticate to the Verifalia
 	 * @throws IllegalArgumentException
 	 */
-	public BasicAuthentication(String accountSid, String authToken) {
-		this.accountSid = accountSid;
-		this.authToken = authToken;
-		this.authString = StringUtils.EMPTY;
+	public BasicAuthentication(String username, String password) {
+		if (username == null)
+			throw new IllegalArgumentException("username is null.");
+
+		this.username = username;
+		this.password = password;
 	}
 
-	/**
-	 * Gets authentication string for basic authentication
-	 * @return String Basic authentication string
-	 */
-	public String getAuthString(){
-		if(StringUtils.isBlank(this.authString)){
-			this.authString = getAuthString(accountSid, authToken);
-		}
-		return this.authString;
-	}
-
-	private String getAuthString(String accountSid, String authToken) throws IllegalArgumentException {
+	private String getAuthString() throws IllegalArgumentException {
 		String authString = StringUtils.EMPTY;
 		try {
-			byte[] authBytes = (accountSid + ':' + authToken).getBytes("UTF-8");
+			byte[] authBytes = (username + ':' + password).getBytes("UTF-8");
 			authString = "Basic " + new String(Base64.encodeBase64(authBytes));
 		} catch(UnsupportedEncodingException ex) {
 			throw new IllegalArgumentException("Invalid format parameters passed");
 		}
 		return authString;
+	}
+
+	@Override
+	public void decorateRequest(RestClient client, HttpRequestBase request) throws IOException {
+		request.setHeader(HttpHeaders.AUTHORIZATION, getAuthString());
 	}
 }

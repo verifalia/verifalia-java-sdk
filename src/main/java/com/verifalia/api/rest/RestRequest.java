@@ -36,8 +36,7 @@ public class RestRequest {
 	 * Constructs new object for a given resource with given method
 	 */
 	public RestRequest(HttpRequestMethod method, String resource) {
-		this.method = method;
-		this.resource = resource;
+		this(method, resource, null);
 	}
 
 	/**

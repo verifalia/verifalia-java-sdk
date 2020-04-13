@@ -2,7 +2,6 @@ package com.verifalia.api.exceptions;
 
 import java.io.IOException;
 
-import com.verifalia.api.rest.HttpStatusCode;
 import com.verifalia.api.rest.RestResponse;
 
 /**
@@ -44,6 +43,6 @@ public class VerifaliaException extends IOException {
 	 * @param errorMessage Error message for HTTP request failure
 	 */
 	public VerifaliaException(String errorMessage) {
-		super(Integer.toString(HttpStatusCode.SERVICE_UNAVAILABLE) + ": "+  errorMessage);
+		super(errorMessage);
 	}
 }

@@ -7,11 +7,11 @@ import static org.junit.Assert.assertNull;
 import java.io.IOException;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.HttpStatus;
 import org.junit.Before;
 import org.junit.Test;
 
 import com.verifalia.api.emailvalidations.models.ValidationMapper;
-import com.verifalia.api.rest.HttpStatusCode;
 import com.verifalia.api.rest.RestResponse;
 import com.verifalia.api.test.utils.TestData;
 
@@ -19,7 +19,7 @@ public class RestResponseTest {
 
 	private final String EMPTY_STRING = StringUtils.EMPTY;
 
-	private final int okCode = HttpStatusCode.OK;
+	private final int okCode = HttpStatus.SC_OK;
 	private final String okMessage = "OK";
 
 	private RestResponse goodResponse1;
