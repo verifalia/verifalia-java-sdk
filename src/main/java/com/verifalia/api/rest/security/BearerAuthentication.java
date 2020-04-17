@@ -6,6 +6,7 @@ import com.verifalia.api.rest.RestClient;
 import com.verifalia.api.rest.RestRequest;
 import com.verifalia.api.rest.RestResponse;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import net.sf.json.JSONObject;
 import org.apache.http.HttpHeaders;
@@ -33,12 +34,7 @@ public class BearerAuthentication extends AuthenticationProvider {
      * @param username Username used to authenticate to Verifalia
      * @param password Password used to authenticate to Verifalia
      */
-    public BearerAuthentication(String username, String password) {
-        if (username == null)
-            throw new IllegalArgumentException("username is null.");
-        if (password == null)
-            throw new IllegalArgumentException("password is null.");
-
+    public BearerAuthentication(@NonNull final String username, @NonNull final String password) {
         this.username = username;
         this.password = password;
     }

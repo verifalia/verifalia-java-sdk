@@ -6,7 +6,6 @@ import org.codehaus.jackson.map.JsonSerializer;
 import org.codehaus.jackson.map.SerializerProvider;
 
 import java.io.IOException;
-import java.time.Duration;
 
 public class QualityLevelNameSerializer extends JsonSerializer<QualityLevelName> {
     @Override

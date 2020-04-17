@@ -2,6 +2,7 @@ package com.verifalia.api.rest.security;
 
 import com.verifalia.api.rest.RestClient;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
@@ -31,10 +32,7 @@ public class BasicAuthentication extends AuthenticationProvider {
      * @param password The password used to authenticate to the Verifalia
      * @throws IllegalArgumentException
      */
-    public BasicAuthentication(String username, String password) {
-        if (username == null)
-            throw new IllegalArgumentException("username is null.");
-
+    public BasicAuthentication(@NonNull final String username, @NonNull final String password) {
         this.username = username;
         this.password = password;
     }

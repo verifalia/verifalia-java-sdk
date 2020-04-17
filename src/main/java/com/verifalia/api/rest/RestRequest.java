@@ -1,6 +1,7 @@
 package com.verifalia.api.rest;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
@@ -38,14 +39,14 @@ public class RestRequest {
     /**
      * Constructs new object for a given resource with given method
      */
-    public RestRequest(HttpRequestMethod method, String resource) {
+    public RestRequest(@NonNull final HttpRequestMethod method, @NonNull final String resource) {
         this(method, resource, null);
     }
 
     /**
      * Constructs new object for a given resource with given method and given data
      */
-    public RestRequest(HttpRequestMethod method, String resource, Object data) {
+    public RestRequest(@NonNull final HttpRequestMethod method, @NonNull final String resource, final Object data) {
         this.method = method;
         this.resource = resource;
 

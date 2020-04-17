@@ -20,12 +20,13 @@ import java.nio.charset.Charset;
 /**
  * Represents REST service response
  */
-@Getter
+//@Getter
 public class RestResponse {
     private final ContentType contentType;
     /**
      * HTTP response code
      */
+    @Getter
     private final int statusCode;
 
     /**
@@ -43,7 +44,7 @@ public class RestResponse {
      * @throws JsonMappingException
      * @throws JsonParseException
      */
-    public RestResponse(int statusCode, HttpEntity entity)
+    public RestResponse(final int statusCode, final HttpEntity entity)
             throws VerifaliaException {
 
         this.statusCode = statusCode;
@@ -64,7 +65,7 @@ public class RestResponse {
 
     }
 
-    public <T> T deserialize(@NonNull Class<T> dataClass) throws VerifaliaException {
+    public <T> T deserialize(@NonNull final Class<T> dataClass) throws VerifaliaException {
         if (data == null) {
             return null;
         }

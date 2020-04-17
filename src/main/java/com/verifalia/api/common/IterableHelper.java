@@ -20,9 +20,9 @@ public class IterableHelper {
     }
 
     private static class ItemIterator<TItem, TOptions extends ListingOptions> implements Iterator {
-        private ListSegment<TItem> segment;
         private final NextSegmentFetcher<TItem> nextSegmentFetcher;
         private final TOptions options;
+        private ListSegment<TItem> segment;
         private int consumedInSegment = 0;
 
         public ItemIterator(@NonNull ListSegment<TItem> segment, @NonNull NextSegmentFetcher<TItem> nextSegmentFetcher, TOptions options) {

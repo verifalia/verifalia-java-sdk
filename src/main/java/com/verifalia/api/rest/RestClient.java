@@ -1,12 +1,9 @@
 package com.verifalia.api.rest;
 
-import com.verifalia.api.baseURIProviders.BaseURIProvider;
-import com.verifalia.api.common.Utils;
 import com.verifalia.api.exceptions.EndpointServerErrorException;
 import com.verifalia.api.exceptions.ServiceUnreachableException;
 import com.verifalia.api.exceptions.VerifaliaException;
 import com.verifalia.api.rest.security.AuthenticationProvider;
-import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -26,41 +23,21 @@ import static java.util.Objects.nonNull;
 /***
  * Represents REST client
  */
-//@Getter
-//@Setter
 public class RestClient {
-    private static final String RESPONSE_ACCEPT_TYPE_ENCODING = "gzip";
-
-    /**
-     * Base URI List
-     */
-    private List<URI> baseURIs;
-
-    /**
-     * API version
-     */
-    private String apiVersion;
-
-    /**
-     * User agent string
-     */
-    private String userAgent;
-
-    /**
-     * Authentication provider for the rest client.
-     */
-    private AuthenticationProvider authenticationProvider;
-
+    private final List<URI> baseURIs;
+    private final String apiVersion;
+    private final String userAgent;
+    private final AuthenticationProvider defaultAuthenticationProvider;
     private int currentBaseURIIndex;
 
     /**
      * Creates new object using given with default values
      */
-    public RestClient(AuthenticationProvider authenticationProvider, List<URI> baseURIs, String apiVersion) {
+    public RestClient(@NonNull final AuthenticationProvider defaultAuthenticationProvider, @NonNull final List<URI> baseURIs, @NonNull final String apiVersion) {
         this.baseURIs = baseURIs;
         this.apiVersion = apiVersion;
         this.userAgent = getUserAgent();
-        this.authenticationProvider = authenticationProvider;
+        this.defaultAuthenticationProvider = defaultAuthenticationProvider;
     }
 
     /**
@@ -70,8 +47,8 @@ public class RestClient {
      * @return RestResponse response object
      * @throws IOException
      */
-    public RestResponse execute(RestRequest request) throws VerifaliaException {
-        return execute(request, this.authenticationProvider);
+    public RestResponse execute(@NonNull final RestRequest request) throws VerifaliaException {
+        return execute(request, this.defaultAuthenticationProvider);
     }
 
     /**
@@ -82,7 +59,7 @@ public class RestClient {
      * @return RestResponse response object
      * @throws IOException
      */
-    public RestResponse execute(RestRequest request, AuthenticationProvider authenticationProviderOverride)
+    public RestResponse execute(@NonNull final RestRequest request, @NonNull final AuthenticationProvider authenticationProvider)
             throws VerifaliaException {
         @Getter
         @Setter
@@ -90,7 +67,7 @@ public class RestClient {
             URI baseUri;
             Exception exception;
 
-            EndpointServerError(@NonNull URI baseUri, @NonNull Exception exception) {
+            EndpointServerError(@NonNull final URI baseUri, @NonNull final Exception exception) {
                 this.setBaseUri(baseUri);
                 this.setException(exception);
             }
@@ -104,7 +81,7 @@ public class RestClient {
                 URI baseURI = this.baseURIs.get(currentBaseURIIndex++ % this.baseURIs.size());
 
                 try {
-                    response = sendRequest(baseURI, request, authenticationProviderOverride);
+                    response = sendRequest(baseURI, request, authenticationProvider);
                 } catch (IOException e) {
                     // Continue with the next attempt on IO exceptions, if needed
                     errors.add(new EndpointServerError(baseURI, e));
@@ -134,7 +111,7 @@ public class RestClient {
         throw new ServiceUnreachableException(sbAggregateError.toString());
     }
 
-    private CloseableHttpResponse sendRequest(URI baseURI, RestRequest restRequest, AuthenticationProvider authenticationProviderOverride)
+    private CloseableHttpResponse sendRequest(@NonNull final URI baseURI, @NonNull final RestRequest restRequest, @NonNull final AuthenticationProvider authenticationProviderOverride)
             throws VerifaliaException, IOException {
 
         StringBuilder sb = new StringBuilder();
@@ -185,73 +162,22 @@ public class RestClient {
         return client.execute(request);
     }
 
-//    private boolean isAuthRequired(String requestResource) {
-//        if (StringUtils.equalsIgnoreCase(Constants.AUTH_TOKEN_RESOURCE, requestResource)) {
-//            return false;
-//        }
-//        return true;
-//    }
-
-//	private boolean isAuthBasicOrBearer(){
-//		if(StringUtils.equalsIgnoreCase(this.authType, Constants.AUTHENTICATION_BASIC) ||
-//				StringUtils.equalsIgnoreCase(this.authType, Constants.AUTHENTICATION_BEARER)){
-//			return true;
-//		}
-//		return false;
-//	}
-//
-//	private String getAuthString() throws IOException{
-//		if(isAuthBasicOrBearer()){
-//			if(StringUtils.equalsIgnoreCase(this.authType, Constants.AUTHENTICATION_BASIC)){
-//				return this.basicAuth.getAuthString();
-//			} else if(StringUtils.equalsIgnoreCase(this.authType, Constants.AUTHENTICATION_BEARER)){
-//				return this.bearerAuth.getAuthString();
-//			} else {
-//				return StringUtils.EMPTY;
-//			}
-//		}
-//		return StringUtils.EMPTY;
-//	}
-
-//    private List<URI> convertStringBaseURIToURIList(List<String> strBaseURIList) throws URISyntaxException {
-//        List<URI> uriList = new ArrayList<URI>();
-//        for (String strBaseURI : strBaseURIList) {
-//            uriList.add(new URI(strBaseURI));
-//        }
-//        return uriList;
-//    }
-//
-//    private List<URI> convertStringBaseURIToURIList(String strBaseURI) throws URISyntaxException {
-//        List<URI> uriList = new ArrayList<URI>();
-//        uriList.add(new URI(strBaseURI));
-//        return uriList;
-//    }
-
-//    private String processHttpResponseEntity(CloseableHttpResponse response) throws ParseException, IOException {
-//        String result = StringUtils.EMPTY;
-//        if (nonNull(response)) {
-//            HttpEntity entity = response.getEntity();
-//            if (nonNull(entity)) {
-//                result = EntityUtils.toString(entity);
-//            }
-//        }
-//        return result;
-//    }
-
-//    private boolean isHttpRetryNeeded(int responseCode, int currentIterValue, int totalBaseUriSize) {
-//        boolean isHttpRetryNeeded = false;
-//
-//        // Automatically retry with another host on HTTP 5xx status codes
-//
-//        if (responseCode >= 500 && responseCode <= 599) {
-//            if (currentIterValue != totalBaseUriSize - 1) { // Check to see if any base URI is there for processing
-//                isHttpRetryNeeded = true;
-//            }
-//        }
-//        return isHttpRetryNeeded;
-//    }
-
     private String getUserAgent() {
-        return "verifalia-rest-client/java/" + getClass().getPackage().getImplementationVersion();
+        StringBuilder sbUserAgent = new StringBuilder("verifalia-rest-client/java");
+
+        // Java version
+
+        sbUserAgent.append(System.getProperty("java.version"));
+
+        // Package version
+
+        String packageVersion = getClass().getPackage().getImplementationVersion();
+
+        if (packageVersion != null) {
+            sbUserAgent.append("/");
+            sbUserAgent.append(packageVersion);
+        }
+
+        return sbUserAgent.toString();
     }
 }

@@ -113,15 +113,6 @@ public class ValidationEntry {
     }
 
     /**
-     * Constructs new object.
-     *
-     * @param inputData Input data to be validated (typically, email address)
-     */
-    public ValidationEntry(String inputData) {
-        this.inputData = inputData;
-    }
-
-    /**
      * Overrides the default set method for status with custom logic to handle status as Unknown if no valid status is returned from server
      *
      * @param status Validation entry status mapped which needs to be checked

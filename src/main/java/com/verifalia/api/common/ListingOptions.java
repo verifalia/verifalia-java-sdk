@@ -15,7 +15,7 @@ public class ListingOptions {
     @Builder.Default
     private Direction direction = Direction.Forward;
 
-    public void setLimit(Integer limit) {
+    public void setLimit(final Integer limit) {
         if (limit != null && limit < 0) {
             throw new IllegalArgumentException("Limit must be 0 (meaning no limit will be enforced) or greater.");
         }
@@ -23,7 +23,7 @@ public class ListingOptions {
         this.limit = limit;
     }
 
-    public void setDirection(@NonNull Direction direction) {
+    public void setDirection(@NonNull final Direction direction) {
         this.direction = direction;
     }
 }

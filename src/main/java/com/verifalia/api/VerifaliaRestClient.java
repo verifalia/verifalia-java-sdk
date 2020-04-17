@@ -10,6 +10,7 @@ import com.verifalia.api.rest.RestClient;
 import com.verifalia.api.rest.security.AuthenticationProvider;
 import com.verifalia.api.rest.security.BasicAuthentication;
 import com.verifalia.api.rest.security.TLSAuthentication;
+import lombok.NonNull;
 
 import java.io.File;
 import java.net.URI;
@@ -48,7 +49,7 @@ public class VerifaliaRestClient {
      * @param password Authentication token
      * @throws URISyntaxException
      */
-    public VerifaliaRestClient(String username, String password) {
+    public VerifaliaRestClient(@NonNull final String username, @NonNull final String password) {
         this(new BasicAuthentication(username, password), new DefaultBaseURIProvider());
     }
 
@@ -64,15 +65,15 @@ public class VerifaliaRestClient {
         this(new TLSAuthentication(certAlias, certPassword, identityStoreJksFile, trustKeyStoreJksFile), new ClientCertificateBaseURIProvider());
     }
 
-    public VerifaliaRestClient(AuthenticationProvider authenticationProvider) {
+    public VerifaliaRestClient(@NonNull final AuthenticationProvider authenticationProvider) {
         this(authenticationProvider, new DefaultBaseURIProvider(), DEFAULT_API_VERSION);
     }
 
-    public VerifaliaRestClient(AuthenticationProvider authenticationProvider, String apiVersion) {
+    public VerifaliaRestClient(@NonNull final AuthenticationProvider authenticationProvider, @NonNull final String apiVersion) {
         this(authenticationProvider, new DefaultBaseURIProvider(), apiVersion);
     }
 
-    public VerifaliaRestClient(AuthenticationProvider authenticationProvider, BaseURIProvider baseURIProvider) {
+    public VerifaliaRestClient(@NonNull final AuthenticationProvider authenticationProvider, @NonNull final BaseURIProvider baseURIProvider) {
         this(authenticationProvider, baseURIProvider, DEFAULT_API_VERSION);
     }
 
@@ -84,7 +85,7 @@ public class VerifaliaRestClient {
      * @param authenticationProvider An authentication provider object, which allows the client to authenticate to the Verifalia API
      * @throws URISyntaxException
      */
-    public VerifaliaRestClient(AuthenticationProvider authenticationProvider, BaseURIProvider baseURIProvider, String apiVersion) {
+    public VerifaliaRestClient(@NonNull final AuthenticationProvider authenticationProvider, @NonNull final BaseURIProvider baseURIProvider, @NonNull final String apiVersion) {
         List<URI> baseURIs = baseURIProvider.provideBaseURIs();
         Collections.shuffle(baseURIs);
 

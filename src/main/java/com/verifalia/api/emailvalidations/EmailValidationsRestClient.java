@@ -28,7 +28,6 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 
 import static java.util.Objects.nonNull;
 
@@ -40,7 +39,7 @@ import static java.util.Objects.nonNull;
 public class EmailValidationsRestClient {
     private final RestClient restClient;
 
-    public EmailValidationsRestClient(@NonNull RestClient restClient) {
+    public EmailValidationsRestClient(@NonNull final RestClient restClient) {
         this.restClient = restClient;
     }
 
@@ -61,7 +60,7 @@ public class EmailValidationsRestClient {
      * @throws IOException
      */
     @SuppressWarnings("serial")
-    public Validation submit(@NonNull String emailAddress) throws VerifaliaException {
+    public Validation submit(@NonNull final String emailAddress) throws VerifaliaException {
         return submit(new ValidationRequest(emailAddress));
     }
 
@@ -79,7 +78,7 @@ public class EmailValidationsRestClient {
      * @throws VerifaliaException
      * @throws IOException
      */
-    public Validation submit(@NonNull String[] emailAddresses) throws VerifaliaException {
+    public Validation submit(@NonNull final String[] emailAddresses) throws VerifaliaException {
         return submit(new ValidationRequest(emailAddresses));
     }
 
@@ -97,7 +96,7 @@ public class EmailValidationsRestClient {
      * @throws VerifaliaException
      * @throws IOException
      */
-    public Validation submit(@NonNull Iterable<String> emailAddresses) throws VerifaliaException {
+    public Validation submit(@NonNull final Iterable<String> emailAddresses) throws VerifaliaException {
         return submit(new ValidationRequest(emailAddresses));
     }
 
@@ -116,7 +115,7 @@ public class EmailValidationsRestClient {
      * @throws IOException
      * @throws VerifaliaException
      */
-    public Validation submit(@NonNull String[] emailAddresses, @NonNull WaitingStrategy waitingStrategy)
+    public Validation submit(@NonNull final String[] emailAddresses, @NonNull final WaitingStrategy waitingStrategy)
             throws VerifaliaException {
         return submit(new ValidationRequest(emailAddresses), waitingStrategy);
     }
@@ -137,7 +136,7 @@ public class EmailValidationsRestClient {
      * @throws VerifaliaException
      */
     @SuppressWarnings("serial")
-    public Validation submit(@NonNull final String emailAddress, @NonNull WaitingStrategy waitingStrategy) throws VerifaliaException {
+    public Validation submit(@NonNull final String emailAddress, @NonNull final WaitingStrategy waitingStrategy) throws VerifaliaException {
         return submit(new ValidationRequest(emailAddress), waitingStrategy);
     }
 
@@ -157,7 +156,7 @@ public class EmailValidationsRestClient {
      * @throws IOException
      * @throws VerifaliaException
      */
-    public Validation submit(@NonNull String[] emailAddresses, @NonNull DeduplicationMode deduplication,
+    public Validation submit(@NonNull final String[] emailAddresses, @NonNull final DeduplicationMode deduplication,
                              @NonNull WaitingStrategy waitingStrategy) throws VerifaliaException {
         return submit(new ValidationRequest(emailAddresses, deduplication), waitingStrategy);
     }
@@ -179,8 +178,8 @@ public class EmailValidationsRestClient {
      * @throws VerifaliaException
      */
     @SuppressWarnings("serial")
-    public Validation submit(@NonNull final String emailAddress, @NonNull QualityLevelName quality,
-                             @NonNull WaitingStrategy waitingStrategy) throws VerifaliaException {
+    public Validation submit(@NonNull final String emailAddress, @NonNull final QualityLevelName quality,
+                             @NonNull final WaitingStrategy waitingStrategy) throws VerifaliaException {
         return submit(new ValidationRequest(emailAddress, quality), waitingStrategy);
     }
 
@@ -200,8 +199,8 @@ public class EmailValidationsRestClient {
      * @throws IOException
      * @throws VerifaliaException
      */
-    public Validation submit(@NonNull String[] emailAddresses, @NonNull QualityLevelName quality,
-                             @NonNull WaitingStrategy waitingStrategy) throws VerifaliaException {
+    public Validation submit(@NonNull final String[] emailAddresses, @NonNull final QualityLevelName quality,
+                             @NonNull final WaitingStrategy waitingStrategy) throws VerifaliaException {
         return submit(new ValidationRequest(emailAddresses, quality), waitingStrategy);
     }
 
@@ -221,8 +220,9 @@ public class EmailValidationsRestClient {
      * @throws IOException
      * @throws VerifaliaException
      */
-    public Validation submit(@NonNull String[] emailAddresses, @NonNull QualityLevelName quality, @NonNull DeduplicationMode deduplication,
-                             @NonNull WaitingStrategy waitingStrategy) throws VerifaliaException {
+    public Validation submit(@NonNull final String[] emailAddresses, @NonNull final QualityLevelName quality,
+                             @NonNull final DeduplicationMode deduplication,
+                             @NonNull final WaitingStrategy waitingStrategy) throws VerifaliaException {
         return submit(new ValidationRequest(emailAddresses, quality, deduplication), waitingStrategy);
     }
 
@@ -277,7 +277,7 @@ public class EmailValidationsRestClient {
 
                 // The batch has been accepted but is not yet completed
 
-                if (waitingStrategy != null && !waitingStrategy.waitForCompletion) {
+                if (!waitingStrategy.waitForCompletion) {
                     validation.getOverview().setStatus(ValidationStatus.InProgress);
                     return validation;
                 }
@@ -313,85 +313,6 @@ public class EmailValidationsRestClient {
      */
     public Validation get(@NonNull final String id) throws VerifaliaException {
         return get(id, new WaitingStrategy(true));
-    }
-
-    private abstract static class PollingCallback<T> {
-        public abstract ValidationOverview getOverview(T result) throws VerifaliaException;
-        public abstract T refresh(String id) throws VerifaliaException;
-    }
-
-    /**
-     * Polling thread task
-     */
-    private static class PollingTask<T> implements Runnable {
-        private final String id;
-        /**
-         * Query result
-         */
-        private T result;
-
-        /*
-         * Thread exception
-         */
-        private VerifaliaException exception;
-
-        private PollingCallback<T> callback;
-        private final WaitingStrategy waitingStrategy;
-
-        public PollingTask(String id, final T initialResult, PollingCallback<T> callback, WaitingStrategy waitingStrategy) {
-            this.id = id;
-            this.result = initialResult;
-            this.callback = callback;
-            this.waitingStrategy = waitingStrategy;
-        }
-
-        /**
-         * Main thread method
-         */
-        public void run() {
-            try {
-                do {
-                    // A null result means the validation has not been found
-                    if (result == null)
-                        return;
-
-                    // Returns immediately if the validation has been completed
-
-                    ValidationOverview overview = this.callback.getOverview(result);
-
-                    if (overview.getStatus() != ValidationStatus.InProgress)
-                        return;
-
-                    // Provides progress updates to the eventual subscriber
-
-                    if (waitingStrategy.progressProvider != null) {
-                        waitingStrategy.progressProvider.report(overview);
-                    }
-
-                    // Wait for the polling interval
-
-                    waitingStrategy.waitForNextPoll(overview);
-
-                    result = this.callback.refresh(id);
-                } while (true);
-            } catch (VerifaliaException exception) {
-                this.exception = exception;
-            } catch (Exception exception) {
-                // Special handling for unhandled exceptions - for example, those thrown by a user-provided waiting strategy
-
-                this.exception = new WaitingInterruptedException("An unhandled exception was thrown while waiting for a job completion.", exception);
-            }
-        }
-
-        public T getResult() throws VerifaliaException {
-            // Handles any eventual exception
-
-            if (exception != null) {
-                throw exception;
-            }
-
-            return result;
-        }
     }
 
     /**
@@ -495,7 +416,7 @@ public class EmailValidationsRestClient {
         return getOverview(id, new WaitingStrategy(true));
     }
 
-    public ValidationOverview getOverview(@NonNull final String id, @NonNull WaitingStrategy waitingStrategy) throws VerifaliaException {
+    public ValidationOverview getOverview(@NonNull final String id, @NonNull final WaitingStrategy waitingStrategy) throws VerifaliaException {
         ValidationOverview result = getOverviewOnce(id);
 
         if (waitingStrategy.waitForCompletion) {
@@ -590,7 +511,7 @@ public class EmailValidationsRestClient {
      * @param id The identifier for an email validation batch to be retrieved.
      * @return List<ValidationEntry> An object list representing the entries of the requested email validation batch.
      */
-    public Iterable<ValidationEntry> listEntries(final String id) throws VerifaliaException {
+    public Iterable<ValidationEntry> listEntries(@NonNull final String id) throws VerifaliaException {
         return listEntries(id, null);
     }
 
@@ -627,7 +548,7 @@ public class EmailValidationsRestClient {
         }
 
         // Build request URI with the param map
-        URI requestUri = Utils.getHttpUri(null, null, null, paramMap);
+        URI requestUri = Utils.getHttpUri(paramMap);
 
         // Build query entries resource string
         StringBuilder queryEntriesResource = new StringBuilder("email-validations/");
@@ -666,7 +587,7 @@ public class EmailValidationsRestClient {
         }
 
         // Build request URI with the param map
-        URI requestUri = Utils.getHttpUri(null, null, null, paramMap);
+        URI requestUri = Utils.getHttpUri(paramMap);
 
         // Build query entries resource string
         StringBuilder queryEntriesResource = new StringBuilder("email-validations/");
@@ -702,10 +623,6 @@ public class EmailValidationsRestClient {
         return list(null);
     }
 
-    // endregion
-
-    // region Listing methods
-
     /**
      * Returns an object representing the various email validations jobs initiated based on filter and sort options passed.
      * Makes a GET request to the <b>"/email-validations"</b> resource.
@@ -720,6 +637,10 @@ public class EmailValidationsRestClient {
                 this::listSegmented,
                 options);
     }
+
+    // endregion
+
+    // region Listing methods
 
     private ListSegment<ValidationOverview> listSegmented(final ValidationOverviewListingOptions options) throws VerifaliaException {
         // Build query string param map
@@ -763,7 +684,7 @@ public class EmailValidationsRestClient {
         }
 
         // Build request URI with the param map
-        URI requestUri = Utils.getHttpUri(null, null, null, paramMap);
+        URI requestUri = Utils.getHttpUri(paramMap);
 
         // Build query entries resource string
         StringBuilder listJobsResource = new StringBuilder("email-validations");
@@ -796,7 +717,7 @@ public class EmailValidationsRestClient {
         }
 
         // Build request URI with the param map
-        URI requestUri = Utils.getHttpUri(null, null, null, paramMap);
+        URI requestUri = Utils.getHttpUri(paramMap);
 
         // Build query entries resource string
         StringBuilder listJobsResource = new StringBuilder("email-validations");
@@ -841,6 +762,84 @@ public class EmailValidationsRestClient {
             }
         }
         return validation;
+    }
+
+    private abstract static class PollingCallback<T> {
+        public abstract ValidationOverview getOverview(T result) throws VerifaliaException;
+
+        public abstract T refresh(String id) throws VerifaliaException;
+    }
+
+    /**
+     * Polling thread task
+     */
+    private static class PollingTask<T> implements Runnable {
+        private final String id;
+        private final WaitingStrategy waitingStrategy;
+        /**
+         * Query result
+         */
+        private T result;
+        /*
+         * Thread exception
+         */
+        private VerifaliaException exception;
+        private final PollingCallback<T> callback;
+
+        public PollingTask(String id, final T initialResult, PollingCallback<T> callback, WaitingStrategy waitingStrategy) {
+            this.id = id;
+            this.result = initialResult;
+            this.callback = callback;
+            this.waitingStrategy = waitingStrategy;
+        }
+
+        /**
+         * Main thread method
+         */
+        public void run() {
+            try {
+                do {
+                    // A null result means the validation has not been found
+                    if (result == null)
+                        return;
+
+                    // Returns immediately if the validation has been completed
+
+                    ValidationOverview overview = this.callback.getOverview(result);
+
+                    if (overview.getStatus() != ValidationStatus.InProgress)
+                        return;
+
+                    // Provides progress updates to the eventual subscriber
+
+                    if (waitingStrategy.progressProvider != null) {
+                        waitingStrategy.progressProvider.report(overview);
+                    }
+
+                    // Wait for the polling interval
+
+                    waitingStrategy.waitForNextPoll(overview);
+
+                    result = this.callback.refresh(id);
+                } while (true);
+            } catch (VerifaliaException exception) {
+                this.exception = exception;
+            } catch (Exception exception) {
+                // Special handling for unhandled exceptions - for example, those thrown by a user-provided waiting strategy
+
+                this.exception = new WaitingInterruptedException("An unhandled exception was thrown while waiting for a job completion.", exception);
+            }
+        }
+
+        public T getResult() throws VerifaliaException {
+            // Handles any eventual exception
+
+            if (exception != null) {
+                throw exception;
+            }
+
+            return result;
+        }
     }
 
     // endregion

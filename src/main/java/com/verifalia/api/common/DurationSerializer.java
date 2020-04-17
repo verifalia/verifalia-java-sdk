@@ -1,5 +1,6 @@
 package com.verifalia.api.common;
 
+import lombok.NonNull;
 import org.codehaus.jackson.JsonGenerator;
 import org.codehaus.jackson.map.JsonSerializer;
 import org.codehaus.jackson.map.SerializerProvider;
@@ -19,7 +20,7 @@ public class DurationSerializer extends JsonSerializer<Duration> {
         }
     }
 
-    private String toString(Duration value) {
+    private String toString(@NonNull Duration value) {
         StringBuffer sb = new StringBuffer();
         long remainingSeconds = value.toMillis() / 1000;
 

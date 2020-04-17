@@ -32,7 +32,7 @@ import static java.util.Objects.nonNull;
 public class CreditsRestClient {
     private final RestClient restClient;
 
-    public CreditsRestClient(@NonNull RestClient restClient) {
+    public CreditsRestClient(@NonNull final RestClient restClient) {
         this.restClient = restClient;
     }
 
@@ -72,14 +72,14 @@ public class CreditsRestClient {
      * @return List<CreditDailyUsageData> List of objects where each object representing the credit daily usage details for a date.
      * @throws IOException
      */
-    public Iterable<DailyUsage> listDailyUsage(DailyUsageListingOptions options) throws VerifaliaException {
+    public Iterable<DailyUsage> listDailyUsage(final DailyUsageListingOptions options) throws VerifaliaException {
         return IterableHelper.buildIterator(
                 this::listDailyUsageSegmented,
                 this::listDailyUsageSegmented,
                 options);
     }
 
-    private ListSegment<DailyUsage> listDailyUsageSegmented(DailyUsageListingOptions options) throws VerifaliaException {
+    private ListSegment<DailyUsage> listDailyUsageSegmented(final DailyUsageListingOptions options) throws VerifaliaException {
         Map<String, String> paramMap = new HashMap<>();
 
         if (nonNull(options)) {
@@ -97,7 +97,7 @@ public class CreditsRestClient {
         }
 
         // Build request URI with the param map
-        URI requestUri = Utils.getHttpUri(null, null, null, paramMap);
+        URI requestUri = Utils.getHttpUri(paramMap);
 
         // Build query entries resource string
         StringBuilder dailyUsageResource = new StringBuilder("credits/daily-usage");
@@ -116,7 +116,7 @@ public class CreditsRestClient {
         return response.deserialize(DailyUsageListSegment.class);
     }
 
-    private DailyUsageListSegment listDailyUsageSegmented(@NonNull ListingCursor cursor) throws VerifaliaException {
+    private DailyUsageListSegment listDailyUsageSegmented(@NonNull final ListingCursor cursor) throws VerifaliaException {
         Map<String, String> paramMap = new HashMap<>();
 
         if (cursor.getDirection() == Direction.Forward) {
@@ -130,7 +130,7 @@ public class CreditsRestClient {
         }
 
         // Build request URI with the param map
-        URI requestUri = Utils.getHttpUri(null, null, null, paramMap);
+        URI requestUri = Utils.getHttpUri(paramMap);
 
         // Build query entries resource string
         StringBuilder dailyUsageResource = new StringBuilder("credits/daily-usage");

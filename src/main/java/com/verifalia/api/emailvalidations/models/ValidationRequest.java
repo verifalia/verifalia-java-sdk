@@ -1,6 +1,5 @@
 package com.verifalia.api.emailvalidations.models;
 
-import com.verifalia.api.common.Constants;
 import com.verifalia.api.common.DurationSerializer;
 import com.verifalia.api.common.QualityLevelNameSerializer;
 import lombok.*;
@@ -24,6 +23,9 @@ import static java.util.Objects.nonNull;
 @AllArgsConstructor
 @Builder
 public class ValidationRequest {
+    private static final Integer VALIDATION_INPUT_PRIORITY_MIN_VALUE = 0;
+    private static final Integer VALIDATION_INPUT_PRIORITY_MAX_VALUE = 255;
+
     /**
      * Entries for emails that needs to be processed
      */
@@ -51,7 +53,7 @@ public class ValidationRequest {
         this(Arrays.asList(emailAddress), null, null);
     }
 
-    public ValidationRequest(@NonNull final String emailAddress, QualityLevelName quality) {
+    public ValidationRequest(@NonNull final String emailAddress, final QualityLevelName quality) {
         this(Arrays.asList(emailAddress), quality, null);
     }
 
@@ -59,15 +61,15 @@ public class ValidationRequest {
         this(Arrays.asList(emailAddresses), null, null);
     }
 
-    public ValidationRequest(@NonNull final String[] emailAddresses, QualityLevelName quality) {
+    public ValidationRequest(@NonNull final String[] emailAddresses, final QualityLevelName quality) {
         this(Arrays.asList(emailAddresses), quality, null);
     }
 
-    public ValidationRequest(@NonNull final String[] emailAddresses, DeduplicationMode deduplication) {
+    public ValidationRequest(@NonNull final String[] emailAddresses, final DeduplicationMode deduplication) {
         this(Arrays.asList(emailAddresses), null, deduplication);
     }
 
-    public ValidationRequest(@NonNull final String[] emailAddresses, QualityLevelName quality, DeduplicationMode deduplication) {
+    public ValidationRequest(@NonNull final String[] emailAddresses, final QualityLevelName quality, final DeduplicationMode deduplication) {
         this(Arrays.asList(emailAddresses), quality, deduplication);
     }
 
@@ -75,15 +77,15 @@ public class ValidationRequest {
         this(emailAddresses, null, null);
     }
 
-    public ValidationRequest(@NonNull final Iterable<String> emailAddresses, QualityLevelName quality) {
+    public ValidationRequest(@NonNull final Iterable<String> emailAddresses, final QualityLevelName quality) {
         this(emailAddresses, quality, null);
     }
 
-    public ValidationRequest(@NonNull final Iterable<String> emailAddresses, DeduplicationMode deduplication) {
+    public ValidationRequest(@NonNull final Iterable<String> emailAddresses, final DeduplicationMode deduplication) {
         this(emailAddresses, null, deduplication);
     }
 
-    public ValidationRequest(@NonNull final Iterable<String> emailAddresses, QualityLevelName quality, DeduplicationMode deduplication) {
+    public ValidationRequest(@NonNull final Iterable<String> emailAddresses, final QualityLevelName quality, final DeduplicationMode deduplication) {
         // Populate validation input object
         List<ValidationRequestEntry> entries = new ArrayList<ValidationRequestEntry>();
 
@@ -101,10 +103,10 @@ public class ValidationRequest {
         }
     }
 
-    public void setPriority(Integer value) {
+    public void setPriority(final Integer value) {
         if (value != null) {
-            if (value < Constants.VALIDATION_INPUT_PRIORITY_MIN_VALUE
-                    || value > Constants.VALIDATION_INPUT_PRIORITY_MAX_VALUE) {
+            if (value < VALIDATION_INPUT_PRIORITY_MIN_VALUE
+                    || value > VALIDATION_INPUT_PRIORITY_MAX_VALUE) {
                 throw new IllegalArgumentException("Invalid priority value. It must be in range 0 to 255");
             }
         }
@@ -115,10 +117,10 @@ public class ValidationRequest {
     public static class ValidationRequestBuilder {
         private Integer priority;
 
-        public ValidationRequestBuilder priority(Integer value) {
+        public ValidationRequestBuilder priority(final Integer value) {
             if (value != null) {
-                if (value < Constants.VALIDATION_INPUT_PRIORITY_MIN_VALUE
-                        || value > Constants.VALIDATION_INPUT_PRIORITY_MAX_VALUE) {
+                if (value < VALIDATION_INPUT_PRIORITY_MIN_VALUE
+                        || value > VALIDATION_INPUT_PRIORITY_MAX_VALUE) {
                     throw new IllegalArgumentException("Invalid priority value. It must be in range 0 to 255");
                 }
             }
