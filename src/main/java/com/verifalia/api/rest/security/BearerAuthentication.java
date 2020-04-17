@@ -1,14 +1,10 @@
 package com.verifalia.api.rest.security;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-
-import com.verifalia.api.common.Constants;
+import com.verifalia.api.exceptions.VerifaliaException;
 import com.verifalia.api.rest.HttpRequestMethod;
 import com.verifalia.api.rest.RestClient;
 import com.verifalia.api.rest.RestRequest;
 import com.verifalia.api.rest.RestResponse;
-
 import lombok.Getter;
 import lombok.Setter;
 import net.sf.json.JSONObject;
@@ -18,17 +14,14 @@ import org.apache.http.client.methods.HttpRequestBase;
 @Getter
 @Setter
 public class BearerAuthentication extends AuthenticationProvider {
-
     /**
      * Account ID
      */
     private String username;
-
     /**
      * Account token
      */
     private String password;
-
     /**
      * Authentication string
      */
@@ -50,7 +43,22 @@ public class BearerAuthentication extends AuthenticationProvider {
         this.password = password;
     }
 
-    private String getAuthString(RestClient client) throws IOException {
+    private static String getBearerToken(RestClient client, String username, String password) throws VerifaliaException {
+        // Build input parameters
+        Credentials credentials = new Credentials();
+
+        credentials.setUsername(username);
+        credentials.setPassword(password);
+
+        // Make rest request
+        RestRequest request = new RestRequest(HttpRequestMethod.POST, "auth/tokens", credentials);
+
+        // Sends the request to the Verifalia servers
+        RestResponse response = client.execute(request, new NoAuthenticationProvider());
+        return response.deserialize(JSONObject.class).getString("accessToken");
+    }
+
+    private String getAuthString(RestClient client) throws VerifaliaException {
         if (accessToken == null) {
             accessToken = getBearerToken(client, username, password);
         }
@@ -58,22 +66,15 @@ public class BearerAuthentication extends AuthenticationProvider {
         return "Bearer " + accessToken;
     }
 
-    private static String getBearerToken(RestClient client, String username, String password) throws IOException {
-        // Build input parameters
-        JSONObject authenticateReqJson = new JSONObject();
-        authenticateReqJson.put("username", username);
-        authenticateReqJson.put("password", password);
-
-        // Make rest request
-        RestRequest request = new RestRequest(HttpRequestMethod.POST, "auth/tokens", authenticateReqJson.toString());
-
-        // Sends the request to the Verifalia servers
-        RestResponse response = client.execute(request, JSONObject.class, new NoAuthenticationProvider());
-        return ((JSONObject) response.getData()).getString("accessToken");
+    @Override
+    public void decorateRequest(RestClient client, HttpRequestBase request) throws VerifaliaException {
+        request.setHeader(HttpHeaders.AUTHORIZATION, getAuthString(client));
     }
 
-    @Override
-    public void decorateRequest(RestClient client, HttpRequestBase request) throws IOException {
-        request.setHeader(HttpHeaders.AUTHORIZATION, getAuthString(client));
+    @Getter
+    @Setter
+    private static class Credentials {
+        private String username;
+        private String password;
     }
 }

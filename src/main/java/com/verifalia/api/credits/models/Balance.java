@@ -1,10 +1,13 @@
 package com.verifalia.api.credits.models;
 
-import org.codehaus.jackson.annotate.JsonIgnoreProperties;
-
+import com.verifalia.api.common.DurationDeserializer;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
+import org.codehaus.jackson.map.annotate.JsonDeserialize;
+
+import java.time.Duration;
 
 /**
  * Represents a single credit balance details for Verifalia API service.
@@ -13,8 +16,8 @@ import lombok.ToString;
 @Setter
 @ToString
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class CreditBalanceData {
-	 /**
+public class Balance {
+    /**
      * The number of credit packs (that is, the non-expiring credits).
      */
     private Double creditPacks;
@@ -25,7 +28,8 @@ public class CreditBalanceData {
     private Double freeCredits;
 
     /**
-     * A string representing the amount of time before the daily credits expire, where available, expressed in the form hh:mm:ss.
+     * The amount of time before the daily credits expire, where available.
      */
-    private String freeCreditsResetIn;
+    @JsonDeserialize(using = DurationDeserializer.class)
+    private Duration freeCreditsResetIn;
 }

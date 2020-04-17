@@ -10,9 +10,9 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class ResponseMeta {
+public class ListSegmentMeta {
 
-	/**
+    /**
      * A string representing the cursor meta details for the entries result
      */
     private String cursor;
@@ -21,4 +21,8 @@ public class ResponseMeta {
      * Signals whether the response is truncated or not. If not present, the response is not truncated.
      */
     private Boolean isTruncated;
+
+    public ListSegmentMeta() {
+        isTruncated = false;
+    }
 }

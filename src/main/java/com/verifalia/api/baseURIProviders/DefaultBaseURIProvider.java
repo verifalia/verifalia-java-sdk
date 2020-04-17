@@ -3,6 +3,7 @@ package com.verifalia.api.baseURIProviders;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.List;
 
 public class DefaultBaseURIProvider extends BaseURIProvider {
     private ArrayList<URI> baseURIs;
@@ -18,7 +19,7 @@ public class DefaultBaseURIProvider extends BaseURIProvider {
         }
     }
 
-    public ArrayList<URI> provideBaseURIs() {
+    public List<URI> provideBaseURIs() {
         return baseURIs;
     }
 }

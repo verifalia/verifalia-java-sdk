@@ -1,12 +1,10 @@
 package com.verifalia.api.emailvalidations.models;
 
-import org.codehaus.jackson.annotate.JsonIgnoreProperties;
-
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.ToString;
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 
 /**
  * Represents a single validated entry within an email validation batch.
@@ -14,8 +12,6 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-@NoArgsConstructor
-@AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ValidationRequestEntry {
 
@@ -29,7 +25,16 @@ public class ValidationRequestEntry {
      */
     private String custom;
 
-    public ValidationRequestEntry(String inputData){
-    	this.inputData = inputData;
+    public ValidationRequestEntry(@NonNull final String inputData) {
+        this.inputData = inputData;
+    }
+
+    public ValidationRequestEntry(@NonNull final String inputData, final String custom) {
+        this.inputData = inputData;
+        this.custom = custom;
+    }
+
+    public void setInputData(@NonNull final String inputData) {
+        this.inputData = inputData;
     }
 }

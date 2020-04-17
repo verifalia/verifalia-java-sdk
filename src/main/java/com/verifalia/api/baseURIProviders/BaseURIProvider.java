@@ -1,8 +1,8 @@
 package com.verifalia.api.baseURIProviders;
 
 import java.net.URI;
-import java.util.ArrayList;
+import java.util.List;
 
 public abstract class BaseURIProvider {
-    public abstract ArrayList<URI> provideBaseURIs();
+    public abstract List<URI> provideBaseURIs();
 }

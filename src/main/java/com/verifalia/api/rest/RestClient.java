@@ -1,23 +1,19 @@
 package com.verifalia.api.rest;
 
 import com.verifalia.api.baseURIProviders.BaseURIProvider;
-import com.verifalia.api.common.Constants;
 import com.verifalia.api.common.Utils;
 import com.verifalia.api.exceptions.EndpointServerErrorException;
 import com.verifalia.api.exceptions.ServiceUnreachableException;
 import com.verifalia.api.exceptions.VerifaliaException;
 import com.verifalia.api.rest.security.AuthenticationProvider;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.http.HttpEntity;
 import org.apache.http.HttpHeaders;
-import org.apache.http.ParseException;
 import org.apache.http.client.methods.*;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.util.EntityUtils;
 
 import java.io.IOException;
 import java.net.URI;
@@ -30,8 +26,8 @@ import static java.util.Objects.nonNull;
 /***
  * Represents REST client
  */
-@Getter
-@Setter
+//@Getter
+//@Setter
 public class RestClient {
     private static final String RESPONSE_ACCEPT_TYPE_ENCODING = "gzip";
 
@@ -55,12 +51,14 @@ public class RestClient {
      */
     private AuthenticationProvider authenticationProvider;
 
+    private int currentBaseURIIndex;
+
     /**
      * Creates new object using given with default values
      */
-    public RestClient(AuthenticationProvider authenticationProvider, BaseURIProvider baseURIProvider) {
-        this.baseURIs = baseURIProvider.provideBaseURIs();
-        this.apiVersion = Constants.DEFAULT_API_VERSION;
+    public RestClient(AuthenticationProvider authenticationProvider, List<URI> baseURIs, String apiVersion) {
+        this.baseURIs = baseURIs;
+        this.apiVersion = apiVersion;
         this.userAgent = getUserAgent();
         this.authenticationProvider = authenticationProvider;
     }
@@ -72,12 +70,8 @@ public class RestClient {
      * @return RestResponse response object
      * @throws IOException
      */
-    public RestResponse execute(RestRequest request) throws IOException {
-        return execute(request, null);
-    }
-
-    public RestResponse execute(RestRequest request, Class<?> responseObjectClass) throws IOException {
-        return execute(request, responseObjectClass, this.authenticationProvider);
+    public RestResponse execute(RestRequest request) throws VerifaliaException {
+        return execute(request, this.authenticationProvider);
     }
 
     /**
@@ -88,7 +82,8 @@ public class RestClient {
      * @return RestResponse response object
      * @throws IOException
      */
-    public RestResponse execute(RestRequest request, Class<?> responseObjectClass, AuthenticationProvider authenticationProviderOverride) throws IOException {
+    public RestResponse execute(RestRequest request, AuthenticationProvider authenticationProviderOverride)
+            throws VerifaliaException {
         @Getter
         @Setter
         class EndpointServerError {
@@ -103,53 +98,30 @@ public class RestClient {
 
         ArrayList<EndpointServerError> errors = new ArrayList<>();
 
-        if (nonNull(this.baseURIs) && this.baseURIs.size() > 0) {
-            int index = -1;
-            int baseURIsSize = this.baseURIs.size();
-
-            for (int i = 0; i < baseURIsSize; i++) {
-                if (index == -1) {
-                    index = Utils.getRandomNumberInRange(baseURIsSize);
-                } else {
-                    index = (index + 1) % baseURIsSize;
-                }
-
-                URI baseURI = baseURIs.get(index);
+        if (nonNull(this.baseURIs)) {
+            for (int idxAttempt = 0; idxAttempt < this.baseURIs.size(); idxAttempt++) {
                 CloseableHttpResponse response;
+                URI baseURI = this.baseURIs.get(currentBaseURIIndex++ % this.baseURIs.size());
 
                 try {
                     response = sendRequest(baseURI, request, authenticationProviderOverride);
-                } catch (VerifaliaException e) {
-                    throw e;
                 } catch (IOException e) {
                     // Continue with the next attempt on IO exceptions, if needed
-
                     errors.add(new EndpointServerError(baseURI, e));
                     continue;
                 }
 
                 if (nonNull(response)) {
-                    int responseCode = response.getStatusLine().getStatusCode();
+                    int statusCode = response.getStatusLine().getStatusCode();
 
                     // Automatically retry with another host on HTTP 5xx status codes
 
-                    if (responseCode >= 500 && responseCode <= 599) {
-                        errors.add(new EndpointServerError(baseURI, new EndpointServerErrorException(String.format("The API endpoint %s returned a server error HTTP status code %d.", baseURI, responseCode))));
+                    if (statusCode >= 500 && statusCode <= 599) {
+                        errors.add(new EndpointServerError(baseURI, new EndpointServerErrorException(String.format("The API endpoint %s returned a server error HTTP status code %d.", baseURI, statusCode))));
                         continue;
                     }
 
-                    String responseBody = StringUtils.EMPTY;
-
-                    if (nonNull(response)) {
-                        HttpEntity entity = response.getEntity();
-                        if (nonNull(entity)) {
-                            responseBody = EntityUtils.toString(entity);
-                        }
-                    }
-
-                    return new RestResponse(responseCode,
-                            responseBody,
-                            responseObjectClass);
+                    return new RestResponse(statusCode, response.getEntity());
                 }
             }
         }
@@ -163,7 +135,7 @@ public class RestClient {
     }
 
     private CloseableHttpResponse sendRequest(URI baseURI, RestRequest restRequest, AuthenticationProvider authenticationProviderOverride)
-            throws IOException {
+            throws VerifaliaException, IOException {
 
         StringBuilder sb = new StringBuilder();
         sb.append(baseURI.toString()).append("/").append(apiVersion).append("/").append(restRequest.getResource());

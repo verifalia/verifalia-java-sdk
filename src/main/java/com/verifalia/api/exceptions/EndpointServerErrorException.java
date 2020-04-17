@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package com.verifalia.api.exceptions;
 
@@ -8,7 +8,7 @@ package com.verifalia.api.exceptions;
  */
 @SuppressWarnings("serial")
 public class EndpointServerErrorException extends VerifaliaException {
-	public EndpointServerErrorException(String errorMessage) {
-		super(errorMessage);
-	}
+    public EndpointServerErrorException(String errorMessage) {
+        super(errorMessage);
+    }
 }

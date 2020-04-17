@@ -8,7 +8,7 @@ public enum DeduplicationMode {
     /**
      * Off does not mark duplicated email addresses.
      */
-	Off,
+    Off,
 
     /**
      * Safe mark duplicated email addresses with an algorithm which guarantees no false duplicates are returned.

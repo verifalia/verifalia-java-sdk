@@ -1,9 +1,12 @@
 package com.verifalia.api.rest;
 
-import java.net.URI;
-
 import lombok.Getter;
 import lombok.Setter;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.map.annotate.JsonSerialize;
+
+import java.io.IOException;
+import java.net.URI;
 
 /**
  * Represents REST request
@@ -12,39 +15,48 @@ import lombok.Setter;
 @Setter
 public class RestRequest {
 
-	/**
-	 * Base URI
-	 */
-	private URI baseURI;
+    /**
+     * Base URI
+     */
+    private URI baseURI;
 
-	/**
-	 * HTTP request method
-	 */
-	private HttpRequestMethod method;
+    /**
+     * HTTP request method
+     */
+    private HttpRequestMethod method;
 
-	/**
-	 * Request target resource
-	 */
-	private String resource;
+    /**
+     * Request target resource
+     */
+    private String resource;
 
-	/**
-	 * HTTP request data
-	 */
-	private String data;
+    /**
+     * HTTP request data
+     */
+    private String data;
 
-	/**
-	 * Constructs new object for a given resource with given method
-	 */
-	public RestRequest(HttpRequestMethod method, String resource) {
-		this(method, resource, null);
-	}
+    /**
+     * Constructs new object for a given resource with given method
+     */
+    public RestRequest(HttpRequestMethod method, String resource) {
+        this(method, resource, null);
+    }
 
-	/**
-	 * Constructs new object for a given resource with given method and given data
-	 */
-	public RestRequest(HttpRequestMethod method, String resource, String data) {
-		this.method = method;
-		this.resource = resource;
-		this.data = data;
-	}
+    /**
+     * Constructs new object for a given resource with given method and given data
+     */
+    public RestRequest(HttpRequestMethod method, String resource, Object data) {
+        this.method = method;
+        this.resource = resource;
+
+        if (data != null) {
+            try {
+                ObjectMapper mapper = new ObjectMapper();
+                mapper.setSerializationInclusion(JsonSerialize.Inclusion.NON_NULL);
+                this.data = mapper.writeValueAsString(data);
+            } catch (IOException exception) {
+                throw new IllegalArgumentException("Cannot convert the payload into a JSON string.", exception);
+            }
+        }
+    }
 }

@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package com.verifalia.api.exceptions;
 
@@ -11,12 +11,12 @@ import com.verifalia.api.rest.RestResponse;
 @SuppressWarnings("serial")
 public class AuthorizationException extends VerifaliaException {
 
-	/**
-	 * Creates new object
-	 * @param response Response form a Verifalia server
-	 */
-	public AuthorizationException(RestResponse response) {
-		super(response);
-	}
+    /**
+     * Creates new object
+     * @param response Response form a Verifalia server
+     */
+    public AuthorizationException(RestResponse response) {
+        super(response);
+    }
 
 }

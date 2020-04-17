@@ -5,22 +5,22 @@ package com.verifalia.api.emailvalidations.models;
  */
 public enum ValidationEntryClassification {
     /**
-     * Signifies that email address should be able to accept messages into its mailbox
+     * Refers to an email address which is deliverable.
      */
-	Deliverable,
+    Deliverable,
 
     /**
-     * Signifies that the email address is believed to be invalid or inactive;
+     * Refers to an email address which is either invalid or no longer deliverable.
      */
-	Undeliverable,
+    Undeliverable,
 
     /**
-     * Signifies that the email address appears to be valid but we are not completely sure about its quality and deliverability
+     * Refers to an email address which could be no longer valid.
      */
-	Risky,
+    Risky,
 
     /**
-     * Signifies that Verifalia is unable to validate the email address for technical reasons.
+     * Refers to an email address whose deliverability is unknown.
      */
-	Unknown
+    Unknown
 }

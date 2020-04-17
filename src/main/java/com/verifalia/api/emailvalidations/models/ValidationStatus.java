@@ -7,7 +7,7 @@ public enum ValidationStatus {
     /**
      * Signifies that the job is being processed by Verifalia
      */
-	InProgress,
+    InProgress,
 
     /**
      * Signifies that the job has been completed and its validated email addresses are available
@@ -19,8 +19,8 @@ public enum ValidationStatus {
      */
     Deleted,
 
-	/**
-     * Signifies that the job has been expired
+    /**
+     * Signifies that the job is expired
      */
     Expired
 }

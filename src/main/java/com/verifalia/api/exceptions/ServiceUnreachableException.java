@@ -1,9 +1,7 @@
 /**
- * 
+ *
  */
 package com.verifalia.api.exceptions;
-
-import com.verifalia.api.rest.RestResponse;
 
 /**
  * Indicates that all of the Verifalia API endpoints are unreachable.
@@ -11,12 +9,12 @@ import com.verifalia.api.rest.RestResponse;
 @SuppressWarnings("serial")
 public class ServiceUnreachableException extends VerifaliaException {
 
-	/**
-	 * Creates new object
-	 * @param response Response form a Verifalia server
-	 */
-	public ServiceUnreachableException(String errorMessage) {
-		super(errorMessage);
-	}
+    /**
+     * Creates new object
+     * @param response Response form a Verifalia server
+     */
+    public ServiceUnreachableException(String errorMessage) {
+        super(errorMessage);
+    }
 
 }

@@ -1,10 +1,13 @@
 package com.verifalia.api.emailvalidations.models;
 
-import java.util.Date;
-
+import com.verifalia.api.common.DurationDeserializer;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.codehaus.jackson.map.annotate.JsonDeserialize;
+
+import java.time.Duration;
+import java.util.Date;
 
 /**
  * Represents a snapshot of an email validation batch.
@@ -14,7 +17,7 @@ import lombok.ToString;
 @ToString
 public class ValidationOverview {
 
-	/**
+    /**
      * A string representing the unique identifier for the job which Verifalia generates upon receiving an email validation request.
      */
     private String id;
@@ -60,9 +63,11 @@ public class ValidationOverview {
     private ValidationProgress progress;
 
     /**
-     * A string with the data retention period to observe for the validation job, expressed in the format dd.hh:mm:ss (where dd: days, hh: hours, mm: minutes, ss: seconds); the initial dd. part is added only for periods of more than 24 hours. Verifalia deletes the job and its data once its retention period is over, starting to count when the job gets completed.
+     * The data retention period to observe for the validation job. Verifalia deletes the job and its data once
+     * its retention period is over, starting to count when the job gets completed.
      */
-    private String retention;
+    @JsonDeserialize(using = DurationDeserializer.class)
+    private Duration retention;
 
     /**
      * A date representing the timestamp of the eventual submission of the job, in the ISO 8601 format

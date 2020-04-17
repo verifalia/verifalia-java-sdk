@@ -1,29 +1,25 @@
 package com.verifalia.api.rest.security;
 
-import com.verifalia.api.common.Constants;
 import com.verifalia.api.rest.RestClient;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
-import org.apache.http.ssl.PrivateKeyDetails;
-import org.apache.http.ssl.PrivateKeyStrategy;
 import org.apache.http.ssl.SSLContexts;
 
 import javax.net.ssl.SSLContext;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.net.Socket;
 import java.security.KeyStore;
-import java.util.Map;
 
 import static java.util.Objects.nonNull;
 
 @Getter
 @Setter
 public class TLSAuthentication extends AuthenticationProvider {
+    private static final String TLS_AUTHENTICATION_JKS = "jks";
 
     /**
      * Certificate alias
@@ -87,21 +83,23 @@ public class TLSAuthentication extends AuthenticationProvider {
     private SSLConnectionSocketFactory getSSlConnectionSocketFactory(final String certAlias, final String certPassword,
                                                                      File identityStoreJksFile, File trustKeyStoreJksFile) throws Exception {
         // Load identity key store
-        KeyStore identityKeyStore = KeyStore.getInstance(Constants.TLS_AUTHENTICATION_JKS);
+        KeyStore identityKeyStore = KeyStore.getInstance(TLS_AUTHENTICATION_JKS);
         FileInputStream identityKeyStoreFile = new FileInputStream(identityStoreJksFile);
         identityKeyStore.load(identityKeyStoreFile, certPassword.toCharArray());
 
         // Load trust key store
-        KeyStore trustKeyStore = KeyStore.getInstance(Constants.TLS_AUTHENTICATION_JKS);
+        KeyStore trustKeyStore = KeyStore.getInstance(TLS_AUTHENTICATION_JKS);
         FileInputStream trustKeyStoreFile = new FileInputStream(trustKeyStoreJksFile);
         trustKeyStore.load(trustKeyStoreFile, certPassword.toCharArray());
 
         // Load SSL context
-        SSLContext sslContext = SSLContexts.custom().loadKeyMaterial(identityKeyStore, certPassword.toCharArray(), new PrivateKeyStrategy() {
-            public String chooseAlias(Map<String, PrivateKeyDetails> aliases, Socket socket) {
-                return certAlias;
-            }
-        }).loadTrustMaterial(trustKeyStore, null).build();
+        SSLContext sslContext = SSLContexts
+                .custom()
+                .loadKeyMaterial(identityKeyStore,
+                        certPassword.toCharArray(),
+                        (aliases, socket) -> certAlias)
+                .loadTrustMaterial(trustKeyStore, null)
+                .build();
 
         // Initialize socket factory
         return new SSLConnectionSocketFactory(sslContext,

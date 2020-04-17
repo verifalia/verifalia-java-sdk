@@ -5,7 +5,7 @@ package com.verifalia.api.emailvalidations.models;
  */
 public enum ValidationEntryStatus {
 
-	/**
+    /**
      * The at sign symbol (@), used to separate the local part from the domain part of the address, has not been found.
      */
     AtSignNotFound,

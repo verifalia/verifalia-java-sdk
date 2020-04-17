@@ -1,14 +1,13 @@
 package com.verifalia.api.emailvalidations.models;
 
-import static java.util.Objects.nonNull;
-
-import java.util.Date;
-
-import org.codehaus.jackson.annotate.JsonIgnoreProperties;
-
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
+
+import java.util.Date;
+
+import static java.util.Objects.nonNull;
 
 /**
  * Represents a single validated entry within an email validation batch.
@@ -18,7 +17,7 @@ import lombok.ToString;
 @ToString
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ValidationEntry {
-	 /**
+    /**
      * A number with the zero-based index of the entry, with respect to the whole job; this value is mostly useful in the event the API consumer requests a filtered entries set.
      */
     private Integer index;
@@ -87,7 +86,7 @@ public class ValidationEntry {
 
     /**
      * Gets the position of the character in the email address that eventually caused the syntax validation to fail.
-     *
+     * <p>
      * This property is <b>null</b> when there is not a {@link #isSyntaxFailure}
      */
     private Integer syntaxFailureIndex;
@@ -110,25 +109,28 @@ public class ValidationEntry {
     /**
      * Constructs new object.
      */
-	protected ValidationEntry() {}
+    protected ValidationEntry() {
+    }
 
     /**
      * Constructs new object.
+     *
      * @param inputData Input data to be validated (typically, email address)
      */
     public ValidationEntry(String inputData) {
-    	this.inputData = inputData;
+        this.inputData = inputData;
     }
 
     /**
      * Overrides the default set method for status with custom logic to handle status as Unknown if no valid status is returned from server
+     *
      * @param status Validation entry status mapped which needs to be checked
      */
-    public void setStatus(ValidationEntryStatus status){
-    	if(!nonNull(status)){
-    		this.status = ValidationEntryStatus.Unknown;
-    	} else {
-    		this.status = status;
-    	}
+    public void setStatus(ValidationEntryStatus status) {
+        if (!nonNull(status)) {
+            this.status = ValidationEntryStatus.Unknown;
+        } else {
+            this.status = status;
+        }
     }
 }

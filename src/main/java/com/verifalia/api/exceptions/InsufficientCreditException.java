@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package com.verifalia.api.exceptions;
 
@@ -11,12 +11,12 @@ import com.verifalia.api.rest.RestResponse;
 @SuppressWarnings("serial")
 public class InsufficientCreditException extends VerifaliaException {
 
-	/**
-	 * Creates new object
-	 * @param response Response form a Verifalia server
-	 */
-	public InsufficientCreditException(RestResponse response) {
-		super(response);
-	}
+    /**
+     * Creates new object
+     * @param response Response form a Verifalia server
+     */
+    public InsufficientCreditException(RestResponse response) {
+        super(response);
+    }
 
 }
