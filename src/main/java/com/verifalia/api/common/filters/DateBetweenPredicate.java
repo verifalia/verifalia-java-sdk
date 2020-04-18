@@ -31,7 +31,6 @@
 
 package com.verifalia.api.common.filters;
 
-import com.verifalia.api.common.Constants;
 import com.verifalia.api.common.Utils;
 import lombok.Getter;
 import lombok.NonNull;
@@ -40,12 +39,28 @@ import lombok.Setter;
 import java.time.LocalDate;
 import java.util.ArrayList;
 
+/**
+ * A filter predicate used to filter dates between two optional values.
+ */
 @Getter
 @Setter
 public class DateBetweenPredicate extends DateFilterPredicate {
+    /**
+     * The minimum date to be included in the filter.
+     */
     private LocalDate since;
+
+    /**
+     * The maximum date to be included in the filter.
+     */
     private LocalDate until;
 
+    /**
+     * Initializes a filter predicate used to filter dates between two optional values.
+     *
+     * @param since The minimum date to be included in the filter.
+     * @param until The maximum date to be included in the filter.
+     */
     public DateBetweenPredicate(final LocalDate since, final LocalDate until) {
         if (since == null && until == null) {
             throw new IllegalArgumentException("Both since and until are null.");
@@ -62,16 +77,16 @@ public class DateBetweenPredicate extends DateFilterPredicate {
     }
 
     @Override
-    public FilterPredicateSegment[] serialize(@NonNull final String fieldName) {
-        ArrayList<FilterPredicateSegment> result = new ArrayList<>();
+    public FilterPredicateFragment[] serialize(@NonNull final String fieldName) {
+        ArrayList<FilterPredicateFragment> result = new ArrayList<>();
 
         if (this.getSince() != null) {
-            result.add(new FilterPredicateSegment(fieldName + ":since", Utils.convertLocalDateToString(this.getSince(), Constants.DATE_FORMAT)));
+            result.add(new FilterPredicateFragment(fieldName + ":since", Utils.convertLocalDateToString(this.getSince(), "yyyy-MM-dd")));
         }
         if (this.getUntil() != null) {
-            result.add(new FilterPredicateSegment(fieldName + ":until", Utils.convertLocalDateToString(this.getUntil(), Constants.DATE_FORMAT)));
+            result.add(new FilterPredicateFragment(fieldName + ":until", Utils.convertLocalDateToString(this.getUntil(), "yyyy-MM-dd")));
         }
 
-        return result.toArray(new FilterPredicateSegment[result.size()]);
+        return result.toArray(new FilterPredicateFragment[result.size()]);
     }
 }

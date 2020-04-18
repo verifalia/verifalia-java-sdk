@@ -31,7 +31,7 @@
 
 package com.verifalia.api.credits.models;
 
-import com.verifalia.api.common.DateDeserializer;
+import com.verifalia.api.common.serialization.DateDeserializer;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -41,7 +41,7 @@ import org.codehaus.jackson.map.annotate.JsonDeserialize;
 import java.time.LocalDate;
 
 /**
- * Represents a single credit balance details for Verifalia API service.
+ * A total usage of Verifalia credits along a specific day..
  */
 @Getter
 @Setter
@@ -50,18 +50,21 @@ import java.time.LocalDate;
 public class DailyUsage {
 
     /**
-     * The date for which credit balance data is given.
+     * The date this credits usage refers to.
      */
     @JsonDeserialize(using = DateDeserializer.class)
     private LocalDate date;
 
     /**
-     * The number of credit packs (that is, the non-expiring credits).
-     */
-    private Double creditPacks;
-
-    /**
-     * The number of daily credits, where available.
+     * The number of credit packs used during the day.
+     * Visit https://verifalia.com/client-area#/credits/add to add credit packs to your Verifalia account.
      */
     private Double freeCredits;
+
+    /**
+     * The number of free daily credits used during the day.
+     * Free daily credits depend on the plan of your Verifalia account; visit https://verifalia.com/client-area#/account/change-plan
+     * to change your plan.
+     */
+    private Double creditPacks;
 }

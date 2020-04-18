@@ -32,7 +32,7 @@
 package com.verifalia.api.emailvalidations.models;
 
 /**
- * Provides enumerated values that specify the supported statuses of a single email address validation entry.
+ * Provides enumerated values for the supported validation statuses for a {@link ValidationEntry}.
  */
 public enum ValidationEntryStatus {
 
@@ -88,8 +88,9 @@ public enum ValidationEntryStatus {
     DoubleDotSequence,
 
     /**
-     * The email address appears to be duplicated with another entry which appears previously in the same validation job;
-     * the duplicateOf property contains the zero-based index of its first occurrence
+     * The item is a duplicate of another email address in the list. To find out the entry this item is a duplicate of,
+     * check the {@link ValidationEntry#duplicateOf} property of the {@link ValidationEntry} instance which exposes this
+     * status code.
      */
     Duplicate,
 
@@ -149,8 +150,7 @@ public enum ValidationEntryStatus {
     MailboxHasInsufficientStorage,
 
     /**
-     * The requested mailbox is temporarily unavailable; it could be experiencing technical issues or some other transient problem
-     * (could be over quota, for example).
+     * The requested mailbox is temporarily unavailable; it could be experiencing technical issues or some other transient problem.
      */
     MailboxTemporarilyUnavailable,
 
@@ -176,12 +176,12 @@ public enum ValidationEntryStatus {
     ServerDoesNotSupportInternationalMailboxes,
 
     /**
-     * The external mail exchanger accepts fake, non existent, email addresses; therefore the provided email address MAY be inexistent too.
+     * The external mail exchanger accepts fake, non existent, email addresses; therefore the provided email address MAY be nonexistent too.
      */
     ServerIsCatchAll,
 
     /**
-     * The mail exchanger is temporarily unavailable.
+     * The mail exchanger responsible for the email address under test is temporarily unavailable.
      */
     ServerTemporaryUnavailable,
 
@@ -196,7 +196,8 @@ public enum ValidationEntryStatus {
     SmtpConnectionTimeout,
 
     /**
-     * The external mail exchanger replied one or more non-standard SMTP lines and caused the SMTP session to be aborted.
+     * The mail exchanger responsible for the email address under test replied one or more non-standard SMTP replies which
+     * caused the SMTP session to be aborted.
      */
     SmtpDialogError,
 
@@ -206,7 +207,8 @@ public enum ValidationEntryStatus {
     Success,
 
     /**
-     * The domain literal mentioned in the domain part is invalid. While Verifalia supports them, domain literals are quite rare nowadays.
+     * The domain literal of the email address couldn't accept messages from the Internet; while Verifalia supports them,
+     * domain literals are quite rare nowadays.
      */
     UnacceptableDomainLiteral,
 
@@ -232,7 +234,7 @@ public enum ValidationEntryStatus {
     UnmatchedQuotedPair,
 
     /**
-     * If no valid status is returned, this will be the default status marked.
+     * Unknown validation status, due to a value reported by the API which is missing in this SDK.
      */
     Unknown
 }

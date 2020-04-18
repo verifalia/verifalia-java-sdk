@@ -32,26 +32,27 @@
 package com.verifalia.api.emailvalidations.models;
 
 /**
- * Provides enumerated values that specify the supported classification of a single email address validation entry.
+ * A classification of the <tt>status</tt> of a {@link ValidationEntry}.
  */
 public enum ValidationEntryClassification {
     /**
-     * Refers to an email address which is deliverable.
+     * A {@link ValidationEntry} marked as {@link #Deliverable} refers to an email address which is deliverable.
      */
     Deliverable,
 
     /**
-     * Refers to an email address which is either invalid or no longer deliverable.
+     * A {@link ValidationEntry} marked as {@link #Undeliverable} refers to an email address which is either invalid
+     * or no longer deliverable.
      */
     Undeliverable,
 
     /**
-     * Refers to an email address which could be no longer valid.
+     * A {@link ValidationEntry} marked as {@link #Risky} refers to an email address which could be no longer valid.
      */
     Risky,
 
     /**
-     * Refers to an email address whose deliverability is unknown.
+     * A {@link ValidationEntry} marked as {@link #Unknown} contains an email address whose deliverability is unknown.
      */
     Unknown
 }

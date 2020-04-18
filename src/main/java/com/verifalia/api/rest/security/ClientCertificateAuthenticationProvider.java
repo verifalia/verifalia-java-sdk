@@ -47,38 +47,41 @@ import java.security.KeyStore;
 
 import static java.util.Objects.nonNull;
 
+/**
+ * Allows to authenticate a REST client against the Verifalia API using an X509 client certificate.
+ */
 @Getter
 @Setter
-public class TLSAuthentication extends AuthenticationProvider {
+public class ClientCertificateAuthenticationProvider extends AuthenticationProvider {
     private static final String TLS_AUTHENTICATION_JKS = "jks";
 
     /**
-     * Certificate alias
+     * Certificate alias.
      */
     private String certAlias;
 
     /**
-     * Certificate password
+     * Certificate password.
      */
     private String certPassword;
 
     /**
-     * Identity store JKS file
+     * Identity store JKS file.
      */
     private File identityStoreJksFile;
 
     /**
-     * Trust key store JKS file
+     * Trust key store JKS file.
      */
     private File trustKeyStoreJksFile;
 
     /**
-     * SSL Connection socket factory
+     * SSL Connection socket factory.
      */
     private SSLConnectionSocketFactory sslConnectionSocketFactory;
 
     /**
-     * Constructs an object for TLS authentication to authenticate API client
+     * Constructs an object for TLS client certificate authentication.
      *
      * @param certAlias            Certificate alias
      * @param certPassword         Certificate password
@@ -86,7 +89,7 @@ public class TLSAuthentication extends AuthenticationProvider {
      * @param trustKeyStoreJksFile Trust key-store JKS file
      * @throws Exception
      */
-    public TLSAuthentication(String certAlias, String certPassword, File identityStoreJksFile, File trustKeyStoreJksFile) {
+    public ClientCertificateAuthenticationProvider(String certAlias, String certPassword, File identityStoreJksFile, File trustKeyStoreJksFile) {
         this.certAlias = certAlias;
         this.certPassword = certPassword;
         this.identityStoreJksFile = identityStoreJksFile;

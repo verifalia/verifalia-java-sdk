@@ -36,6 +36,9 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Provides the default base URIs for the Verifalia API.
+ */
 public class DefaultBaseURIProvider extends BaseURIProvider {
     private ArrayList<URI> baseURIs;
 

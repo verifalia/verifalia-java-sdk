@@ -32,7 +32,7 @@
 package com.verifalia.api.rest;
 
 /**
- * HTTP REST request method used by the Verifalia SDK.
+ * HTTP REST request methods used by the Verifalia SDK.
  */
 public enum HttpRequestMethod {
     GET,

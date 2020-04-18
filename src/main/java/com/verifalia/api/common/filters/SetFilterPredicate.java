@@ -31,5 +31,10 @@
 
 package com.verifalia.api.common.filters;
 
+/**
+ * Base class for filter predicates.
+ *
+ * @param <T> The type of elements in the target set.
+ */
 public abstract class SetFilterPredicate<T> extends FilterPredicate {
 }

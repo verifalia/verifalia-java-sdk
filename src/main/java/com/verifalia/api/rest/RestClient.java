@@ -52,7 +52,7 @@ import java.util.List;
 import static java.util.Objects.nonNull;
 
 /***
- * Represents REST client
+ * Represents the internal REST client used by the SDK.
  */
 public class RestClient {
     private final List<URI> baseURIs;
@@ -61,9 +61,6 @@ public class RestClient {
     private final AuthenticationProvider defaultAuthenticationProvider;
     private int currentBaseURIIndex;
 
-    /**
-     * Creates new object using given with default values
-     */
     public RestClient(@NonNull final AuthenticationProvider defaultAuthenticationProvider, @NonNull final List<URI> baseURIs, @NonNull final String apiVersion) {
         this.baseURIs = baseURIs;
         this.apiVersion = apiVersion;
@@ -71,25 +68,10 @@ public class RestClient {
         this.defaultAuthenticationProvider = defaultAuthenticationProvider;
     }
 
-    /**
-     * Executes given request
-     *
-     * @param request The request
-     * @return RestResponse response object
-     * @throws IOException
-     */
     public RestResponse execute(@NonNull final RestRequest request) throws VerifaliaException {
         return execute(request, this.defaultAuthenticationProvider);
     }
 
-    /**
-     * Executes given request
-     *
-     * @param request             The request
-     * @param responseObjectClass Java class of the expected response
-     * @return RestResponse response object
-     * @throws IOException
-     */
     public RestResponse execute(@NonNull final RestRequest request, @NonNull final AuthenticationProvider authenticationProvider)
             throws VerifaliaException {
         @Getter

@@ -29,58 +29,29 @@
  * THE SOFTWARE.
  */
 
-package com.verifalia.api.common;
+package com.verifalia.api.emailvalidations.serialization;
 
-import lombok.NonNull;
+import com.verifalia.api.emailvalidations.models.QualityLevelName;
+import com.verifalia.api.emailvalidations.models.ValidationPriority;
 import org.codehaus.jackson.JsonParser;
+import org.codehaus.jackson.JsonProcessingException;
 import org.codehaus.jackson.map.DeserializationContext;
 import org.codehaus.jackson.map.JsonDeserializer;
 
 import java.io.IOException;
-import java.time.Duration;
 
-public class DurationDeserializer extends JsonDeserializer<Duration> {
+/**
+ * A Json deserializer for validation priorities returned by the Verifalia API.
+ */
+public class ValidationPriorityDeserializer extends JsonDeserializer<ValidationPriority> {
     @Override
-    public Duration deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
-        String durationString = jsonParser.getText();
+    public ValidationPriority deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException, JsonProcessingException {
+        String value = jp.getText();
 
-        if (durationString == null) {
+        if (value == null) {
             return null;
         }
 
-        return parseDuration(durationString);
-    }
-
-    private Duration parseDuration(@NonNull String inputData) {
-        inputData = inputData.trim();
-
-        // Parse the eventual days information
-
-        String[] dayFields = inputData.split("\\.");
-
-        if (dayFields.length > 2) {
-            throw new IllegalArgumentException();
-        }
-
-        int days = 0;
-        String timeData = inputData;
-
-        if (dayFields.length == 2) {
-            days = Integer.parseInt(dayFields[0]);
-            timeData = dayFields[1];
-        }
-
-        // Parse the time information
-
-        String[] timeFields = timeData.split(":");
-
-        if (timeFields.length != 3) {
-            throw new IllegalArgumentException();
-        }
-
-        return Duration.ofSeconds((days * 24 * 60 * 60) +
-                (Integer.parseInt(timeFields[0]) * 60 * 60) +
-                (Integer.parseInt(timeFields[1]) * 60) +
-                (Integer.parseInt(timeFields[2])));
+        return new ValidationPriority(Byte.parseByte(value));
     }
 }

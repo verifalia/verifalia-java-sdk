@@ -44,7 +44,7 @@ import java.util.Map;
 import static java.util.Objects.nonNull;
 
 /**
- * Utility methods/functions used throughout the SDK
+ * Internal utility methods/functions used throughout the SDK.
  */
 public class Utils {
     /**

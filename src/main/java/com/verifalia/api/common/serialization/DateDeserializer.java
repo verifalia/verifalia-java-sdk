@@ -29,26 +29,37 @@
  * THE SOFTWARE.
  */
 
-package com.verifalia.api.common.filters;
+package com.verifalia.api.common.serialization;
 
-import lombok.Getter;
 import lombok.NonNull;
+import org.apache.commons.lang3.StringUtils;
+import org.codehaus.jackson.JsonParser;
+import org.codehaus.jackson.map.DeserializationContext;
+import org.codehaus.jackson.map.JsonDeserializer;
 
-@Getter
-public class FilterPredicateSegment {
-    private String key;
-    private String value;
+import java.io.IOException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
-    public FilterPredicateSegment(@NonNull final String key, @NonNull final String value) {
-        this.setKey(key);
-        this.setValue(value);
+/**
+ * A Json deserializer for the dates returned by the Verifalia API.
+ */
+public class DateDeserializer extends JsonDeserializer<LocalDate> {
+    private static LocalDate convertStringToLocalDate(@NonNull final String dateStr) {
+        if (!StringUtils.isBlank(dateStr)) {
+            return LocalDate.parse(dateStr, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        }
+        return null;
     }
 
-    public void setKey(@NonNull final String key) {
-        this.key = key;
-    }
+    @Override
+    public LocalDate deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
+        String dateString = jsonParser.getText();
 
-    public void setValue(@NonNull final String value) {
-        this.value = value;
+        if (dateString == null) {
+            return null;
+        }
+
+        return convertStringToLocalDate(dateString);
     }
 }

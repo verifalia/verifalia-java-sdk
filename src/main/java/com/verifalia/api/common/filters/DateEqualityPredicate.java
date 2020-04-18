@@ -31,25 +31,35 @@
 
 package com.verifalia.api.common.filters;
 
-import com.verifalia.api.common.Constants;
 import com.verifalia.api.common.Utils;
 import lombok.Getter;
 import lombok.NonNull;
 
 import java.time.LocalDate;
 
+/**
+ * A filter predicate used to filter dates on a specific value.
+ */
 @Getter
 public class DateEqualityPredicate extends DateFilterPredicate {
+    /**
+     * The date (with no time information) to be included in the filter.
+     */
     private LocalDate date;
 
+    /**
+     * Initializes a filter predicate used to filter dates on a specific value.
+     *
+     * @param date The date (with no time information) to be included in the filter.
+     */
     public DateEqualityPredicate(@NonNull final LocalDate date) {
         this.setLocalDate(date);
     }
 
     @Override
-    public FilterPredicateSegment[] serialize(@NonNull final String fieldName) {
-        return new FilterPredicateSegment[]{
-                new FilterPredicateSegment(fieldName, Utils.convertLocalDateToString(this.getDate(), Constants.DATE_FORMAT))
+    public FilterPredicateFragment[] serialize(@NonNull final String fieldName) {
+        return new FilterPredicateFragment[]{
+                new FilterPredicateFragment(fieldName, Utils.convertLocalDateToString(this.getDate(), "yyyy-MM-dd"))
         };
     }
 

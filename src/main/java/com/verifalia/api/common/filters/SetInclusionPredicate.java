@@ -36,23 +36,36 @@ import lombok.NonNull;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 
+/**
+ * A filter predicate used to include certain elements from a target set of possible values.
+ *
+ * @param <T> The type of elements in the set.
+ */
 @Getter
 @Setter
 public class SetInclusionPredicate<T> extends SetFilterPredicate<T> {
+    /**
+     * The values to include from the target set.
+     */
     private T[] values;
 
+    /**
+     * Initializes a filter predicate used to include certain elements from a target set of possible values.
+     *
+     * @param values The values to include from the target set.
+     */
     public SetInclusionPredicate(@NonNull final T... values) {
         this.values = values;
     }
 
     @Override
-    public FilterPredicateSegment[] serialize(@NonNull final String fieldName) {
+    public FilterPredicateFragment[] serialize(@NonNull final String fieldName) {
         if (values.length > 0) {
-            return new FilterPredicateSegment[]{
-                    new FilterPredicateSegment(fieldName, StringUtils.join(values, ","))
+            return new FilterPredicateFragment[]{
+                    new FilterPredicateFragment(fieldName, StringUtils.join(values, ","))
             };
         }
 
-        return new FilterPredicateSegment[0];
+        return new FilterPredicateFragment[0];
     }
 }

@@ -37,10 +37,22 @@ import lombok.ToString;
 
 import java.util.List;
 
+/**
+ * A segment of a list of <tt>T</tt>, returned by a Verifalia API which supports key-set navigation.
+ *
+ * @param <T> The type of elements contained in the segment.
+ */
 @Getter
 @Setter
 @ToString
 public abstract class ListSegment<T> {
+    /**
+     * The meta-data for this list segment.
+     */
     private ListSegmentMeta meta;
+
+    /**
+     * The items of type <tt>T</tt> included in this segment.
+     */
     private List<T> data;
 }

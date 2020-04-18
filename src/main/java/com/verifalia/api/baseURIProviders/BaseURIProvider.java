@@ -34,6 +34,9 @@ package com.verifalia.api.baseURIProviders;
 import java.net.URI;
 import java.util.List;
 
+/**
+ * Provides base URIs for the Verifalia API.
+ */
 public abstract class BaseURIProvider {
     public abstract List<URI> provideBaseURIs();
 }

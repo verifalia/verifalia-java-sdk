@@ -41,7 +41,7 @@ import java.io.IOException;
 import java.net.URI;
 
 /**
- * Represents REST request
+ * Represents a REST request.
  */
 @Getter
 @Setter

@@ -41,6 +41,9 @@ import org.apache.http.impl.client.HttpClients;
 
 import java.io.IOException;
 
+/**
+ * Base class for classes which can authenticate a REST client against the Verifalia API.
+ */
 @Getter
 @Setter
 public abstract class AuthenticationProvider {

@@ -32,10 +32,10 @@
 package com.verifalia.api.emailvalidations;
 
 import com.verifalia.api.common.Direction;
-import com.verifalia.api.common.IterableHelper;
+import com.verifalia.api.common.iterables.IterableHelper;
 import com.verifalia.api.common.ListingCursor;
 import com.verifalia.api.common.Utils;
-import com.verifalia.api.common.filters.FilterPredicateSegment;
+import com.verifalia.api.common.filters.FilterPredicateFragment;
 import com.verifalia.api.common.models.ListSegment;
 import com.verifalia.api.common.models.ListSegmentMeta;
 import com.verifalia.api.emailvalidations.models.*;
@@ -63,13 +63,17 @@ import java.util.Map;
 import static java.util.Objects.nonNull;
 
 /**
- * Allows to submit and manage email validations using the Verifalia service.
- * <p>The functionalities of this type are exposed by way of the {@link com.verifalia.api.VerifaliaRestClient#getEmailValidations getmailValidations()}
- * of {@link com.verifalia.api.VerifaliaRestClient VerifaliaRestClient}.
+ * Allows to submit, retrieve, list and delete email validations.
+ * The features of this type are exposed by way of the {@link com.verifalia.api.VerifaliaRestClient#emailValidations}
+ * property of {@link com.verifalia.api.VerifaliaRestClient}.
  */
 public class EmailValidationsRestClient {
     private final RestClient restClient;
 
+    /**
+     * Internal method used to initialize the object. Do not use this directly: instead, use the {@link com.verifalia.api.VerifaliaRestClient#emailValidations}
+     * property of the {@link com.verifalia.api.VerifaliaRestClient}.
+     */
     public EmailValidationsRestClient(@NonNull final RestClient restClient) {
         this.restClient = restClient;
     }
@@ -77,206 +81,140 @@ public class EmailValidationsRestClient {
     // region Submission methods
 
     /**
-     * Initiates a new email validation batch. Makes a POST request to the "/email-validations" resource.
-     * <p>Upon initialization, batches usually are in the {@link ValidationStatus#InProgress InProgress} status.
-     * Validations are completed only when their {@link ValidationOverview#status} property
-     * is {@link ValidationStatus#Completed Completed}. Use the {@link EmailValidationsRestClient#submit(String, WaitForCompletionOptions)}
-     * to wait for the completion of the batch without having to manually poll the API.
-     * In order to retrieve the most up-to-date snapshot of a validation batch, call the {@link EmailValidationsRestClient#get(String) query}
-     * along with the batch's {@link ValidationOverview#id}.
-     *
-     * @param emailAddress Email address to validate.
-     * @return An object representing the email validation batch.
-     * @throws VerifaliaException
-     * @throws IOException
+     * Submits a new email validation for processing. By default, this method does not wait for the completion of the
+     * email validation job: pass a {@link WaitingStrategy} to request a different waiting behavior.
+     * @param emailAddress The email address to validate.
+     * @return A {@link Validation} object representing the submitted email validation job.
      */
-    @SuppressWarnings("serial")
     public Validation submit(@NonNull final String emailAddress) throws VerifaliaException {
         return submit(new ValidationRequest(emailAddress));
     }
 
     /**
-     * Initiates a new email validation batch. Makes a POST request to the "/email-validations" resource.
-     * <p>Upon initialization, batches usually are in the {@link ValidationStatus#InProgress InProgress} status.
-     * Validations are completed only when their {@link ValidationOverview#status} property
-     * is {@link ValidationStatus#Completed Completed}. Use the {@link EmailValidationsRestClient#submit(String[], WaitForCompletionOptions)}
-     * to wait for the completion of the batch without having to manually poll the API.
-     * In order to retrieve the most up-to-date snapshot of a validation batch, call the {@link EmailValidationsRestClient#get(String) query}
-     * along with the batch's {@link ValidationOverview#id}.
-     *
-     * @param emailAddresses A collection of email addresses to validate
-     * @return An object representing the email validation batch.
+     * Submits a new email validation for processing. By default, this method does not wait for the completion of the
+     * email validation job: pass a {@link WaitingStrategy} to request a different waiting behavior.
+     * @param emailAddresses One or more email addresses to validate.
+     * @return A {@link Validation} object representing the submitted email validation job.
      * @throws VerifaliaException
-     * @throws IOException
      */
     public Validation submit(@NonNull final String[] emailAddresses) throws VerifaliaException {
         return submit(new ValidationRequest(emailAddresses));
     }
 
     /**
-     * Initiates a new email validation batch. Makes a POST request to the "/email-validations" resource.
-     * <p>Upon initialization, batches usually are in the {@link ValidationStatus#InProgress InProgress} status.
-     * Validations are completed only when their {@link ValidationOverview#status} property
-     * is {@link ValidationStatus#Completed Completed}. Use the {@link EmailValidationsRestClient#submit(com.verifalia.api.emailvalidations.models.ValidationRequest, WaitForCompletionOptions)}
-     * to wait for the completion of the batch without having to manually poll the API.
-     * In order to retrieve the most up-to-date snapshot of a validation batch, call the {@link EmailValidationsRestClient#get(String) query}
-     * along with the batch's {@link ValidationOverview#id}.
-     *
-     * @param emailAddresses A collection of email addresses to validate
-     * @return An object representing the email validation batch
+     * Submits a new email validation for processing. By default, this method does not wait for the completion of the
+     * email validation job: pass a {@link WaitingStrategy} to request a different waiting behavior.
+     * @param emailAddresses One or more email addresses to validate.
+     * @return A {@link Validation} object representing the submitted email validation job.
      * @throws VerifaliaException
-     * @throws IOException
      */
     public Validation submit(@NonNull final Iterable<String> emailAddresses) throws VerifaliaException {
         return submit(new ValidationRequest(emailAddresses));
     }
 
     /**
-     * Initiates a new email validation batch. Makes a POST request to the "/email-validations" resource.
-     * <p>Upon initialization, batches usually are in the {@link ValidationStatus#InProgress InProgress} status.
-     * Validations are completed only when their {@link ValidationOverview#status} property.
-     * is {@link ValidationStatus#Completed Completed}; the <b>waitForCompletionOptions</b> parameter
-     * allows to wait for the completion of the batch, without having to manually poll the API.
-     * In order to retrieve the most up-to-date snapshot of a validation batch, call the {@link EmailValidationsRestClient#get(String)}
-     * along with the batch's {@link ValidationOverview#id}.
-     *
-     * @param emailAddresses           A collection of email addresses to validate
-     * @param waitForCompletionOptions The options about waiting for the validation completion
-     * @return An object representing the email validation batch.
-     * @throws IOException
+     * Submits a new email validation for processing.
+     * @param emailAddresses One or more email addresses to validate.
+     * @param waitingStrategy The {@link WaitingStrategy strategy} which rules out how to wait for the completion of the email validation.
+     *                        Passing <tt>null</tt> makes the method avoid waiting for the job completion.
+     * @return A {@link Validation} object representing the submitted email validation job.
      * @throws VerifaliaException
      */
-    public Validation submit(@NonNull final String[] emailAddresses, @NonNull final WaitingStrategy waitingStrategy)
+    public Validation submit(@NonNull final String[] emailAddresses, final WaitingStrategy waitingStrategy)
             throws VerifaliaException {
         return submit(new ValidationRequest(emailAddresses), waitingStrategy);
     }
 
     /**
-     * Initiates a new email validation batch. Makes a POST request to the "/email-validations" resource.
-     * <p>Upon initialization, batches usually are in the {@link ValidationStatus#InProgress InProgress} status.
-     * Validations are completed only when their {@link ValidationOverview#status} property.
-     * is {@link ValidationStatus#Completed Completed}; the <b>waitForCompletionOptions</b> parameter
-     * allows to wait for the completion of the batch, without having to manually poll the API.
-     * In order to retrieve the most up-to-date snapshot of a validation batch, call the {@link EmailValidationsRestClient#get(String)}
-     * along with the batch's {@link ValidationOverview#id}.
-     *
-     * @param emailAddress             Email addresses to validate
-     * @param waitForCompletionOptions The options about waiting for the validation completion
-     * @return An object representing the email validation batch.
-     * @throws IOException
+     * Submits a new email validation for processing.
+     * @param emailAddress The email address to validate.
+     * @param waitingStrategy The {@link WaitingStrategy strategy} which rules out how to wait for the completion of the email validation.
+     *                        Passing <tt>null</tt> makes the method avoid waiting for the job completion.
+     * @return A {@link Validation} object representing the submitted email validation job.
      * @throws VerifaliaException
      */
-    @SuppressWarnings("serial")
-    public Validation submit(@NonNull final String emailAddress, @NonNull final WaitingStrategy waitingStrategy) throws VerifaliaException {
+    public Validation submit(@NonNull final String emailAddress, final WaitingStrategy waitingStrategy) throws VerifaliaException {
         return submit(new ValidationRequest(emailAddress), waitingStrategy);
     }
 
     /**
-     * Initiates a new email validation batch. Makes a POST request to the "/email-validations" resource.
-     * <p>Upon initialization, batches usually are in the {@link ValidationStatus#InProgress InProgress} status.
-     * Validations are completed only when their {@link ValidationOverview#status} property.
-     * is {@link ValidationStatus#Completed Completed}; the <b>waitForCompletionOptions</b> parameter
-     * allows to wait for the completion of the batch, without having to manually poll the API.
-     * In order to retrieve the most up-to-date snapshot of a validation batch, call the {@link EmailValidationsRestClient#get(String)}
-     * along with the batch's {@link ValidationOverview#id}.
-     *
-     * @param emailAddresses           A collection of email addresses to validate
-     * @param deduplication            Validation deduplication based on which request needs to be proceessed
-     * @param waitForCompletionOptions The options about waiting for the validation completion
-     * @return An object representing the email validation batch.
-     * @throws IOException
+     * Submits a new email validation for processing.
+     * @param emailAddresses One or more email addresses to validate.
+     * @param deduplication The {@link DeduplicationMode deduplication algorithm} to use while determining which email addresses are duplicates.
+     * @param waitingStrategy The {@link WaitingStrategy strategy} which rules out how to wait for the completion of the email validation.
+     *                        Passing <tt>null</tt> makes the method avoid waiting for the job completion.
+     * @return A {@link Validation} object representing the submitted email validation job.
      * @throws VerifaliaException
      */
     public Validation submit(@NonNull final String[] emailAddresses, @NonNull final DeduplicationMode deduplication,
-                             @NonNull WaitingStrategy waitingStrategy) throws VerifaliaException {
+                             WaitingStrategy waitingStrategy) throws VerifaliaException {
         return submit(new ValidationRequest(emailAddresses, deduplication), waitingStrategy);
     }
 
     /**
-     * Initiates a new email validation batch. Makes a POST request to the "/email-validations" resource.
-     * <p>Upon initialization, batches usually are in the {@link ValidationStatus#InProgress InProgress} status.
-     * Validations are completed only when their {@link ValidationOverview#status} property.
-     * is {@link ValidationStatus#Completed Completed}; the <b>waitForCompletionOptions</b> parameter
-     * allows to wait for the completion of the batch, without having to manually poll the API.
-     * In order to retrieve the most up-to-date snapshot of a validation batch, call the {@link EmailValidationsRestClient#get(String)}
-     * along with the batch's {@link ValidationOverview#id}.
-     *
-     * @param emailAddress             Email addresses to validate
-     * @param quality                  Validation quality based on which request needs to be processed
-     * @param waitForCompletionOptions The options about waiting for the validation completion
-     * @return An object representing the email validation batch.
-     * @throws IOException
+     * Submits a new email validation for processing.
+     * @param emailAddress The email address to validate.
+     * @param quality The desired {@link QualityLevelName quality level} for this email validation.
+     * @param waitingStrategy The {@link WaitingStrategy strategy} which rules out how to wait for the completion of the email validation.
+     *                        Passing <tt>null</tt> makes the method avoid waiting for the job completion.
+     * @return A {@link Validation} object representing the submitted email validation job.
      * @throws VerifaliaException
      */
-    @SuppressWarnings("serial")
     public Validation submit(@NonNull final String emailAddress, @NonNull final QualityLevelName quality,
-                             @NonNull final WaitingStrategy waitingStrategy) throws VerifaliaException {
+                             final WaitingStrategy waitingStrategy) throws VerifaliaException {
         return submit(new ValidationRequest(emailAddress, quality), waitingStrategy);
     }
 
     /**
-     * Initiates a new email validation batch. Makes a POST request to the "/email-validations" resource.
-     * <p>Upon initialization, batches usually are in the {@link ValidationStatus#InProgress InProgress} status.
-     * Validations are completed only when their {@link ValidationOverview#status} property.
-     * is {@link ValidationStatus#Completed Completed}; the <b>waitForCompletionOptions</b> parameter
-     * allows to wait for the completion of the batch, without having to manually poll the API.
-     * In order to retrieve the most up-to-date snapshot of a validation batch, call the {@link EmailValidationsRestClient#get(String)}
-     * along with the batch's {@link ValidationOverview#id}.
-     *
-     * @param emailAddresses           A collection of email addresses to validate
-     * @param quality                  Validation quality based on which request needs to be processed
-     * @param waitForCompletionOptions The options about waiting for the validation completion
-     * @return An object representing the email validation batch.
-     * @throws IOException
+     * Submits a new email validation for processing.
+     * @param emailAddresses One or more email addresses to validate.
+     * @param quality The desired {@link QualityLevelName quality level} for this email validation.
+     * @param waitingStrategy The {@link WaitingStrategy strategy} which rules out how to wait for the completion of the email validation.
+     *                        Passing <tt>null</tt> makes the method avoid waiting for the job completion.
+     * @return A {@link Validation} object representing the submitted email validation job.
      * @throws VerifaliaException
      */
     public Validation submit(@NonNull final String[] emailAddresses, @NonNull final QualityLevelName quality,
-                             @NonNull final WaitingStrategy waitingStrategy) throws VerifaliaException {
+                             final WaitingStrategy waitingStrategy) throws VerifaliaException {
         return submit(new ValidationRequest(emailAddresses, quality), waitingStrategy);
     }
 
     /**
-     * Initiates a new email validation batch. Makes a POST request to the "/email-validations" resource.
-     * <p>Upon initialization, batches usually are in the {@link ValidationStatus#InProgress InProgress} status.
-     * Validations are completed only when their {@link ValidationOverview#status} property.
-     * is {@link ValidationStatus#Completed Completed}; the <b>waitForCompletionOptions</b> parameter
-     * allows to wait for the completion of the batch, without having to manually poll the API.
-     * In order to retrieve the most up-to-date snapshot of a validation batch, call the {@link EmailValidationsRestClient#get(String)}
-     * along with the batch's {@link ValidationOverview#id}.
-     *
-     * @param emailAddresses           A collection of email addresses to validate
-     * @param quality                  Validation quality based on which request needs to be processed
-     * @param waitForCompletionOptions The options about waiting for the validation completion
-     * @return An object representing the email validation batch.
-     * @throws IOException
+     * Submits a new email validation for processing.
+     * @param emailAddresses One or more email addresses to validate.
+     * @param quality The desired {@link QualityLevelName quality level} for this email validation.
+     * @param deduplication The {@link DeduplicationMode deduplication algorithm} to use while determining which email addresses are duplicates.
+     * @param waitingStrategy The {@link WaitingStrategy strategy} which rules out how to wait for the completion of the email validation.
+     *                        Passing <tt>null</tt> makes the method avoid waiting for the job completion.
+     * @return A {@link Validation} object representing the submitted email validation job.
      * @throws VerifaliaException
      */
     public Validation submit(@NonNull final String[] emailAddresses, @NonNull final QualityLevelName quality,
                              @NonNull final DeduplicationMode deduplication,
-                             @NonNull final WaitingStrategy waitingStrategy) throws VerifaliaException {
+                             final WaitingStrategy waitingStrategy) throws VerifaliaException {
         return submit(new ValidationRequest(emailAddresses, quality, deduplication), waitingStrategy);
     }
 
+    /**
+     * Submits a new email validation for processing. By default, this method does not wait for the completion of the
+     * email validation job: pass a {@link WaitingStrategy} to request a different waiting behavior.
+     * @param validationRequest A {@link ValidationRequest} to submit for validation.
+     * @return A {@link Validation} object representing the submitted email validation job.
+     * @throws VerifaliaException
+     */
     public Validation submit(@NonNull final ValidationRequest validationRequest) throws VerifaliaException {
-        return submit(validationRequest, new WaitingStrategy(true));
+        return submit(validationRequest, null);
     }
 
     /**
-     * Initiates a new email validation batch. Makes a POST request to the "/email-validations" resource.
-     * <p>Upon initialization, batches usually are in the {@link ValidationStatus#InProgress InProgress} status.
-     * Validations are completed only when their {@link ValidationOverview#status} property.
-     * is {@link ValidationStatus#Completed Completed}; the {@code waitForCompletionOptions} parameter
-     * allows to wait for the completion of the batch, without having to manually poll the API.
-     * In order to retrieve the most up-to-date snapshot of a validation batch, call the {@link EmailValidationsRestClient#get(String)}
-     * along with the batch's {@link ValidationOverview#id}.
-     *
-     * @param validationRequest        An object representing the input for email validation requests
-     * @param waitForCompletionOptions The options about waiting for the validation completion
-     * @return Validation An object representing the email validation batch.
-     * @throws IOException
+     * Submits a new email validation for processing.
+     * @param validationRequest A {@link ValidationRequest} to submit for validation.
+     * @param waitingStrategy The {@link WaitingStrategy strategy} which rules out how to wait for the completion of the email validation.
+     *                        Passing <tt>null</tt> makes the method avoid waiting for the job completion.
+     * @return A {@link Validation} object representing the submitted email validation job.
      * @throws VerifaliaException
      */
-    public Validation submit(@NonNull final ValidationRequest validationRequest, @NonNull final WaitingStrategy waitingStrategy) throws VerifaliaException {
+    public Validation submit(@NonNull final ValidationRequest validationRequest, final WaitingStrategy waitingStrategy) throws VerifaliaException {
         // Checks the parameters
 
         if (validationRequest.getEntries() == null) {
@@ -308,7 +246,7 @@ public class EmailValidationsRestClient {
 
                 // The batch has been accepted but is not yet completed
 
-                if (!waitingStrategy.waitForCompletion) {
+                if (waitingStrategy == null || !waitingStrategy.waitForCompletion) {
                     validation.getOverview().setStatus(ValidationStatus.InProgress);
                     return validation;
                 }
@@ -328,42 +266,41 @@ public class EmailValidationsRestClient {
         }
     }
 
-
     // endregion
 
     // region Retrieval methods
 
     /**
-     * Returns an object representing an email validation batch, identified by the specified unique identifier.
-     * Makes a GET request to the <b>"/email-validations/{id}"</b> resource.
-     * <p>To initiate a new email validation batch, please use {@link EmailValidationsRestClient#submit(java.lang.Iterable)}
-     *
-     * @param id The identifier for an email validation batch to be retrieved.
-     * @return Validation An object representing the current status of the requested email validation batch.
-     * @throws IOException
+     * Returns an email validation job previously submitted for processing. In the event retrieving the whole validation
+     * job data is not needed and getting just the {@link ValidationOverview} would be enough, use the {@link #getOverview(String)}
+     * method instead.
+     * By default, this method does not wait for the completion of the email validation job: pass a {@link WaitingStrategy}
+     * to request a different waiting behavior.
+     * @param id The {@link ValidationOverview#id} of the email validation job to retrieve.
+     * @return The {@link Validation} object representing the email validation job.
+     * @throws VerifaliaException
      */
     public Validation get(@NonNull final String id) throws VerifaliaException {
-        return get(id, new WaitingStrategy(true));
+        return get(id, null);
     }
 
     /**
-     * Returns an object representing an email validation batch, waiting for its completion and issuing multiple retries if needed.
-     * Makes a GET request to the <b>"/email-validations/{uniqueId}"</b> resource.
-     * <p>To initiate a new email validation batch, please use {@link EmailValidationsRestClient#submit(java.lang.Iterable)}
-     *
-     * @param id                       The identifier for an email validation batch to be retrieved.
-     * @param waitOptions              The options about waiting for the validation completion.
-     * @param pollingLoopEventListener Polling loop event listener, may be <b>null</b>.
-     * @return An object representing the current status of the requested email validation batch.
-     * @throws IOException
+     * Returns an email validation job previously submitted for processing. In the event retrieving the whole validation
+     * job data is not needed and getting just the {@link ValidationOverview} would be enough, use the {@link #getOverview(String)}
+     * method instead.
+     * @param id The {@link ValidationOverview#id} of the email validation job to retrieve.
+     * @param waitingStrategy The {@link WaitingStrategy strategy} which rules out how to wait for the completion of the email validation.
+     *                        Passing <tt>null</tt> makes the method avoid waiting for the job completion.
+     * @return The {@link Validation} object representing the email validation job.
+     * @throws VerifaliaException
      */
-    public Validation get(@NonNull final String id, @NonNull final WaitingStrategy waitingStrategy) throws VerifaliaException {
+    public Validation get(@NonNull final String id, final WaitingStrategy waitingStrategy) throws VerifaliaException {
 
         // Handle the case when the client wishes to avoid waiting for completion
 
         Validation result = getOnce(id);
 
-        if (waitingStrategy.waitForCompletion) {
+        if (waitingStrategy != null && waitingStrategy.waitForCompletion) {
             EmailValidationsRestClient parent = this;
             PollingTask<Validation> pollingTask = new PollingTask<>(id,
                     result,
@@ -389,14 +326,6 @@ public class EmailValidationsRestClient {
         return result;
     }
 
-    /**
-     * Returns an object representing an email validation batch, identified by the specified unique identifier.
-     * Makes a GET request to the <b>"/email-validations/{id}"</b> resource.
-     * <p>To initiate a new email validation batch, please use {@link EmailValidationsRestClient#submit(java.lang.Iterable)}
-     *
-     * @param id The identifier for an email validation batch to be retrieved.
-     * @return An object representing the current status of the requested email validation batch.
-     */
     private Validation getOnce(@NonNull final String id) throws VerifaliaException {
         // Build request
         RestRequest request = new RestRequest(HttpRequestMethod.GET, "email-validations/" + id);
@@ -443,14 +372,32 @@ public class EmailValidationsRestClient {
         }
     }
 
+    /**
+     * Returns a lightweight {@link ValidationOverview} of an email validation job previously submitted for processing.
+     * To retrieve the whole job data, including its results, use the {@link #get(String)} method instead.
+     * By default, this method does not wait for the completion of the email validation job: pass a {@link WaitingStrategy}
+     * to request a different waiting behavior.
+     * @param id The {@link ValidationOverview#id} of the email validation job to retrieve.
+     * @return
+     * @throws VerifaliaException
+     */
     public ValidationOverview getOverview(@NonNull final String id) throws VerifaliaException {
-        return getOverview(id, new WaitingStrategy(true));
+        return getOverview(id, null);
     }
 
-    public ValidationOverview getOverview(@NonNull final String id, @NonNull final WaitingStrategy waitingStrategy) throws VerifaliaException {
+    /**
+     * Returns a lightweight {@link ValidationOverview} of an email validation job previously submitted for processing.
+     * To retrieve the whole job data, including its results, use the {@link #get(String)} method instead.
+     * @param id The {@link ValidationOverview#id} of the email validation job to retrieve.
+     * @param waitingStrategy The {@link WaitingStrategy strategy} which rules out how to wait for the completion of the email validation.
+     *                        Passing <tt>null</tt> makes the method avoid waiting for the job completion.
+     * @return
+     * @throws VerifaliaException
+     */
+    public ValidationOverview getOverview(@NonNull final String id, final WaitingStrategy waitingStrategy) throws VerifaliaException {
         ValidationOverview result = getOverviewOnce(id);
 
-        if (waitingStrategy.waitForCompletion) {
+        if (waitingStrategy != null && waitingStrategy.waitForCompletion) {
             PollingTask<ValidationOverview> pollingTask = new PollingTask<>(id,
                     result,
                     new PollingCallback<ValidationOverview>() {
@@ -475,14 +422,6 @@ public class EmailValidationsRestClient {
         return result;
     }
 
-    /**
-     * Returns an object representing an email validation batch overview, identified by the specified unique identifier.
-     * Makes a GET request to the <b>"/email-validations/{id}/overview"</b> resource.
-     * <p>To initiate a new email validation batch, please use {@link EmailValidationsRestClient#submit(java.lang.Iterable)}
-     *
-     * @param id The identifier for an email validation batch to be retrieved.
-     * @return ValidationOverview An object representing the overview of the requested email validation batch.
-     */
     private ValidationOverview getOverviewOnce(@NonNull final String id) throws VerifaliaException {
         // Build URL
         StringBuilder requestUrlBuilder = new StringBuilder();
@@ -535,25 +474,21 @@ public class EmailValidationsRestClient {
     }
 
     /**
-     * Returns an object representing an email validation batch entries, identified by the specified unique identifier.
-     * Makes a GET request to the <b>"/email-validations/{id}/entries"</b> resource.
-     * <p>To initiate a new email validation batch, please use {@link EmailValidationsRestClient#submit(java.lang.Iterable)}
-     *
-     * @param id The identifier for an email validation batch to be retrieved.
-     * @return List<ValidationEntry> An object list representing the entries of the requested email validation batch.
+     * Lists the validated entries for a given validation.
+     * @param id The {@link ValidationOverview#id} of the email validation job to list the entries for.
+     * @return An iterable collection of {@link ValidationEntry} items.
+     * @throws VerifaliaException
      */
     public Iterable<ValidationEntry> listEntries(@NonNull final String id) throws VerifaliaException {
         return listEntries(id, null);
     }
 
     /**
-     * Returns an object representing an email validation batch entries, identified by the specified unique identifier and with specified statuses.
-     * Makes a GET request to the <b>"/email-validations/{id}/entries"</b> resource.
-     * <p>To initiate a new email validation batch, please use {@link EmailValidationsRestClient#submit(java.lang.Iterable)}
-     *
-     * @param id      The identifier for an email validation batch to be retrieved.
-     * @param options An object with the various filters mentioned when retrieving entries.
-     * @return List<ValidationEntry> An object list representing the entries of the requested email validation batch.
+     * Lists the validated entries for a given validation.
+     * @param id The {@link ValidationOverview#id} of the email validation job to list the entries for.
+     * @param options A {@link ValidationEntryListingOptions} representing the options for the listing operation.
+     * @return An iterable collection of {@link ValidationEntry} items.
+     * @throws VerifaliaException
      */
     public Iterable<ValidationEntry> listEntries(@NonNull final String id, final ValidationEntryListingOptions options) throws VerifaliaException {
         return IterableHelper.buildIterator(theOptions -> this.listEntriesSegmented(id, theOptions),
@@ -572,7 +507,7 @@ public class EmailValidationsRestClient {
             // Predicates
 
             if (options.getStatuses() != null) {
-                for (FilterPredicateSegment fragment : options.getStatuses().serialize("status")) {
+                for (FilterPredicateFragment fragment : options.getStatuses().serialize("status")) {
                     paramMap.put(fragment.getKey(), fragment.getValue());
                 }
             }
@@ -643,24 +578,25 @@ public class EmailValidationsRestClient {
         return response.deserialize(ValidationEntryListSegment.class);
     }
 
+    // endregion
+
+    // region Listing methods
+
     /**
-     * Returns an object representing the various email validations jobs initiated.
-     * Makes a GET request to the <b>"/email-validations"</b> resource.
-     * <p>To initiate a new email validation batch, please use {@link EmailValidationsRestClient#submit(java.lang.Iterable)}
-     *
-     * @return List<ValidationOverview> An object list representing the information related to each validation job.
+     * Lists all the email validation jobs, from the oldest to the newest. Pass a {@link ValidationOverviewListingOptions}
+     * to specify filters and a different sorting.
+     * @return An iterable collection of {@link ValidationOverview} elements.
+     * @throws VerifaliaException
      */
     public Iterable<ValidationOverview> list() throws VerifaliaException {
         return list(null);
     }
 
     /**
-     * Returns an object representing the various email validations jobs initiated based on filter and sort options passed.
-     * Makes a GET request to the <b>"/email-validations"</b> resource.
-     * <p>To initiate a new email validation batch, please use {@link EmailValidationsRestClient#submit(java.lang.Iterable)}
-     *
-     * @param validationJobFilter Object with options for filters and sort options supported.
-     * @return List<ValidationOverview> An object list representing the information related to each validation job.
+     * Lists all the email validation jobs, according to the listing specified options.
+     * @param options A {@link ValidationOverviewListingOptions} representing the options for the listing operation.
+     * @return An iterable collection of {@link ValidationOverview} elements.
+     * @throws VerifaliaException
      */
     public Iterable<ValidationOverview> list(final ValidationOverviewListingOptions options) throws VerifaliaException {
         return IterableHelper.buildIterator(
@@ -668,10 +604,6 @@ public class EmailValidationsRestClient {
                 this::listSegmented,
                 options);
     }
-
-    // endregion
-
-    // region Listing methods
 
     private ListSegment<ValidationOverview> listSegmented(final ValidationOverviewListingOptions options) throws VerifaliaException {
         // Build query string param map
@@ -685,17 +617,17 @@ public class EmailValidationsRestClient {
             // Predicates
 
             if (options.getCreatedOn() != null) {
-                for (FilterPredicateSegment fragment : options.getCreatedOn().serialize("createdOn")) {
+                for (FilterPredicateFragment fragment : options.getCreatedOn().serialize("createdOn")) {
                     paramMap.put(fragment.getKey(), fragment.getValue());
                 }
             }
             if (options.getStatuses() != null) {
-                for (FilterPredicateSegment fragment : options.getStatuses().serialize("status")) {
+                for (FilterPredicateFragment fragment : options.getStatuses().serialize("status")) {
                     paramMap.put(fragment.getKey(), fragment.getValue());
                 }
             }
             if (options.getOwner() != null) {
-                for (FilterPredicateSegment fragment : options.getOwner().serialize("owner")) {
+                for (FilterPredicateFragment fragment : options.getOwner().serialize("owner")) {
                     paramMap.put(fragment.getKey(), fragment.getValue());
                 }
             }
@@ -766,21 +698,6 @@ public class EmailValidationsRestClient {
         return response.deserialize(ValidationOverviewListSegment.class);
     }
 
-    /**
-     * Deletes an email validation batch, identified by the specified unique identifier.
-     * Makes a DELETE request to the <b>"/email-validations/{id}"</b> resource.
-     *
-     * @param id The identifier for an email validation batch to be deleted.
-     * @throws VerifaliaException
-     */
-    public void delete(@NonNull final String id) throws VerifaliaException {
-        // Make request
-        RestRequest request = new RestRequest(HttpRequestMethod.DELETE, "email-validations/" + id);
-
-        // Sends the request to the Verifalia servers
-        restClient.execute(request);
-    }
-
     private Validation mapValidationMapperToValidation(ValidationMapper validationMapper) {
         Validation validation = null;
         if (nonNull(validationMapper)) {
@@ -801,21 +718,12 @@ public class EmailValidationsRestClient {
         public abstract T refresh(String id) throws VerifaliaException;
     }
 
-    /**
-     * Polling thread task
-     */
     private static class PollingTask<T> implements Runnable {
         private final String id;
         private final WaitingStrategy waitingStrategy;
-        /**
-         * Query result
-         */
-        private T result;
-        /*
-         * Thread exception
-         */
-        private VerifaliaException exception;
         private final PollingCallback<T> callback;
+        private T result;
+        private VerifaliaException exception;
 
         public PollingTask(String id, final T initialResult, PollingCallback<T> callback, WaitingStrategy waitingStrategy) {
             this.id = id;
@@ -824,9 +732,6 @@ public class EmailValidationsRestClient {
             this.waitingStrategy = waitingStrategy;
         }
 
-        /**
-         * Main thread method
-         */
         public void run() {
             try {
                 do {
@@ -877,10 +782,23 @@ public class EmailValidationsRestClient {
 
     // region Deletion methods
 
-    private static class ValidationEntryListSegment extends ListSegment<ValidationEntry> {
+    /**
+     * Deletes an email validation job previously submitted for processing.
+     * @param id The {@link ValidationOverview#id} of the email validation job to delete.
+     * @throws VerifaliaException
+     */
+    public void delete(@NonNull final String id) throws VerifaliaException {
+        // Make request
+        RestRequest request = new RestRequest(HttpRequestMethod.DELETE, "email-validations/" + id);
+
+        // Sends the request to the Verifalia servers
+        restClient.execute(request);
     }
 
     // endregion
+
+    private static class ValidationEntryListSegment extends ListSegment<ValidationEntry> {
+    }
 
     public static class ValidationOverviewListSegment extends ListSegment<ValidationOverview> {
     }

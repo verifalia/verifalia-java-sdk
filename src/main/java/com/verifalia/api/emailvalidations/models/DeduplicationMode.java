@@ -32,22 +32,22 @@
 package com.verifalia.api.emailvalidations.models;
 
 /**
- * An optional string with the name of the algorithm the engine will use to scrub the list of email addresses and remove its duplicates.
- * If not specified, Verifalia will not mark duplicated email addresses.
+ * The deduplication algorithm Verifalia will use to scrub the list of email addresses and mark its duplicates.
  */
 public enum DeduplicationMode {
     /**
-     * Off does not mark duplicated email addresses.
+     * Duplicates detection is turned off.
      */
     Off,
 
     /**
-     * Safe mark duplicated email addresses with an algorithm which guarantees no false duplicates are returned.
+     * Identifies duplicates using an algorithm with safe rules-only, which guarantees no false duplicates.
      */
     Safe,
 
     /**
-     * Relaxed mark duplicated email addresses using a set of relaxed rules which assume the target email service providers are configured with modern settings only.
+     * Identifies duplicates using a set of relaxed rules which assume the target email service providers are
+     * configured with modern settings only (instead of the broader options the RFCs from the '80s allow).
      */
     Relaxed
 }

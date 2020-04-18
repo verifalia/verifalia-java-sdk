@@ -29,11 +29,15 @@
  * THE SOFTWARE.
  */
 
-package com.verifalia.api.common;
+package com.verifalia.api.common.iterables;
 
+import com.verifalia.api.common.ListingCursor;
 import com.verifalia.api.common.models.ListSegment;
 import com.verifalia.api.exceptions.VerifaliaException;
 
-public interface FirstSegmentFetcher<TItem, TOptions> {
-    ListSegment<TItem> fetch(TOptions options) throws VerifaliaException;
+/**
+ * Internal class used for keyset pagination against the Verifalia API.
+ */
+public interface NextSegmentFetcher<TItem> {
+    ListSegment<TItem> fetch(ListingCursor cursor) throws VerifaliaException;
 }

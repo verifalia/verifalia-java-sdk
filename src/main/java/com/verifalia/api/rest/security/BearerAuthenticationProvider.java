@@ -43,29 +43,23 @@ import net.sf.json.JSONObject;
 import org.apache.http.HttpHeaders;
 import org.apache.http.client.methods.HttpRequestBase;
 
+/**
+ * Allows to authenticate a REST client against the Verifalia API using bearer authentication.
+ */
 @Getter
 @Setter
-public class BearerAuthentication extends AuthenticationProvider {
-    /**
-     * Account ID
-     */
+public class BearerAuthenticationProvider extends AuthenticationProvider {
     private String username;
-    /**
-     * Account token
-     */
     private String password;
-    /**
-     * Authentication string
-     */
     private String accessToken;
 
     /**
-     * Constructs an object for bearer authentication to authenticate API client
+     * Initializes a new bearer authentication provider for the Verifalia API, with the specified username and password.
      *
-     * @param username Username used to authenticate to Verifalia
-     * @param password Password used to authenticate to Verifalia
+     * @param username The username of the user.
+     * @param password The password of the user.
      */
-    public BearerAuthentication(@NonNull final String username, @NonNull final String password) {
+    public BearerAuthenticationProvider(@NonNull final String username, @NonNull final String password) {
         this.username = username;
         this.password = password;
     }
@@ -81,7 +75,7 @@ public class BearerAuthentication extends AuthenticationProvider {
         RestRequest request = new RestRequest(HttpRequestMethod.POST, "auth/tokens", credentials);
 
         // Sends the request to the Verifalia servers
-        RestResponse response = client.execute(request, new NoAuthenticationProvider());
+        RestResponse response = client.execute(request, new AuthenticationProvider() { });
         return response.deserialize(JSONObject.class).getString("accessToken");
     }
 

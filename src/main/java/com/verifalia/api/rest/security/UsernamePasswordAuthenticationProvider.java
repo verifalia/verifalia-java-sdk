@@ -42,9 +42,12 @@ import org.apache.http.client.methods.HttpRequestBase;
 
 import java.nio.charset.StandardCharsets;
 
+/**
+ * Allows to authenticate a REST client against the Verifalia API using HTTP basic auth.
+ */
 @Getter
 @Setter
-public class BasicAuthentication extends AuthenticationProvider {
+public class UsernamePasswordAuthenticationProvider extends AuthenticationProvider {
 
     /**
      * Username used to authenticate to Verifalia
@@ -61,9 +64,8 @@ public class BasicAuthentication extends AuthenticationProvider {
      *
      * @param username The username used to authenticate to Verifalia
      * @param password The password used to authenticate to the Verifalia
-     * @throws IllegalArgumentException
      */
-    public BasicAuthentication(@NonNull final String username, @NonNull final String password) {
+    public UsernamePasswordAuthenticationProvider(@NonNull final String username, @NonNull final String password) {
         this.username = username;
         this.password = password;
     }

@@ -31,5 +31,8 @@
 
 package com.verifalia.api.common.filters;
 
+/**
+ * Base class for string filter predicates.
+ */
 public abstract class StringFilterPredicate extends FilterPredicate {
 }

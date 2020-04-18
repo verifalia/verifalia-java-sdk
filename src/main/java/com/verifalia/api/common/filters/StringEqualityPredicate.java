@@ -34,18 +34,29 @@ package com.verifalia.api.common.filters;
 import lombok.Getter;
 import lombok.NonNull;
 
+/**
+ * A filter predicate used to filter strings on a specific value.
+ */
 @Getter
 public class StringEqualityPredicate extends StringFilterPredicate {
+    /**
+     * The string to be included in the filter.
+     */
     private String string;
 
+    /**
+     * Initializes a filter predicate used to filter strings on a specific value.
+     *
+     * @param string The string to be included in the filter.
+     */
     public StringEqualityPredicate(@NonNull final String string) {
         this.setString(string);
     }
 
     @Override
-    public FilterPredicateSegment[] serialize(@NonNull final String fieldName) {
-        return new FilterPredicateSegment[]{
-                new FilterPredicateSegment(fieldName, this.getString())
+    public FilterPredicateFragment[] serialize(@NonNull final String fieldName) {
+        return new FilterPredicateFragment[]{
+                new FilterPredicateFragment(fieldName, this.getString())
         };
     }
 

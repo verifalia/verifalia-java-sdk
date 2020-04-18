@@ -67,8 +67,7 @@ In addition to the HTTP Basic Auth method, this SDK also supports other differen
 Bearer authentication offers higher security over HTTP Basic Auth, as the latter requires sending the actual credentials on each API call, while the former only requires it on a first, dedicated authentication request. On the other side, the first authentication request needed by Bearer authentication takes a non-negligible time: if you need to perform only a single request, using HTTP Basic Auth provides the same degree of security and is the faster option too.
 
 ```java
-import com.verifalia.api.VerifaliaRestClient;
-import com.verifalia.api.rest.security.BearerAuthentication;
+
 
 // Create REST client object with your credentials
 VerifaliaRestClient restClient = new VerifaliaRestClient(new BearerAuthentication("YOUR-ACCOUNT-SID", "YOUR-AUTH-TOKEN"));
@@ -83,9 +82,7 @@ One needs to generate identity keystore file and trust store keystore file from 
 Once the required files are generate use the below code to create the rest client.
 
 ```java
-import com.verifalia.api.VerifaliaRestClient;
-import com.verifalia.api.rest.security.TLSAuthentication;
-import java.io.File;
+
 
 RestClient restClient = new VerifaliaRestClient(new TLSAuthentication(certAlias, certPassword, new File(identifyJksFilePath), new File(trustStoreJksFilePath)));
 ```

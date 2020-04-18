@@ -29,20 +29,53 @@
  * THE SOFTWARE.
  */
 
-package com.verifalia.api.common;
+package com.verifalia.api.common.serialization;
 
-import com.verifalia.api.emailvalidations.models.QualityLevelName;
+import lombok.NonNull;
 import org.codehaus.jackson.JsonGenerator;
 import org.codehaus.jackson.map.JsonSerializer;
 import org.codehaus.jackson.map.SerializerProvider;
 
 import java.io.IOException;
+import java.time.Duration;
 
-public class QualityLevelNameSerializer extends JsonSerializer<QualityLevelName> {
+/**
+ * A Json serializer for the dates accepted by the Verifalia API.
+ */
+public class DurationSerializer extends JsonSerializer<Duration> {
+    private final long SECONDS_IN_MINUTE = 60;
+    private final long SECONDS_IN_HOUR = SECONDS_IN_MINUTE * 60;
+    private final long SECONDS_IN_DAY = SECONDS_IN_HOUR * 24;
+
     @Override
-    public void serialize(QualityLevelName value, JsonGenerator jgen, SerializerProvider provider) throws IOException {
+    public void serialize(Duration value, JsonGenerator jgen, SerializerProvider provider) throws IOException {
         if (value != null) {
-            jgen.writeString(value.getNameOrGuid());
+            jgen.writeString(toString(value));
         }
+    }
+
+    private String toString(@NonNull Duration value) {
+        StringBuffer sb = new StringBuffer();
+        long remainingSeconds = value.toMillis() / 1000;
+
+        long days = remainingSeconds / SECONDS_IN_DAY;
+
+        if (days != 0) {
+            sb.append(days);
+            sb.append(".");
+            remainingSeconds = remainingSeconds % SECONDS_IN_DAY;
+        }
+
+        sb.append(remainingSeconds / SECONDS_IN_HOUR);
+        sb.append(":");
+        remainingSeconds = remainingSeconds % SECONDS_IN_HOUR;
+
+        sb.append(remainingSeconds / SECONDS_IN_MINUTE);
+        sb.append(":");
+        remainingSeconds = remainingSeconds % SECONDS_IN_MINUTE;
+
+        sb.append(remainingSeconds);
+
+        return sb.toString();
     }
 }

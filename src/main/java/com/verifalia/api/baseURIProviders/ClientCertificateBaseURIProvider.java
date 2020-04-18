@@ -36,6 +36,10 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Provides base URIs for the Verifalia API endpoints which support mutual TLS authentication (a feature available
+ * to premium plans only).
+ */
 public class ClientCertificateBaseURIProvider extends BaseURIProvider {
     private ArrayList<URI> baseURIs;
 

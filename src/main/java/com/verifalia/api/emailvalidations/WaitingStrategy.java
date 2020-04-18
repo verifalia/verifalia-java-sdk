@@ -40,21 +40,46 @@ import lombok.Setter;
 
 import java.time.Duration;
 
+/**
+ * A strategy to use while waiting for the completion of an email validation job.
+ */
 @Getter
-@Setter
 public class WaitingStrategy {
+    /**
+     * Gets a value that controls whether to wait for the completion of an email validation job.
+     */
     boolean waitForCompletion;
+
+    /**
+     * Gets a {@link ProgressProvider} instance which eventually receives completion progress updates for an email
+     * validation job.
+     */
     ProgressProvider<ValidationOverview> progressProvider;
 
+    /**
+     * Initializes a {@link WaitingStrategy} according to specified options.
+     * @param waitForCompletion If <tt>true</tt>, the strategy will wait for the job completion.
+     */
     public WaitingStrategy(@NonNull final Boolean waitForCompletion) {
         this(waitForCompletion, null);
     }
 
+    /**
+     * Initializes a {@link WaitingStrategy} according to specified options.
+     * @param waitForCompletion If <tt>true</tt>, the strategy will wait for the job completion.
+     * @param progressProvider A {@link ProgressProvider} instance which eventually receives completion progress updates
+     *                        for an email validation job.
+     */
     public WaitingStrategy(@NonNull final Boolean waitForCompletion, final ProgressProvider<ValidationOverview> progressProvider) {
         this.waitForCompletion = waitForCompletion;
         this.progressProvider = progressProvider;
     }
 
+    /**
+     * Waits for the next polling interval of the specified {@link ValidationOverview}.
+     * @param validationOverview
+     * @throws InterruptedException
+     */
     public void waitForNextPoll(@NonNull final ValidationOverview validationOverview) throws InterruptedException {
         // Observe the ETA if we have one, otherwise a delay given the formula: max(0.5, min(30, 2^(log(noOfEntries, 10) - 1)))
 

@@ -29,12 +29,31 @@
  * THE SOFTWARE.
  */
 
-package com.verifalia.api.rest.security;
+package com.verifalia.api.emailvalidations.serialization;
 
-import lombok.Getter;
-import lombok.Setter;
+import com.verifalia.api.emailvalidations.models.QualityLevelName;
+import org.codehaus.jackson.JsonGenerator;
+import org.codehaus.jackson.JsonParser;
+import org.codehaus.jackson.JsonProcessingException;
+import org.codehaus.jackson.map.DeserializationContext;
+import org.codehaus.jackson.map.JsonDeserializer;
+import org.codehaus.jackson.map.JsonSerializer;
+import org.codehaus.jackson.map.SerializerProvider;
 
-@Getter
-@Setter
-public class NoAuthenticationProvider extends AuthenticationProvider {
+import java.io.IOException;
+
+/**
+ * A Json deserializer for quality levels returned by the Verifalia API.
+ */
+public class QualityLevelNameDeserializer extends JsonDeserializer<QualityLevelName> {
+    @Override
+    public QualityLevelName deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException, JsonProcessingException {
+        String qualityLevelNameString = jp.getText();
+
+        if (qualityLevelNameString == null) {
+            return null;
+        }
+
+        return new QualityLevelName(qualityLevelNameString);
+    }
 }

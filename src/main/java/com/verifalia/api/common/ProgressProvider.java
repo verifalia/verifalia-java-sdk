@@ -33,6 +33,14 @@ package com.verifalia.api.common;
 
 import lombok.NonNull;
 
+/**
+ * Defines a method to provide progress information to a consumer.
+ * @param <T> The type of progress information returned.
+ */
 public interface ProgressProvider<T> {
+    /**
+     * Reports progress information of type <tt>T</tt> to a consumer.
+     * @param value The type of progress information.
+     */
     void report(@NonNull T value);
 }

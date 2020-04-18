@@ -31,7 +31,17 @@
 
 package com.verifalia.api.common;
 
+/**
+ * The direction of a listing operation in the Verifalia API.
+ */
 public enum Direction {
+    /**
+     * Items will be returned in ascending order (smaller to greater).
+     */
     Forward,
+
+    /**
+     * Items will be returned in descending order (greater to smaller).
+     */
     Backward
 }

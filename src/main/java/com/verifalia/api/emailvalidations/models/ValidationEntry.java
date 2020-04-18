@@ -41,7 +41,7 @@ import java.util.Date;
 import static java.util.Objects.nonNull;
 
 /**
- * Represents a single validated entry within an email validation batch.
+ * Represents a single validated entry within a <tt>Validation</tt>.
  */
 @Getter
 @Setter
@@ -49,91 +49,98 @@ import static java.util.Objects.nonNull;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ValidationEntry {
     /**
-     * A number with the zero-based index of the entry, with respect to the whole job; this value is mostly useful in the event the API consumer requests a filtered entries set.
+     * The index of this entry within its <tt>Validation</tt> container. This property is mostly useful in the event
+     * the API returns a filtered view of the items.
      */
     private Integer index;
 
     /**
-     * A string with the original input data submitted for validation.
+     * The input string being validated.
      */
     private String inputData;
 
     /**
-     * Represents the name of the classification for the email validation, which groups related email validation status codes.
+     * The <tt>ValidationEntryClassification</tt> for the status of this email address.
      */
     private ValidationEntryClassification classification;
 
     /**
-     * A detailed status information for the validation result.
+     * The validation status for this entry.
      */
     private ValidationEntryStatus status;
 
     /**
-     * A string with the eventually recognized email address, without any comment or FWS (folding white space) symbol.
+     * Gets the email address, without any eventual comment or folding white space.
      */
     private String emailAddress;
 
     /**
-     * The local part of the email address, without comments and folding white spaces.
+     * Gets the local part of the email address, without comments and folding white spaces.
      */
     private String emailAddressLocalPart;
 
     /**
-     * The domain part of the email address, without comments and folding white spaces.
+     * Gets the local part of the email address, without comments and folding white spaces. If the ASCII-only (punycode)
+     * version of the domain part is needed, use <tt>AsciiEmailAddressDomainPart</tt>.
      */
     private String emailAddressDomainPart;
 
     /**
-     * Gets the domain part of the email address, converted to ASCII if needed and with comments and folding
-     * white spaces stripped off.
+     * Gets the domain part of the email address, converted to ASCII if needed and with comments and folding white
+     * spaces stripped off.
      * <p>The ASCII encoding is performed using the standard <a href="http://en.wikipedia.org/wiki/Punycode">Punycode algorithm</a>.
+     * <p>To get the domain part without any ASCII encoding, use <tt>EmailAddressDomainPart</tt>.</p>
      */
     private String asciiEmailAddressDomainPart;
 
     /**
-     * A logical value indicating whether the email address has an international domain name or not.
+     * If true, the email address has an international domain name.
      */
     private Boolean hasInternationalDomainName;
 
     /**
-     * A logical value indicating whether the email address has an international mailbox name or not.
+     * If true, the email address has an international mailbox name.
      */
     private Boolean hasInternationalMailboxName;
 
     /**
-     * A logical value indicating whether the email address comes from a disposable email address provider or not.
+     * If true, the email address comes from a disposable email address (DEA) provider.
+     * <p>See <see cref="https://verifalia.com/help/email-validations/what-is-a-disposable-email-address-dea"/> for
+     * additional information about disposable email addresses.
      */
     private Boolean isDisposableEmailAddress;
 
     /**
-     * A logical value indicating whether the local part of the email address is a well-known role account or not.
+     * If true, the local part of the email address is a well-known role account.
      */
     private Boolean isRoleAccount;
 
     /**
-     * A logical value indicating whether the local part of the email address is a free email address or not.
+     * If true, the email address comes from a free email address provider (e.g. gmail, yahoo, outlook / hotmail, ...).
      */
     private Boolean isFreeEmailAddress;
 
     /**
-     * Gets the position of the character in the email address that eventually caused the syntax validation to fail.
-     * <p>
-     * This property is <b>null</b> when there is not a {@link #isSyntaxFailure}
+     * The position of the character in the email address that eventually caused the syntax validation to fail.
+     * Returns <tt>null</tt> if there isn't any syntax failure.
      */
     private Integer syntaxFailureIndex;
 
     /**
-     * A string with the eventual custom data included with the entry at the job submission time.
+     * A custom, optional string which is passed back upon completing the validation. To pass back and forth a custom
+     * value, use the <tt>ValidationRequestEntry.Custom</tt> property of <tt>ValidationRequestEntry</tt>.
      */
     private String custom;
 
     /**
-     * A number with the eventual zero-based index of the entry which appears to be duplicated by this item. Only present when the status property equals to Duplicate.
+     * The zero-based index of the first occurrence of this email address in the parent <tt>Validation</tt>, in the
+     * event the <tt>Status</tt> for this entry is <tt>Duplicate</tt>; duplicated items do not expose any result detail
+     * apart from this and the eventual <tt>Custom</tt> values.
      */
     private Integer duplicateOf;
 
     /**
-     * The date this entry has been completed.
+     * The date this entry has been completed, if available.
      */
     private Date completedOn;
 
@@ -144,12 +151,13 @@ public class ValidationEntry {
     }
 
     /**
-     * Overrides the default set method for status with custom logic to handle status as Unknown if no valid status is returned from server
+     * Overrides the default set method for status with custom logic to handle status as Unknown if no valid status is
+     * returned from the Verifalia API.
      *
      * @param status Validation entry status mapped which needs to be checked
      */
     public void setStatus(ValidationEntryStatus status) {
-        if (!nonNull(status)) {
+        if (status == null) {
             this.status = ValidationEntryStatus.Unknown;
         } else {
             this.status = status;

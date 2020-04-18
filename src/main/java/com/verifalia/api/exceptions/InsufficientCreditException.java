@@ -34,20 +34,15 @@
  */
 package com.verifalia.api.exceptions;
 
+import com.verifalia.api.credits.CreditsRestClient;
 import com.verifalia.api.rest.RestResponse;
 
 /**
- * Indicates that the credit of the requesting account is not large enough to perform an operation.
+ * The exception that is thrown when the credit of the requesting account is not enough to accept a given email validation
+ * job. Use the {@link CreditsRestClient#getBalance()} method to check the available credits.
  */
-@SuppressWarnings("serial")
 public class InsufficientCreditException extends VerifaliaException {
-
-    /**
-     * Creates new object
-     * @param response Response form a Verifalia server
-     */
-    public InsufficientCreditException(RestResponse response) {
+   public InsufficientCreditException(RestResponse response) {
         super(response);
     }
-
 }

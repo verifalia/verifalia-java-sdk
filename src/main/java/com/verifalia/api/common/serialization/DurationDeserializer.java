@@ -29,34 +29,61 @@
  * THE SOFTWARE.
  */
 
-package com.verifalia.api.common;
+package com.verifalia.api.common.serialization;
 
 import lombok.NonNull;
-import org.apache.commons.lang3.StringUtils;
 import org.codehaus.jackson.JsonParser;
 import org.codehaus.jackson.map.DeserializationContext;
 import org.codehaus.jackson.map.JsonDeserializer;
 
 import java.io.IOException;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
+import java.time.Duration;
 
-public class DateDeserializer extends JsonDeserializer<LocalDate> {
-    private static LocalDate convertStringToLocalDate(@NonNull final String dateStr) {
-        if (!StringUtils.isBlank(dateStr)) {
-            return LocalDate.parse(dateStr, DateTimeFormatter.ofPattern(Constants.DATE_FORMAT));
-        }
-        return null;
-    }
-
+/**
+ * A Json deserializer for the durations returned by the Verifalia API.
+ */
+public class DurationDeserializer extends JsonDeserializer<Duration> {
     @Override
-    public LocalDate deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
-        String dateString = jsonParser.getText();
+    public Duration deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
+        String durationString = jsonParser.getText();
 
-        if (dateString == null) {
+        if (durationString == null) {
             return null;
         }
 
-        return convertStringToLocalDate(dateString);
+        return parseDuration(durationString);
+    }
+
+    private Duration parseDuration(@NonNull String inputData) {
+        inputData = inputData.trim();
+
+        // Parse the eventual days information
+
+        String[] dayFields = inputData.split("\\.");
+
+        if (dayFields.length > 2) {
+            throw new IllegalArgumentException();
+        }
+
+        int days = 0;
+        String timeData = inputData;
+
+        if (dayFields.length == 2) {
+            days = Integer.parseInt(dayFields[0]);
+            timeData = dayFields[1];
+        }
+
+        // Parse the time information
+
+        String[] timeFields = timeData.split(":");
+
+        if (timeFields.length != 3) {
+            throw new IllegalArgumentException();
+        }
+
+        return Duration.ofSeconds((days * 24 * 60 * 60) +
+                (Integer.parseInt(timeFields[0]) * 60 * 60) +
+                (Integer.parseInt(timeFields[1]) * 60) +
+                (Integer.parseInt(timeFields[2])));
     }
 }

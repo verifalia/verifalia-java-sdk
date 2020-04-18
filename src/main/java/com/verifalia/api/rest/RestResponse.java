@@ -49,9 +49,8 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 
 /**
- * Represents REST service response
+ * Represents REST service response.
  */
-//@Getter
 public class RestResponse {
     private final ContentType contentType;
     /**

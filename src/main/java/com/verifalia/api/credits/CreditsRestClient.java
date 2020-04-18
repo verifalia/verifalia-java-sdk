@@ -32,10 +32,10 @@
 package com.verifalia.api.credits;
 
 import com.verifalia.api.common.Direction;
-import com.verifalia.api.common.IterableHelper;
+import com.verifalia.api.common.iterables.IterableHelper;
 import com.verifalia.api.common.ListingCursor;
 import com.verifalia.api.common.Utils;
-import com.verifalia.api.common.filters.FilterPredicateSegment;
+import com.verifalia.api.common.filters.FilterPredicateFragment;
 import com.verifalia.api.common.models.ListSegment;
 import com.verifalia.api.credits.models.Balance;
 import com.verifalia.api.credits.models.DailyUsage;
@@ -56,23 +56,22 @@ import java.util.Map;
 import static java.util.Objects.nonNull;
 
 /**
- * Allows to submit and manage credits for the Verifalia service.
- * <p>The functionalities of this type are exposed by way of the {@link com.verifalia.api.VerifaliaRestClient#getCredits}
- * of {@link com.verifalia.api.VerifaliaRestClient VerifaliaRestClient}.
+ * Manages credit packs, daily free credits and usage consumption for the Verifalia account.
  */
 public class CreditsRestClient {
     private final RestClient restClient;
 
+    /**
+     * Internal method used to initialize the object. Do not use this directly: instead, use the {@link com.verifalia.api.VerifaliaRestClient#credits}
+     * property of the {@link com.verifalia.api.VerifaliaRestClient}.
+     */
     public CreditsRestClient(@NonNull final RestClient restClient) {
         this.restClient = restClient;
     }
 
     /**
-     * Gets Verifalia API current credit balance information.
-     * Makes a GET request to the <b>"/credits/balance"</b> resource.
-     *
-     * @return CreditBalanceData representing the credit balance data.
-     * @throws IOException
+     * Returns the current credits balance for the Verifalia account.
+     * @return Balance representing the current credits balance.
      */
     public Balance getBalance() throws VerifaliaException {
         // Make rest request
@@ -85,23 +84,16 @@ public class CreditsRestClient {
     }
 
     /**
-     * Gets Verifalia API daily usage credit balance information.
-     * Makes a GET request to the <b>"/credits/daily-usage"</b> resource.
-     *
-     * @return List<CreditDailyUsageData> List of objects where each object representing the credit daily usage details for a date.
-     * @throws IOException
+     * Lists the daily usages of the credits for the Verifalia account.
+     * @return Iterable<DailyUsage> A collection where each item represents the daily usage of credits for a date.
      */
     public Iterable<DailyUsage> listDailyUsage() throws VerifaliaException {
         return listDailyUsage(null);
     }
 
     /**
-     * Gets Verifalia API daily usage credit balance information for given options defined in the filter object
-     * Makes a GET request to the <b>"/credits/daily-usage"</b> resource with the set of filters defined in the input object.
-     *
-     * @param options Object representing the daily usage filter options possible for the API.
-     * @return List<CreditDailyUsageData> List of objects where each object representing the credit daily usage details for a date.
-     * @throws IOException
+     * Lists the daily usages of the credits for the Verifalia account.
+     * @return Iterable<DailyUsage> A collection where each item represents the daily usage of credits for a date.
      */
     public Iterable<DailyUsage> listDailyUsage(final DailyUsageListingOptions options) throws VerifaliaException {
         return IterableHelper.buildIterator(
@@ -121,7 +113,7 @@ public class CreditsRestClient {
             // Predicates
 
             if (options.getDateFilter() != null) {
-                for (FilterPredicateSegment fragment : options.getDateFilter().serialize("date")) {
+                for (FilterPredicateFragment fragment : options.getDateFilter().serialize("date")) {
                     paramMap.put(fragment.getKey(), fragment.getValue());
                 }
             }

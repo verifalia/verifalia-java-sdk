@@ -32,26 +32,27 @@
 package com.verifalia.api.emailvalidations.models;
 
 /**
- * The possible statuses for an email validation batch.
+ * Provides enumerated values for the supported statuses for a {@link ValidationOverview}.
  */
 public enum ValidationStatus {
     /**
-     * Signifies that the job is being processed by Verifalia
+     * The email validation job is being processed by Verifalia. The completion progress, if any, is available through
+     * the {@link ValidationOverview#progress} property.
      */
     InProgress,
 
     /**
-     * Signifies that the job has been completed and its validated email addresses are available
+     * The email validation job has been completed and its results are available.
      */
     Completed,
 
     /**
-     * Signifies that the job has been deleted
+     * The email validation job has either been deleted.
      */
     Deleted,
 
     /**
-     * Signifies that the job is expired
+     * The email validation job is expired.
      */
     Expired
 }

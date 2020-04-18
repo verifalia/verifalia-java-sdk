@@ -31,7 +31,7 @@
 
 package com.verifalia.api.emailvalidations.models;
 
-import com.verifalia.api.common.DurationDeserializer;
+import com.verifalia.api.common.serialization.DurationDeserializer;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -40,7 +40,7 @@ import org.codehaus.jackson.map.annotate.JsonDeserialize;
 import java.time.Duration;
 
 /**
- * Represents the completion progress of an email validation batch.
+ * Progress details for a {@link ValidationOverview}, exposed by way of the {@link ValidationOverview#progress} property.
  */
 @Getter
 @Setter
@@ -48,12 +48,12 @@ import java.time.Duration;
 public class ValidationProgress {
 
     /**
-     * The overall progress percentage for the job, when available, expressed as a number between 0 and 1.
+     * The percentage of completed entries, ranging from 0 to 1.
      */
     private Double percentage;
 
     /**
-     * The estimated remaining time for completing the email validation job, if available.
+     * An eventual estimated required time span needed to complete the whole job.
      */
     @JsonDeserialize(using = DurationDeserializer.class)
     private Duration estimatedTimeRemaining;

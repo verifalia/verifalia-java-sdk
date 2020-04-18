@@ -38,7 +38,7 @@ import lombok.ToString;
 import java.util.List;
 
 /**
- * Represents a snapshot of an email validation batch.
+ * Represents a snapshot of an email validation job, along with its overview and eventual validated entries.
  */
 @Getter
 @Setter
@@ -46,12 +46,12 @@ import java.util.List;
 public class Validation {
 
     /**
-     * The overview of the email validation batch.
+     * Overview information for this email validation job.
      */
     private ValidationOverview overview;
 
     /**
-     * List of all the validation entry data object submitted with the request
+     * The eventual validated items for this email validation job.
      */
     private List<ValidationEntry> entries;
 }

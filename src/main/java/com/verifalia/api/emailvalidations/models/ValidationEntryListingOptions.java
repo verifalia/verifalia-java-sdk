@@ -40,7 +40,7 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 /**
- * Filter object represents the various filters that can be applied when fetching validation entries.
+ * Provides options for a listing of validation entries.
  */
 @Getter
 @Setter
@@ -48,5 +48,8 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @NoArgsConstructor
 public class ValidationEntryListingOptions extends ListingOptions {
+    /**
+     * A predicate which allows to filter the validation entries by their statuses.
+     */
     private SetFilterPredicate<ValidationEntryStatus> statuses;
 }

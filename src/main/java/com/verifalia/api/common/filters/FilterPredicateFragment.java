@@ -29,11 +29,42 @@
  * THE SOFTWARE.
  */
 
-package com.verifalia.api.common;
+package com.verifalia.api.common.filters;
+
+import lombok.Getter;
+import lombok.NonNull;
 
 /**
- * Constants that will be used throughout the SDK
+ * A raw key-value pair predicate fragment, to be passed to the Verifalia API for filtering data.
  */
-public class Constants {
-    public static final String DATE_FORMAT = "yyyy-MM-dd";
+@Getter
+public class FilterPredicateFragment {
+    /**
+     * The key for the predicate fragment.
+     */
+    private String key;
+
+    /**
+     * The value for the predicate fragment.
+     */
+    private String value;
+
+    /**
+     * Initializes a raw key-value pair predicate fragment, to be passed to the Verifalia API for filtering data.
+     *
+     * @param key   The key for the predicate fragment.
+     * @param value The value for the predicate fragment.
+     */
+    public FilterPredicateFragment(@NonNull final String key, @NonNull final String value) {
+        this.setKey(key);
+        this.setValue(value);
+    }
+
+    public void setKey(@NonNull final String key) {
+        this.key = key;
+    }
+
+    public void setValue(@NonNull final String value) {
+        this.value = value;
+    }
 }

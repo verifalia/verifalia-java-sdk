@@ -31,7 +31,9 @@
 
 package com.verifalia.api.emailvalidations.models;
 
-import com.verifalia.api.common.DurationDeserializer;
+import com.verifalia.api.common.serialization.DurationDeserializer;
+import com.verifalia.api.emailvalidations.serialization.QualityLevelNameDeserializer;
+import com.verifalia.api.emailvalidations.serialization.ValidationPriorityDeserializer;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -41,7 +43,7 @@ import java.time.Duration;
 import java.util.Date;
 
 /**
- * Represents a snapshot of an email validation batch.
+ * Overview information for a {@link Validation}.
  */
 @Getter
 @Setter
@@ -49,69 +51,84 @@ import java.util.Date;
 public class ValidationOverview {
 
     /**
-     * A string representing the unique identifier for the job which Verifalia generates upon receiving an email validation request.
+     * The unique identifier for the validation job.
      */
     private String id;
 
     /**
-     * The completion status for the batch.
+     * The processing {@link ValidationStatus} for the validation job.
      */
     private ValidationStatus status;
 
     /**
-     * A string with the user-defined name eventually given to this job at the time of its submission: used for your own internal reference
+     * An optional user-defined name for the validation job, for your own reference.
      */
     private String name;
 
     /**
-     * A string representing the unique identifier of the user which created the job.
+     * The unique ID of the Verifalia user who submitted the validation job.
      */
     private String owner;
 
     /**
-     * IP for client who submitted the email validation batch.
+     * The IP address of the client which submitted the validation job.
      */
     private String clientIP;
 
     /**
-     * Identifies the results quality level requested for the job; can be one of Standard, High and Extreme (or other values for custom quality levels).
+     * The eventual priority (speed) of the validation job, relative to the parent Verifalia account. In the event of an account
+     * with many concurrent validation jobs, this value allows to increase the processing speed of a job with respect to the others.
+     * The allowed range of values spans from {@link ValidationPriority#Lowest} (0 - lowest priority) to
+     * {@link ValidationPriority#Highest} (255 - highest priority), where the midway value
+     * {@link ValidationPriority#Normal} (127) means normal priority; if not specified, Verifalia processes all the
+     * concurrent validation jobs for an account using the same priority.
      */
-    private String quality;
+    @JsonDeserialize(using = ValidationPriorityDeserializer.class)
+    private ValidationPriority priority;
 
     /**
-     * Identifies the deduplication algorithm requested for the job; can be one of Off, Safe and Relaxed.
+     * A reference to the quality level this job was validated against.
+     */
+    @JsonDeserialize(using = QualityLevelNameDeserializer.class)
+    private QualityLevelName quality;
+
+    /**
+     * A {@link DeduplicationMode} option which affected the way Verifalia eventually marked entries as duplicates upon
+     * processing.
      */
     private DeduplicationMode deduplication;
 
     /**
-     * The number of email addresses included in this job.
+     * The number of entries the validation job contains.
      */
     private Integer noOfEntries;
 
     /**
-     * The completion progress for the batch.
+     * The eventual completion progress for the validation job.
      */
     private ValidationProgress progress;
 
     /**
-     * The data retention period to observe for the validation job. Verifalia deletes the job and its data once
-     * its retention period is over, starting to count when the job gets completed.
+     * The maximum data retention period Verifalia observes for this verification job, after which the job will be
+     * automatically deleted.
+     * A verification job can be deleted anytime prior to its retention period through the
+     * {@link com.verifalia.api.emailvalidations.EmailValidationsRestClient#delete(String)} method.
      */
     @JsonDeserialize(using = DurationDeserializer.class)
     private Duration retention;
 
     /**
-     * A date representing the timestamp of the eventual submission of the job, in the ISO 8601 format
+     * The date and time this validation job has been submitted to Verifalia.
      */
     private Date submittedOn;
 
     /**
-     * A date representing the timestamp of the creation of the job, in the ISO 8601 format.
+     * The date and time the validation job was created.
      */
     private Date createdOn;
 
     /**
-     * A date representing the timestamp of the eventual completion of the job, in the ISO 8601 format.
+     * The date and time this validation job has been eventually completed.
      */
     private Date completedOn;
 }

@@ -29,8 +29,10 @@
  * THE SOFTWARE.
  */
 
-package com.verifalia.api.common;
+package com.verifalia.api.common.iterables;
 
+import com.verifalia.api.common.ListingCursor;
+import com.verifalia.api.common.ListingOptions;
 import com.verifalia.api.common.models.ListSegment;
 import com.verifalia.api.exceptions.VerifaliaException;
 import lombok.NonNull;
@@ -39,6 +41,9 @@ import lombok.SneakyThrows;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
+/**
+ * Internal class used for keyset pagination against the Verifalia API.
+ */
 public class IterableHelper {
     public static <TItem, TOptions extends ListingOptions> Iterable<TItem> buildIterator(FirstSegmentFetcher<TItem, TOptions> firstSegmentFetcher,
                                                                                          NextSegmentFetcher<TItem> nextSegmentFetcher,

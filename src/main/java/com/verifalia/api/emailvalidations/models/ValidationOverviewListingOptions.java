@@ -42,7 +42,7 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 /**
- * Filter and sort object represents the various filters that can be applied when fetching validation jobs.
+ * Provides options for a listing of validation jobs.
  */
 @Getter
 @Setter
@@ -50,17 +50,25 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @NoArgsConstructor
 public class ValidationOverviewListingOptions extends ListingOptions {
+    /**
+     * Allows to filter the resulting list by the creation date of its {@link ValidationOverview} items.
+     */
     private DateFilterPredicate createdOn;
 
     /**
-     * A string representing the Id of the user which you wish to filter the results for; if present, the API will return only the jobs submitted by the specified user.
+     * Allows to filter the resulting list by the ID of its owner; if present, the API will return only the jobs
+     * submitted by the specified user.
      */
     private StringEqualityPredicate owner;
 
+    /**
+     * Allows to filter the results by their {@link ValidationStatus}.
+     */
     private SetFilterPredicate<ValidationStatus> statuses;
 
     /**
-     * A object representing the required sorting to apply to the listing operation. Can be one of the following values: createdOn, -createdOn
+     * The {@link ValidationOverview} field to order the resulting listing by; can be used used in conjunction with the
+     * {@link #direction} property to vary the order of the returned elements.
      */
     private ValidationOverviewListingField orderBy;
 }

@@ -33,6 +33,9 @@ package com.verifalia.api.common.filters;
 
 import lombok.NonNull;
 
+/**
+ * Base class for filter predicates.
+ */
 public abstract class FilterPredicate {
-    public abstract FilterPredicateSegment[] serialize(@NonNull final String fieldName);
+    public abstract FilterPredicateFragment[] serialize(@NonNull final String fieldName);
 }

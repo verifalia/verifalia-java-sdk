@@ -39,12 +39,17 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 /**
- * Filter object for making API call to daily usage details.
+ * The options for a daily usage listing operation against the Verifalia API.
  */
 @Getter
 @Setter
 @ToString
 @SuperBuilder
 public class DailyUsageListingOptions extends ListingOptions {
+    /**
+     * If set, apply a filter against the daily usage dates, before returning their usage records. Use  either
+     * <tt>DateEqualityPredicate</tt> to specify an exact date to match or <tt>DateBetweenPredicate</tt> to set a
+     * range of dates.
+     */
     private DateFilterPredicate dateFilter;
 }

@@ -32,8 +32,11 @@
 package com.verifalia.api.emailvalidations.models;
 
 /**
- * Provides enumerated values that specify the supported classification of a single email address validation entry.
+ * Provides enumerated values for the {@link ValidationOverview} fields.
  */
 public enum ValidationOverviewListingField {
+    /**
+     * The date and time the validation job was created; refers to the {@link ValidationOverview#createdOn} field.
+     */
     CreatedOn
 }

@@ -37,12 +37,24 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.SuperBuilder;
 
+/**
+ * Base class for listing operations against the Verifalia API.
+ */
 @Getter
 @SuperBuilder
 @NoArgsConstructor
 public class ListingOptions {
+    /**
+     * The maximum number of items to return with a listing request. The Verifalia API may choose to override the specified
+     * limit if it is either too small or too big. Note: a single listing operation may automatically perform different
+     * listing requests to the Verifalia API: this value limits the number of items returned by *each* API request, not
+     * the overall total number of returned items.
+     */
     private Integer limit;
 
+    /**
+     * The direction of the listing.
+     */
     @Builder.Default
     private Direction direction = Direction.Forward;
 

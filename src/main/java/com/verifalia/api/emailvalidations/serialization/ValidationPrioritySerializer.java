@@ -29,11 +29,24 @@
  * THE SOFTWARE.
  */
 
-package com.verifalia.api.common;
+package com.verifalia.api.emailvalidations.serialization;
 
-import com.verifalia.api.common.models.ListSegment;
-import com.verifalia.api.exceptions.VerifaliaException;
+import com.verifalia.api.emailvalidations.models.QualityLevelName;
+import com.verifalia.api.emailvalidations.models.ValidationPriority;
+import org.codehaus.jackson.JsonGenerator;
+import org.codehaus.jackson.map.JsonSerializer;
+import org.codehaus.jackson.map.SerializerProvider;
 
-public interface NextSegmentFetcher<TItem> {
-    ListSegment<TItem> fetch(ListingCursor cursor) throws VerifaliaException;
+import java.io.IOException;
+
+/**
+ * A Json serializer for validation priorities accepted by the Verifalia API.
+ */
+public class ValidationPrioritySerializer extends JsonSerializer<ValidationPriority> {
+    @Override
+    public void serialize(ValidationPriority value, JsonGenerator jgen, SerializerProvider provider) throws IOException {
+        if (value != null) {
+            jgen.writeString(new Byte(value.getValue()).toString());
+        }
+    }
 }

@@ -31,5 +31,8 @@
 
 package com.verifalia.api.common.filters;
 
+/**
+ * Base class for date filter predicates.
+ */
 public abstract class DateFilterPredicate extends FilterPredicate {
 }

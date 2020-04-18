@@ -29,18 +29,14 @@
  * THE SOFTWARE.
  */
 
-package com.verifalia.api.common;
+package com.verifalia.api.common.iterables;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import com.verifalia.api.common.models.ListSegment;
+import com.verifalia.api.exceptions.VerifaliaException;
 
 /**
  * Internal class used for keyset pagination against the Verifalia API.
  */
-@Getter
-@Setter
-@ToString
-public class ListingCursor extends ListingOptions {
-    private String cursor;
+public interface FirstSegmentFetcher<TItem, TOptions> {
+    ListSegment<TItem> fetch(TOptions options) throws VerifaliaException;
 }
