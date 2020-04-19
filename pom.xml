@@ -5,7 +5,7 @@
 	<groupId>com.github.verifalia</groupId>
 	<artifactId>verifalia-java-sdk</artifactId>
 	<packaging>jar</packaging>
-	<version>2.0.0</version>
+	<version>2.0.1</version>
 	<name>Verifalia SDK for Java</name>
 	<description>Verifalia provides a simple HTTPS-based API for validating email addresses and checking whether they are deliverable or not. This library allows to easily integrate with Verifalia and validate email addresses in real-time.</description>
 	<url>https://verifalia.com/</url>
@@ -205,7 +205,7 @@
 						<configuration>
 							<serverId>ossrh-verifalia</serverId>
 							<nexusUrl>https://oss.sonatype.org/</nexusUrl>
-							<autoReleaseAfterClose>false</autoReleaseAfterClose>
+							<autoReleaseAfterClose>true</autoReleaseAfterClose>
 							<keepStagingRepositoryOnCloseRuleFailure>true</keepStagingRepositoryOnCloseRuleFailure>
 						</configuration>
 					</plugin>

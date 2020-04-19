@@ -48,7 +48,6 @@ import com.verifalia.api.rest.RestResponse;
 import lombok.NonNull;
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.IOException;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
@@ -87,15 +86,15 @@ public class CreditsRestClient {
      * Lists the daily usages of the credits for the Verifalia account.
      * @return Iterable<DailyUsage> A collection where each item represents the daily usage of credits for a date.
      */
-    public Iterable<DailyUsage> listDailyUsage() throws VerifaliaException {
-        return listDailyUsage(null);
+    public Iterable<DailyUsage> listDailyUsages() throws VerifaliaException {
+        return listDailyUsages(null);
     }
 
     /**
      * Lists the daily usages of the credits for the Verifalia account.
      * @return Iterable<DailyUsage> A collection where each item represents the daily usage of credits for a date.
      */
-    public Iterable<DailyUsage> listDailyUsage(final DailyUsageListingOptions options) throws VerifaliaException {
+    public Iterable<DailyUsage> listDailyUsages(final DailyUsageListingOptions options) throws VerifaliaException {
         return IterableHelper.buildIterator(
                 this::listDailyUsageSegmented,
                 this::listDailyUsageSegmented,
