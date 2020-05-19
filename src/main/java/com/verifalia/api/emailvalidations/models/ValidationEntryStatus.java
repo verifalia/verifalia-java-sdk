@@ -89,7 +89,7 @@ public enum ValidationEntryStatus {
 
     /**
      * The item is a duplicate of another email address in the list. To find out the entry this item is a duplicate of,
-     * check the {@link ValidationEntry#duplicateOf} property of the {@link ValidationEntry} instance which exposes this
+     * check the {@link ValidationEntry#getDuplicateOf()} property of the {@link ValidationEntry} instance which exposes this
      * status code.
      */
     Duplicate,
@@ -150,6 +150,11 @@ public enum ValidationEntryStatus {
     MailboxHasInsufficientStorage,
 
     /**
+     * The mailbox is disposable (DEA).
+     */
+    MailboxIsDea,
+
+    /**
      * The requested mailbox is temporarily unavailable; it could be experiencing technical issues or some other transient problem.
      */
     MailboxTemporarilyUnavailable,
@@ -163,6 +168,11 @@ public enum ValidationEntryStatus {
      * The external mail exchanger hides a honeypot / spam trap.
      */
     MailExchangerIsHoneypot,
+
+    /**
+     * The external mail exchanger is a well-know disposable email address provider (DEA).
+     */
+    MailExchangerIsWellKnownDea,
 
     /**
      * The catch-all validation could not be completed correctly, thus the target mail exchanger could be catch-all.

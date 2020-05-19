@@ -61,6 +61,12 @@ public class ValidationRequest {
     private static final Integer VALIDATION_INPUT_PRIORITY_MAX_VALUE = 255;
 
     /**
+     * An optional user-defined name for the validation job, for your own reference. The name will be returned on
+     * subsequent API calls and shown on the Verifalia clients area.
+     */
+    private String name;
+
+    /**
      * One or more {@link ValidationEntry} containing with the email addresses to validate, each along with an optional
      * custom state to be passed back upon completion.
      */

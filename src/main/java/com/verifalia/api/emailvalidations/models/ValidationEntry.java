@@ -31,10 +31,13 @@
 
 package com.verifalia.api.emailvalidations.models;
 
+import com.verifalia.api.emailvalidations.serialization.QualityLevelNameDeserializer;
+import com.verifalia.api.emailvalidations.serialization.ValidationEntryStatusDeserializer;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
+import org.codehaus.jackson.map.annotate.JsonDeserialize;
 
 import java.util.Date;
 
@@ -67,6 +70,7 @@ public class ValidationEntry {
     /**
      * The validation status for this entry.
      */
+    @JsonDeserialize(using = ValidationEntryStatusDeserializer.class)
     private ValidationEntryStatus status;
 
     /**
@@ -148,19 +152,5 @@ public class ValidationEntry {
      * Constructs new object.
      */
     protected ValidationEntry() {
-    }
-
-    /**
-     * Overrides the default set method for status with custom logic to handle status as Unknown if no valid status is
-     * returned from the Verifalia API.
-     *
-     * @param status Validation entry status mapped which needs to be checked
-     */
-    public void setStatus(ValidationEntryStatus status) {
-        if (status == null) {
-            this.status = ValidationEntryStatus.Unknown;
-        } else {
-            this.status = status;
-        }
     }
 }
