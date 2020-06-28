@@ -1,4 +1,4 @@
-![Verifalia API](https://img.shields.io/badge/Verifalia%20API-v2.1-green)
+![Verifalia API](https://img.shields.io/badge/Verifalia%20API-v2.2-green)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.verifalia/verifalia-java-sdk/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.verifalia/verifalia-java-sdk)
 
 Verifalia RESTful API - Java SDK and helper library
@@ -214,6 +214,33 @@ verifalia
 
 Once deleted, a job is gone and there is no way to retrieve its email validation(s).
 
+### How to import email addresses from a file ###
+
+In addition to submitting structured data (see the paragraphs above), it also possible to import the email addresses to
+verify [from a file](https://verifalia.com/developers#email-validations-importing-file) provided by the user. Once submitted,
+the email verification job follows the same flow as described above.
+
+Verifalia accepts the following file types:
+- plain text files (.txt), with one email address per line
+- comma-separated values (.csv), tab-separated values (.tsv) and other delimiter-separated values files
+- Microsoft Excel spreadsheets (.xls and .xlsx)
+
+Here is how to extract and verify email addresses, for example, from the third column of the first sheet of an Excel workbook,
+starting from the second row:
+
+```java
+FileValidationRequest request = new FileValidationRequest("my-list.xlsx",
+    WellKnownMimeTypes.EXCEL_XLSX);
+
+// request.setSheet(0); // 0 is the default value
+request.setColumn(2); // zero-based column number
+request.setStartingRow(1); // zero-based starting row number
+
+Validation validation = verifalia
+    .getEmailValidations()
+    .submit(request);
+```
+
 ### Iterating over your email validation jobs ###
 
 For management and reporting purposes, you may want to obtain a detailed list of your past email
@@ -297,8 +324,7 @@ Iterable<DailyUsage> dailyUsages = verifalia
         .dateFilter(lastThirtyDays)
         .build());
 
-for (DailyUsage dailyUsage : dailyUsages)
-{
+for (DailyUsage dailyUsage : dailyUsages) {
 	System.out.printf("%s - credit packs: %d, free daily credits: %d",
 		dailyUsage.Date,
 		dailyUsage.CreditPacks,

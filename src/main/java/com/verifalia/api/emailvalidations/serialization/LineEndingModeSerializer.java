@@ -31,7 +31,7 @@
 
 package com.verifalia.api.emailvalidations.serialization;
 
-import com.verifalia.api.emailvalidations.models.QualityLevelName;
+import com.verifalia.api.emailvalidations.models.LineEndingMode;
 import org.codehaus.jackson.JsonGenerator;
 import org.codehaus.jackson.map.JsonSerializer;
 import org.codehaus.jackson.map.SerializerProvider;
@@ -39,12 +39,12 @@ import org.codehaus.jackson.map.SerializerProvider;
 import java.io.IOException;
 
 /**
- * A Json serializer for quality levels accepted by the Verifalia API.
+ * A Json serializer for the line ending modes accepted by the Verifalia API.
  */
-public class QualityLevelNameSerializer extends JsonSerializer<QualityLevelName> {
+public class LineEndingModeSerializer extends JsonSerializer<LineEndingMode> {
     @Override
-    public void serialize(QualityLevelName value, JsonGenerator jgen, SerializerProvider provider) throws IOException {
-        if (value == null) {
+    public void serialize(LineEndingMode value, JsonGenerator jgen, SerializerProvider provider) throws IOException {
+        if (value == null || value == LineEndingMode.Auto) {
             jgen.writeNull();
         } else {
             jgen.writeString(value.toString());

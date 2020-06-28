@@ -34,11 +34,20 @@ package com.verifalia.api.rest;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpHeaders;
+import org.apache.http.client.methods.HttpDelete;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.entity.AbstractHttpEntity;
+import org.apache.http.entity.StringEntity;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
 import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
 
 /**
  * Represents a REST request.
@@ -46,49 +55,106 @@ import java.net.URI;
 @Getter
 @Setter
 public class RestRequest {
+    /**
+     * HTTP request data, if any.
+     */
+    private HttpEntity httpEntity;
 
     /**
-     * Base URI
+     * HTTP request method.
      */
-    private URI baseURI;
-
-    /**
-     * HTTP request method
-     */
+    @NonNull
     private HttpRequestMethod method;
 
     /**
-     * Request target resource
+     * Request target resource.
      */
+    @NonNull
     private String resource;
 
-    /**
-     * HTTP request data
-     */
-    private String data;
-
-    /**
-     * Constructs new object for a given resource with given method
-     */
-    public RestRequest(@NonNull final HttpRequestMethod method, @NonNull final String resource) {
-        this(method, resource, null);
+    public static String serializeToJson(Object data) {
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            mapper.setSerializationInclusion(JsonSerialize.Inclusion.NON_NULL);
+            return mapper.writeValueAsString(data);
+        } catch (IOException exception) {
+            throw new IllegalArgumentException("Cannot convert the payload into a JSON string.", exception);
+        }
     }
 
-    /**
-     * Constructs new object for a given resource with given method and given data
-     */
-    public RestRequest(@NonNull final HttpRequestMethod method, @NonNull final String resource, final Object data) {
-        this.method = method;
-        this.resource = resource;
+    public RestRequest(@NonNull final HttpRequestMethod method, @NonNull final String resource) {
+        this.setMethod(method);
+        this.setResource(resource);
+    }
 
-        if (data != null) {
-            try {
-                ObjectMapper mapper = new ObjectMapper();
-                mapper.setSerializationInclusion(JsonSerialize.Inclusion.NON_NULL);
-                this.data = mapper.writeValueAsString(data);
-            } catch (IOException exception) {
-                throw new IllegalArgumentException("Cannot convert the payload into a JSON string.", exception);
+    public RestRequest(@NonNull final HttpRequestMethod method, @NonNull final String resource, @NonNull final HttpEntity httpEntity) {
+        this(method, resource);
+        this.setHttpEntity(httpEntity);
+    }
+
+    public HttpRequestBase buildHttpRequest(@NonNull URI apiVersionURI) throws IOException {
+        HttpRequestBase request;
+
+        // Determine the final URI for this request
+
+        URI requestURI = buildRequestURI(apiVersionURI);
+
+        // Build the actual HTTP request
+
+        switch (getMethod()) {
+            case GET: {
+                request = new HttpGet(requestURI);
+                break;
             }
+
+            case POST: {
+                request = new HttpPost(requestURI);
+                ((HttpPost) request).setEntity(httpEntity);
+
+                if (httpEntity != null) {
+                    // HACK: Since MultipartFormEntity is not public (WTF!), we will assume that all entities are multi-parts
+                    // *unless* they are instances of a specific defined type.
+
+                    if (httpEntity instanceof StringEntity) {
+                        request.setHeader(HttpHeaders.CONTENT_TYPE, "application/json");
+                    }
+                    else {
+                        request.setHeader(HttpHeaders.CONTENT_TYPE, httpEntity.getContentType().getValue());
+                    }
+                }
+
+                break;
+            }
+
+            case DELETE: {
+                request = new HttpDelete(requestURI);
+                break;
+            }
+
+            default:
+                throw new IllegalArgumentException("Unsupported method " + getMethod());
         }
+
+        // Common headers
+
+        request.setHeader(HttpHeaders.ACCEPT, "application/json");
+        request.setHeader(HttpHeaders.ACCEPT_ENCODING, "gzip");
+
+        return request;
+    }
+
+    protected URI buildRequestURI(URI apiVersionURI) throws IOException {
+        // Determine the final URI for this request
+
+        URI requestURI;
+        String requestURICandidate = apiVersionURI.toString() + getResource();
+
+        try {
+            requestURI = new URI(requestURICandidate);
+        } catch (URISyntaxException e) {
+            throw new IOException("Invalid URI " + requestURICandidate);
+        }
+
+        return requestURI;
     }
 }

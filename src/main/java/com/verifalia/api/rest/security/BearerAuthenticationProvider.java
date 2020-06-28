@@ -42,6 +42,8 @@ import lombok.Setter;
 import net.sf.json.JSONObject;
 import org.apache.http.HttpHeaders;
 import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.StringEntity;
 
 /**
  * Allows to authenticate a REST client against the Verifalia API using bearer authentication.
@@ -72,7 +74,10 @@ public class BearerAuthenticationProvider extends AuthenticationProvider {
         credentials.setPassword(password);
 
         // Make rest request
-        RestRequest request = new RestRequest(HttpRequestMethod.POST, "auth/tokens", credentials);
+
+        RestRequest request = new RestRequest(HttpRequestMethod.POST,
+                "auth/tokens",
+                new StringEntity(RestRequest.serializeToJson(credentials), "UTF-8"));
 
         // Sends the request to the Verifalia servers
         RestResponse response = client.execute(request, new AuthenticationProvider() { });

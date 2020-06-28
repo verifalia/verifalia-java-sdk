@@ -49,7 +49,9 @@ public class DurationSerializer extends JsonSerializer<Duration> {
 
     @Override
     public void serialize(Duration value, JsonGenerator jgen, SerializerProvider provider) throws IOException {
-        if (value != null) {
+        if (value == null) {
+            jgen.writeNull();
+        } else {
             jgen.writeString(toString(value));
         }
     }

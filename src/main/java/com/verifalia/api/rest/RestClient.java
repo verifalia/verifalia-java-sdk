@@ -127,49 +127,27 @@ public class RestClient {
     private CloseableHttpResponse sendRequest(@NonNull final URI baseURI, @NonNull final RestRequest restRequest, @NonNull final AuthenticationProvider authenticationProviderOverride)
             throws VerifaliaException, IOException {
 
-        StringBuilder sb = new StringBuilder();
-        sb.append(baseURI.toString()).append("/").append(apiVersion).append("/").append(restRequest.getResource());
+        // Determine the intermediate URI, including the API version, for this invocation
 
-        URI uri;
+        StringBuilder sbApiVersionURI = new StringBuilder();
+        sbApiVersionURI.append(baseURI.toString()).append("/").append(apiVersion).append("/");
+
+        URI apiVersionURI;
 
         try {
-            uri = new URI(sb.toString());
+            apiVersionURI = new URI(sbApiVersionURI.toString());
         } catch (URISyntaxException e) {
-            throw new IOException("Invalid URI " + sb);
+            throw new IOException("Invalid URI " + sbApiVersionURI);
         }
+
+        // Build the HTTP client and the HTTP request out of the provided RestRequest
 
         CloseableHttpClient client = authenticationProviderOverride.buildClient(this);
-        HttpRequestBase request;
-
-        switch (restRequest.getMethod()) {
-            case GET: {
-                request = new HttpGet(uri);
-                break;
-            }
-
-            case POST: {
-                request = new HttpPost(uri);
-                StringEntity entity = new StringEntity(restRequest.getData());
-                ((HttpPost) request).setEntity(entity);
-                break;
-            }
-
-            case DELETE: {
-                request = new HttpDelete(uri);
-                break;
-            }
-
-            default:
-                throw new IllegalArgumentException("Unsupported method " + restRequest.getMethod());
-        }
+        HttpRequestBase request = restRequest.buildHttpRequest(apiVersionURI);
 
         // Common headers and authentication handling
 
         request.setHeader(HttpHeaders.USER_AGENT, this.userAgent);
-        request.setHeader(HttpHeaders.CONTENT_TYPE, "application/json");
-        request.setHeader(HttpHeaders.ACCEPT, "application/json");
-        request.setHeader(HttpHeaders.ACCEPT_ENCODING, "gzip");
-
         authenticationProviderOverride.decorateRequest(this, request);
 
         return client.execute(request);

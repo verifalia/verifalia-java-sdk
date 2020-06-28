@@ -29,25 +29,19 @@
  * THE SOFTWARE.
  */
 
-package com.verifalia.api.emailvalidations.serialization;
+/**
+ *
+ */
+package com.verifalia.api.exceptions;
 
-import com.verifalia.api.emailvalidations.models.QualityLevelName;
-import org.codehaus.jackson.JsonGenerator;
-import org.codehaus.jackson.map.JsonSerializer;
-import org.codehaus.jackson.map.SerializerProvider;
-
-import java.io.IOException;
+import com.verifalia.api.credits.CreditsRestClient;
+import com.verifalia.api.rest.RestResponse;
 
 /**
- * A Json serializer for quality levels accepted by the Verifalia API.
+ * The exception that is thrown whenever Verifalia can't process the format of the provided file.
  */
-public class QualityLevelNameSerializer extends JsonSerializer<QualityLevelName> {
-    @Override
-    public void serialize(QualityLevelName value, JsonGenerator jgen, SerializerProvider provider) throws IOException {
-        if (value == null) {
-            jgen.writeNull();
-        } else {
-            jgen.writeString(value.toString());
-        }
+public class UnsupportedMediaTypeException extends VerifaliaException {
+   public UnsupportedMediaTypeException(RestResponse response) {
+        super(response);
     }
 }

@@ -31,21 +31,13 @@
 
 package com.verifalia.api.emailvalidations;
 
-import com.verifalia.api.common.Direction;
-import com.verifalia.api.common.iterables.IterableHelper;
-import com.verifalia.api.common.ListingCursor;
-import com.verifalia.api.common.Utils;
-import com.verifalia.api.common.filters.FilterPredicateFragment;
-import com.verifalia.api.common.models.ListSegment;
-import com.verifalia.api.common.models.ListSegmentMeta;
+import com.verifalia.api.common.*;
+import com.verifalia.api.common.filters.*;
+import com.verifalia.api.common.iterables.*;
+import com.verifalia.api.common.models.*;
 import com.verifalia.api.emailvalidations.models.*;
-import com.verifalia.api.exceptions.InsufficientCreditException;
-import com.verifalia.api.exceptions.VerifaliaException;
-import com.verifalia.api.exceptions.WaitingInterruptedException;
-import com.verifalia.api.rest.HttpRequestMethod;
-import com.verifalia.api.rest.RestClient;
-import com.verifalia.api.rest.RestRequest;
-import com.verifalia.api.rest.RestResponse;
+import com.verifalia.api.exceptions.*;
+import com.verifalia.api.rest.*;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -53,8 +45,10 @@ import lombok.ToString;
 import org.apache.commons.lang.NotImplementedException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpStatus;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.entity.mime.MultipartEntityBuilder;
 
-import java.io.IOException;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.List;
@@ -202,7 +196,7 @@ public class EmailValidationsRestClient {
      * @return A {@link Validation} object representing the submitted email validation job.
      * @throws VerifaliaException
      */
-    public Validation submit(@NonNull final ValidationRequest validationRequest) throws VerifaliaException {
+    public Validation submit(@NonNull final AbstractValidationRequest validationRequest) throws VerifaliaException {
         return submit(validationRequest, null);
     }
 
@@ -214,20 +208,60 @@ public class EmailValidationsRestClient {
      * @return A {@link Validation} object representing the submitted email validation job.
      * @throws VerifaliaException
      */
-    public Validation submit(@NonNull final ValidationRequest validationRequest, final WaitingStrategy waitingStrategy) throws VerifaliaException {
-        // Checks the parameters
+    public Validation submit(@NonNull final AbstractValidationRequest validationRequest, final WaitingStrategy waitingStrategy) throws VerifaliaException {
+        // Checks the parameters and build the REST request
 
-        if (validationRequest.getEntries() == null) {
-            throw new IllegalArgumentException("emailAddresses cannot be null");
-        }
-        if (validationRequest.getEntries().size() == 0) {
-            throw new IllegalArgumentException("Can't validate an empty batch (emailAddresses)");
-        }
+        RestRequest request;
 
-        // Build the REST request
-        RestRequest request = new RestRequest(HttpRequestMethod.POST, "email-validations", validationRequest);
+        if (validationRequest instanceof ValidationRequest) {
+            ValidationRequest standardValidationRequest = (ValidationRequest) validationRequest;
+
+            if (standardValidationRequest.getEntries() == null) {
+                throw new IllegalArgumentException("emailAddresses cannot be null");
+            }
+            if (standardValidationRequest.getEntries().size() == 0) {
+                throw new IllegalArgumentException("Can't validate an empty batch (emailAddresses)");
+            }
+
+            request = new RestRequest(HttpRequestMethod.POST,
+                    "email-validations",
+                    // Explicitly set the charset as UTF-8 (see https://github.com/verifalia/verifalia-java-sdk/issues/4)
+                    new StringEntity(RestRequest.serializeToJson(validationRequest), "UTF-8"));
+        }
+        else if (validationRequest instanceof FileValidationRequest) {
+            // The actual file content will be checked by the Verifalia API
+
+            FileValidationRequest fileValidationRequest = (FileValidationRequest) validationRequest;
+
+            // Build the multi-part entity
+            // TODO: Move the entity building part to an ad-hoc class derived from RestRequest
+
+            MultipartEntityBuilder entityBuilder = MultipartEntityBuilder.create();
+
+            // inputFile part
+
+            entityBuilder.addBinaryBody("inputFile",
+                    fileValidationRequest.getInputStream(),
+                    fileValidationRequest.getContentType(),
+                    // HACK: Dummy file name to make the underlying Java multi-part form data serializer happy
+                    "file");
+
+            // Settings part
+
+            entityBuilder.addTextBody("settings",
+                    RestRequest.serializeToJson(fileValidationRequest),
+                    ContentType.parse("application/json"));
+
+            request = new RestRequest(HttpRequestMethod.POST,
+                    "email-validations",
+                    entityBuilder.build());
+        }
+        else {
+            throw new IllegalArgumentException("Unsupported class for the validationRequest parameter.");
+        }
 
         // Send the request to the Verifalia servers
+
         RestResponse response = restClient.execute(request);
 
         // Handle response based on status code
@@ -258,6 +292,10 @@ public class EmailValidationsRestClient {
 
             case HttpStatus.SC_PAYMENT_REQUIRED: {
                 throw new InsufficientCreditException(response);
+            }
+
+            case HttpStatus.SC_UNSUPPORTED_MEDIA_TYPE: {
+                throw new UnsupportedMediaTypeException(response);
             }
 
             default: {

@@ -55,7 +55,7 @@ public class VerifaliaRestClient {
     /**
      * The default API version supported by the SDK.
      */
-    public static final String DEFAULT_API_VERSION = "v2.1";
+    public static final String DEFAULT_API_VERSION = "v2.2";
 
     /**
      * Cached REST client object.

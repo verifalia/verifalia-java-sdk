@@ -56,56 +56,12 @@ import static java.util.Objects.nonNull;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ValidationRequest {
-    private static final Integer VALIDATION_INPUT_PRIORITY_MIN_VALUE = 0;
-    private static final Integer VALIDATION_INPUT_PRIORITY_MAX_VALUE = 255;
-
-    /**
-     * An optional user-defined name for the validation job, for your own reference. The name will be returned on
-     * subsequent API calls and shown on the Verifalia clients area.
-     */
-    private String name;
-
+public class ValidationRequest extends AbstractValidationRequest {
     /**
      * One or more {@link ValidationEntry} containing with the email addresses to validate, each along with an optional
      * custom state to be passed back upon completion.
      */
     private List<ValidationRequestEntry> entries;
-
-    /**
-     * A reference to the expected results quality level for this request. Quality levels determine how Verifalia validates
-     * email addresses, including whether and how the automatic reprocessing logic occurs (for transient statuses) and the
-     * verification timeouts settings.
-     * Use one of {@link QualityLevelName#Standard}, {@link QualityLevelName#High} or {@link QualityLevelName#Extreme}
-     * values or a custom quality level ID if you have one (custom quality levels are available to premium plans only).
-     */
-    @JsonSerialize(using = QualityLevelNameSerializer.class)
-    private QualityLevelName quality;
-
-    /**
-     * The strategy Verifalia follows while determining which email addresses are duplicates, within a multiple items job.
-     * Duplicated items (after the first occurrence) will have the {@link ValidationEntryStatus#Duplicate} status.
-     */
-    private DeduplicationMode deduplication;
-
-    /**
-     * The eventual priority (speed) of the validation job, relative to the parent Verifalia account. In the event of an account
-     * with many concurrent validation jobs, this value allows to increase the processing speed of a job with respect to the others.
-     * The allowed range of values spans from {@link ValidationPriority#Lowest} (0 - lowest priority) to
-     * {@link ValidationPriority#Highest} (255 - highest priority), where the midway value
-     * {@link ValidationPriority#Normal} (127) means normal priority; if not specified, Verifalia processes all the
-     * concurrent validation jobs for an account using the same priority.
-     */
-    @JsonSerialize(using = ValidationPrioritySerializer.class)
-    private ValidationPriority priority;
-
-    /**
-     * The maximum data retention period Verifalia observes for this verification job, after which the job will be
-     * automatically deleted. A verification job can be deleted anytime prior to its retention period through the
-     * {@link com.verifalia.api.emailvalidations.EmailValidationsRestClient#delete(String)} method.
-     */
-    @JsonSerialize(using = DurationSerializer.class)
-    private Duration retention;
 
     /**
      * Initializes a {@link ValidationRequest} to be submitted to the Verifalia email validation engine.

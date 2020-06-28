@@ -45,7 +45,9 @@ import java.io.IOException;
 public class ValidationPrioritySerializer extends JsonSerializer<ValidationPriority> {
     @Override
     public void serialize(ValidationPriority value, JsonGenerator jgen, SerializerProvider provider) throws IOException {
-        if (value != null) {
+        if (value == null || value == ValidationPriority.Normal) {
+            jgen.writeNull();
+        } else {
             jgen.writeString(new Byte(value.getValue()).toString());
         }
     }
