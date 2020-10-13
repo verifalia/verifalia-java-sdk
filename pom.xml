@@ -36,7 +36,7 @@
 
 	<properties>
 		<jackson.version>1.9.3</jackson.version>
-		<junit.version>4.8.1</junit.version>
+		<junit.version>4.13.1</junit.version>
 		<lombok.version>1.18.4</lombok.version>
 		<apache.commons.version>3.9</apache.commons.version>
 		<http.client.version>4.5.12</http.client.version>
