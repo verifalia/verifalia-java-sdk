@@ -39,7 +39,7 @@
 		<junit.version>4.8.1</junit.version>
 		<lombok.version>1.18.4</lombok.version>
 		<apache.commons.version>3.9</apache.commons.version>
-		<http.client.version>4.5.12</http.client.version>
+		<http.client.version>4.5.13</http.client.version>
 		<http.mime.version>4.5.12</http.mime.version>
 		<json.lib.version>2.4</json.lib.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
